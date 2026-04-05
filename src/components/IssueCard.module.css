@@ -1,0 +1,87 @@
+.card {
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+
+    overflow: hidden;
+
+    transition: all 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary);
+}
+
+/* COVER */
+
+.coverWrapper {
+    background-color: var(--surface-hover);
+    padding: 1.5rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 260px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.placeholderCover {
+    width: 160px;
+    height: 220px;
+
+    background-color: var(--border);
+    border-radius: var(--radius-sm);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--foreground-muted);
+    font-size: 0.875rem;
+}
+
+/* INFO */
+
+.info {
+    padding: 1.5rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+/* BADGE */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 0.25rem 0.75rem;
+
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    border-radius: 9999px;
+
+    background-color: var(--surface-hover);
+    color: var(--foreground-muted);
+
+    width: fit-content;
+}
+
+.digital {
+    color: var(--primary);
+}
