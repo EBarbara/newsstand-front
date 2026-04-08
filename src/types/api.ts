@@ -33,3 +33,8 @@ export type IssueDetail = IssueList & {
     file_path?: string | null;
     sections: IssueSection[];
 };
+
+export type Page = {
+    index: number;
+    name: string;
+}

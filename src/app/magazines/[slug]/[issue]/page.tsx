@@ -13,7 +13,6 @@ export default async function Page({ params }: Props) {
     const issueId = parseInt(issue, 10);
 
     const issueData = await getIssueDetail(slug, Number(issueId));
-    console.log(issueData);
 
     return (
         <div className="flex flex-col gap-8">
