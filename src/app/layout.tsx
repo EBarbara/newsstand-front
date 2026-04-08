@@ -38,7 +38,7 @@ export default function RootLayout({
             <Link href="/public" className={styles.logo}>Magazine List</Link>
 
             <nav className={styles.nav}>
-              <Link href="/issues" className={styles.navlink}>Issues</Link>
+              <Link href="/magazines" className={styles.navLink}>Magazines</Link>
               <Link href="/people" className={styles.navlink}>People</Link>
               <Link href="/sections" className={styles.navlink}>Sections</Link>
             </nav>

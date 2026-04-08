@@ -1,36 +1,35 @@
-export interface Person {
-    id: number;
+// types/api.ts
+
+export type Magazine = {
     name: string;
-}
+    slug: string;
+};
 
-export interface Credit {
-    id: number;
-    person?: Person | null;
-}
-
-export interface SectionInfo {
-    id: number;
-    name: string;
-}
-
-export interface Section {
-    id: number;
-    page: number | null;
-    section?: SectionInfo | null;
-    credits: Credit[];
-}
-
-export interface Cover {
+export type IssueCover = {
     id: number;
     image: string;
-}
+};
 
-export interface Issue {
+export type IssueList = {
     id: number;
     publishing_date: string;
-    edition: number;
-    file_path: string | null;
-    is_digital: boolean | null;
-    covers: Cover[];
-    sections: Section[];
-}
+    edition: number | null;
+    is_digital: string;
+    magazine: Magazine;
+    covers: IssueCover[];
+};
+
+export type IssueSection = {
+    id: number;
+    section: {
+        id: number;
+        name: string;
+    };
+    page: number | null;
+    page_indexes: number[];
+};
+
+export type IssueDetail = IssueList & {
+    file_path?: string | null;
+    sections: IssueSection[];
+};

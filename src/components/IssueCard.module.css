@@ -85,3 +85,19 @@
 .digital {
     color: var(--primary);
 }
+
+.subtitle {
+    font-size: 0.875rem;
+    color: var(--foreground-muted);
+}
+
+.magazineLink {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.magazineLink:hover {
+    text-decoration: underline;
+}
