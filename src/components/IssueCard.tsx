@@ -4,7 +4,7 @@ import clsx from "clsx";
 import styles from "./IssueCard.module.css";
 import IssueCover from "@/components/IssueCover";
 import { IssueList } from "@/types/api";
-import { formatIssueDate } from "@/utils/date";
+import { formatIssueDate } from "@/lib/date";
 
 interface props {
     issue: IssueList;
@@ -16,7 +16,7 @@ export default function IssueCard({ issue }: props) {
     return (
         <div className={styles.card}>
             <Link
-                href={`/magazines/${issue.magazine.slug}/${issue.id}`}
+                href={`/magazines/${issue.magazine.slug}/${issue.edition}`}
                 className={styles.coverWrapper}
             >
                 {/* COVER */}

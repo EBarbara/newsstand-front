@@ -10,14 +10,18 @@ export function getIssuesByMagazine(slug: string) {
     return request<IssueList[]>(`/magazines/${slug}/issues/`);
 }
 
-export function getIssueDetail(slug: string, id: number) {
-    return request<IssueDetail>(`/magazines/${slug}/issues/${id}/`);
+export function getIssueDetail(slug: string, edition: string) {
+    return request<IssueDetail>(`/magazines/${slug}/issues/${edition}/`);
 }
 
-export function getIssuePages(slug: string, id: number) {
-    return request<Page[]>(`/magazines/${slug}/issues/${id}/pages/`);
+export function getIssuePages(id: number) {
+    return request<Page[]>(`/issues/${id}/pages/`);
 }
 
-export function getPageImageUrl(slug: string, id: number, index: number) {
-    return `${process.env.NEXT_PUBLIC_API_URL}/magazines/${slug}/issues/${id}/pages/${index}/`;
+export async function getSectionPages(issueId: number, sectionId: number) {
+    return request<Page[]>(`/issues/${issueId}/sections/${sectionId}/pages`);
+}
+
+export function getPageImageUrl(id: number, index: number) {
+    return `${process.env.NEXT_PUBLIC_API_URL}/issues/${id}/pages/${index}/`;
 }

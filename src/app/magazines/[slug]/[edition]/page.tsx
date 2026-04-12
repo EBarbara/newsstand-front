@@ -4,22 +4,25 @@ import Link from "next/link";
 type Props = {
     params: Promise<{
         slug: string;
-        issue: string;
+        edition: string;
     }>;
 };
 
 export default async function Page({ params }: Props) {
-    const { slug, issue } = await params;
-    const issueId = parseInt(issue, 10);
+    const { slug, edition } = await params;
 
-    const issueData = await getIssueDetail(slug, Number(issueId));
+    if (!slug || !edition) {
+        throw new Error("Invalid params");
+    }
+
+    const issueData = await getIssueDetail(slug, edition);
 
     return (
         <div className="flex flex-col gap-8">
 
             {/* BREADCRUMB */}
             <nav className="text-sm text-gray-500">
-                <Link href="/">Home</Link> /{" "}
+                <Link href="/public">Home</Link> /{" "}
                 <Link href="/magazines">Magazines</Link> /{" "}
                 <Link href={`/magazines/${slug}`}>
                     {issueData.magazine.name}
@@ -59,7 +62,7 @@ export default async function Page({ params }: Props) {
             {/* ACTIONS */}
             <div>
                 <Link
-                    href={`/magazines/${slug}/${issueId}/read`}
+                    href={`/magazines/${slug}/${edition}/read`}
                     className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
                     Read Issue
