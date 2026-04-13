@@ -20,19 +20,17 @@ export default function IssueCard({ issue }: props) {
                 className={styles.coverWrapper}
             >
                 {/* COVER */}
-                <div className={styles.coverWrapper}>
-                    {hasCover ? (
-                        <IssueCover
-                            imageUrl={issue.covers[0].image}
-                            altText={`Cover for issue ${issue.id}`}
-                            defaultWidth={160}
-                        />
-                        ) : (
-                        <div className={styles.placeholderCover}>
-                            No Cover
-                        </div>
-                    )}
-                </div>
+                {hasCover ? (
+                    <IssueCover
+                        imageUrl={issue.covers[0].image}
+                        altText={`Cover for issue ${issue.id}`}
+                        defaultWidth={240}
+                    />
+                ) : (
+                    <div className={styles.placeholderCover}>
+                        No Cover
+                    </div>
+                )}
             </Link>
 
             {/* INFO */}

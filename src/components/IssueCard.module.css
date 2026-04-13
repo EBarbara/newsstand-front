@@ -21,28 +21,25 @@
 
 .coverWrapper {
     background-color: var(--surface-hover);
-    padding: 1.5rem;
 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 
-    min-height: 260px;
+    padding: 0.5rem 0.5rem 0 0.5rem; /* menos padding embaixo */
 
     border-bottom: 1px solid var(--border);
 }
 
 .placeholderCover {
-    width: 160px;
-    height: 220px;
-
-    background-color: var(--border);
-    border-radius: var(--radius-sm);
+    width: 100%;
+    height: 100%;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    background-color: var(--border);
     color: var(--foreground-muted);
     font-size: 0.875rem;
 }
@@ -50,10 +47,7 @@
 /* INFO */
 
 .info {
-    padding: 1.5rem;
-
-    display: flex;
-    flex-direction: column;
+    padding: 1rem;
     gap: 0.5rem;
 }
 
