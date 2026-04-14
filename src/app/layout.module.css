@@ -63,7 +63,7 @@
     width: 100%;
     padding: 2rem;
 
-    display: flex;          /* 👈 ADICIONAR */
-    flex-direction: column; /* 👈 ADICIONAR */
-    overflow: hidden;       /* 👈 ADICIONAR */
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
 }

@@ -1,5 +1,7 @@
-import { getIssueDetail } from "@/lib/issues";
 import Link from "next/link";
+
+import SectionCard from "@/components/SectionCard";
+import { getIssueDetail } from "@/lib/issues";
 
 type Props = {
     params: Promise<{
@@ -80,22 +82,13 @@ export default async function Page({ params }: Props) {
                 ) : (
                     <ul className="flex flex-col gap-2">
                         {issueData.sections.map((section) => (
-                            <li
+                            <SectionCard
                                 key={section.id}
-                                className="border p-3 rounded"
-                            >
-                                <div className="font-medium">
-                                    <Link href={`/magazines/${slug}/${edition}/read?section=${section.id}`}>
-                                        {section.section.name}
-                                    </Link>
-                                </div>
-
-                                {section.page && (
-                                    <div className="text-sm text-gray-500">
-                                        Page {section.page}
-                                    </div>
-                                )}
-                            </li>
+                                section={section}
+                                slug={slug}
+                                edition={edition}
+                                issueId={issueData.id}
+                            />
                         ))}
                     </ul>
                 )}
