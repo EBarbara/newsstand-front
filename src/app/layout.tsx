@@ -32,7 +32,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
-      <body>
+    <body className="flex flex-col min-h-screen">
         <div className={styles.app}>
           <header className={styles.header}>
             <Link href="/public" className={styles.logo}>Magazine List</Link>

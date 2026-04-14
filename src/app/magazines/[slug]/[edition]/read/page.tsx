@@ -17,6 +17,9 @@ export default async function Page({ params }: Props) {
         <Reader
             issueId={issueData.id}
             pages={pages}
+            sections={issueData.sections}
+            slug={slug}
+            edition={edition}
         />
     );
 }

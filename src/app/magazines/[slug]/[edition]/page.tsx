@@ -85,7 +85,9 @@ export default async function Page({ params }: Props) {
                                 className="border p-3 rounded"
                             >
                                 <div className="font-medium">
-                                    {section.section.name}
+                                    <Link href={`/magazines/${slug}/${edition}/read?section=${section.id}`}>
+                                        {section.section.name}
+                                    </Link>
                                 </div>
 
                                 {section.page && (
