@@ -27,6 +27,7 @@ export type IssueSection = {
     };
     page: number | null;
     page_indexes: number[];
+    text_content: string | null;
 };
 
 export type IssueDetail = IssueList & {
