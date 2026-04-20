@@ -24,7 +24,7 @@ export default async function Page({ params }: Props) {
 
             {/* BREADCRUMB */}
             <nav className="text-sm text-gray-500">
-                <Link href="/public">Home</Link> /{" "}
+                <Link href="/">Home</Link> /{" "}
                 <Link href="/magazines">Magazines</Link> /{" "}
                 <Link href={`/magazines/${slug}`}>
                     {issueData.magazine.name}
@@ -36,9 +36,9 @@ export default async function Page({ params }: Props) {
             <header className="flex gap-6 items-start">
 
                 {/* COVER */}
-                {issueData.covers?.[0] && (
+                {issueData.cover && (
                     <img
-                        src={issueData.covers[0].image}
+                        src={issueData.cover}
                         alt="Cover"
                         className="w-40 rounded shadow"
                     />
@@ -54,17 +54,13 @@ export default async function Page({ params }: Props) {
                         {issueData.publishing_date}
                         {issueData.edition && ` • Issue #${issueData.edition}`}
                     </p>
-
-                    <div className="text-sm">
-                        {issueData.is_digital ? "Digital" : "Physical"}
-                    </div>
                 </div>
             </header>
 
             {/* ACTIONS */}
             <div>
                 <Link
-                    href={`/magazines/${slug}/${edition}/read`}
+                    href={`/reader/${issueData.id}`}
                     className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
                     Read Issue

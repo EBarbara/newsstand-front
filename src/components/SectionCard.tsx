@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { IssueSection } from "@/types/api";
-import {getPageImageUrl} from "@/lib/issues";
+import { getPageImageUrl } from "@/lib/issues";
+import { IssueSection } from "@/@types/issueSection";
 
 type Props = {
     section: IssueSection;
@@ -11,11 +11,11 @@ type Props = {
 };
 
 export default function SectionCard({ section, slug, edition, issueId, }: Props) {
-    const firstIndex = section.page_indexes?.[0];
+    const firstIndex = section.segments[0]?.start_page;
 
     return (
         <Link
-            href={`/magazines/${slug}/${edition}/read?section=${section.id}`}
+            href={`/reader/${issueId}?section=${section.id}`}
             className="flex items-center gap-4 border p-4 rounded hover:bg-gray-900 transition"
         >
             <div className="flex flex-col flex-1 min-w-0">

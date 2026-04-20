@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Magazine } from "@/types/api";
+import { Magazine } from "@/@types/magazine";
 
 export default function MagazineCard({ mag }: { mag: Magazine }) {
     return (

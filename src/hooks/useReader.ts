@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 
-import { IssueSection } from "@/types/api";
 import { getIssuePages, getSectionPages } from "@/lib/issues";
 import { normalizePages } from "@/lib/reader";
+import { IssueSection } from "@/@types/issueSection";
 
 type ReaderMode = "issue" | "section";
 
@@ -21,7 +21,7 @@ export function useReader(issueId: number, initialIndexes: number[]){
         const pages = await getIssuePages(issueId);
         const indexes = normalizePages(pages);
 
-        const first = section.page_indexes?.[0];
+        const first = section.segments[0]?.start_page;
         const startIndex = indexes[first];
 
         setPageIndexes(indexes);

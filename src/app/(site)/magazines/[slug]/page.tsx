@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { getIssuesByMagazine } from "@/lib/issues";
-import IssueCard from "@/components/IssueCard";
+import IssueCard from "@/components/issueCard/IssueCard";
 
 type Props = {
     params: Promise<{ slug: string; }>

@@ -1,17 +1,17 @@
 // lib/issues.ts
 import { request } from './api';
-import { IssueList, IssueDetail, Page } from '@/types/api';
+import { Issue } from "@/@types/issue";
 
 export function getRecentIssues() {
-    return request<IssueList[]>('/issues/recent/');
+    return request<Issue[]>('/issues/recent/');
 }
 
 export function getIssuesByMagazine(slug: string) {
-    return request<IssueList[]>(`/magazines/${slug}/issues/`);
+    return request<Issue[]>(`/magazines/${slug}/issues/`);
 }
 
 export function getIssueDetail(slug: string, edition: string) {
-    return request<IssueDetail>(`/magazines/${slug}/issues/${edition}/`);
+    return request<Issue>(`/magazines/${slug}/issues/${edition}/`);
 }
 
 export function getIssuePages(id: number) {

@@ -1,0 +1,9 @@
+.reader-root {
+    position: fixed;
+    inset: 0;
+
+    background: black;
+    overflow: hidden;
+
+    display: flex;
+}

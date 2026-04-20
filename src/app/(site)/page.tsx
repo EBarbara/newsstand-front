@@ -1,10 +1,10 @@
 import styles from "./page.module.css";
-import { IssueList } from "@/types/api";
 import { getRecentIssues } from "@/lib/issues";
-import IssueCard from "@/components/IssueCard";
+import IssueCard from "@/components/issueCard/IssueCard";
+import { Issue } from "@/@types/issue";
 
 export default async function Home() {
-    let issues: IssueList[] = [];
+    let issues: Issue[] = [];
 
     try {
         issues = await getRecentIssues();

@@ -1,5 +1,3 @@
-import { Page } from '@/types/api'
-
 export function normalizePages(pages: Page[]): number[] {
     return pages.map(p => p.index)
 }
