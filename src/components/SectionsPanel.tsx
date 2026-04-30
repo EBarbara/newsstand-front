@@ -29,9 +29,7 @@ export default function SectionsPanel({
                                           savedSections
 }: Props) {
     return (
-        <div
-            style={{ width: 250, padding: 10 }}
-        >
+        <div className="w-[250px] p-2.5">
 
             {/* SELECT */}
             <select
@@ -40,7 +38,7 @@ export default function SectionsPanel({
                     e.stopPropagation()
                     setSelectedTemplate(Number(e.target.value))
                 }}
-                style={{ width: "100%", marginBottom: 8 }}
+                className="w-full mb-2 p-1 border rounded"
             >
                 <option value="">Select section type</option>
                 {availableSections.map((s) => (
@@ -53,7 +51,7 @@ export default function SectionsPanel({
             {/* BOTÃO */}
             <button
                 onClick={createSection}
-                style={{ width: "100%", marginBottom: 12 }}
+                className="w-full mb-3 p-2 border border-gray-300 bg-gray-100 rounded hover:bg-gray-200"
             >
                 + Add Section
             </button>
@@ -66,12 +64,7 @@ export default function SectionsPanel({
                         e.stopPropagation()
                         setSelectedSectionId(prev => (prev === s.id ? null : s.id))
                     }}
-                    style={{
-                        padding: 8,
-                        borderRadius: 6,
-                        cursor: "pointer",
-                        backgroundColor: selectedSectionId === s.id ? "#f0f0f0" : "transparent"
-                    }}
+                    className={`p-2 rounded-md cursor-pointer ${selectedSectionId === s.id ? "bg-[#f0f0f0]" : "bg-transparent"}`}
                 >
                     {selectedSectionId === s.id ? (
                         <>
@@ -79,7 +72,7 @@ export default function SectionsPanel({
                                 value={s.title || ""}
                                 onChange={(e) => updateSectionTitle(s.id, e.target.value)}
                                 onClick={(e) => e.stopPropagation()}
-                                style={{ width: "100%", marginBottom: 6 }}
+                                className="w-full mb-1.5 px-2 py-1 border rounded"
                             />
 
                             <button
@@ -88,20 +81,7 @@ export default function SectionsPanel({
                                     saveSection(s.id)
                                 }}
                                 disabled={savingSections[s.id]}
-                                style={{
-                                    width: "100%",
-                                    marginTop: 6,
-                                    padding: "6px 8px",
-                                    background: savingSections[s.id]
-                                        ? "#999"
-                                        : savedSections[s.id]
-                                            ? "#2e7d32"
-                                            : "#1976d2",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: 4,
-                                    cursor: "pointer",
-                                }}
+                                className={`w-full mt-1.5 px-2 py-1.5 text-white border-none rounded cursor-pointer ${savingSections[s.id] ? "bg-[#999]" : savedSections[s.id] ? "bg-[#2e7d32]" : "bg-[#1976d2]"}`}
                             >
                                 {savingSections[s.id]
                                     ? "Saving..."

@@ -9,7 +9,7 @@ export default async function Home() {
     try {
         issues = await getRecentIssues();
     } catch (error) {
-        console.error(error);
+        console.error("Error fetching recent issues:", error);
     }
 
     return (

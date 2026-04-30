@@ -42,30 +42,42 @@ export function useIssueEditor(slug: string, edition: string) {
     const [pageMap, setPageMap] = useState<PageMap>({});
 
     useEffect(() => {
+        let isMounted = true;
+        
         async function load() {
-            const data = await getIssueDetail(slug, edition);
+            try {
+                const data = await getIssueDetail(slug, edition);
+                if (!isMounted) return;
 
-            setIssue(data);
-            setSections(data.sections);
+                setIssue(data);
+                setSections(data.sections);
 
-            const map: PageMap = {}
+                const map: PageMap = {}
 
-            data.sections.forEach(section => {
-                section.segments.forEach(segment => {
-                    for (let p = segment.start_page; p <= segment.end_page; p++) {
-                        map[p] = section.id;
-                    }
+                data.sections.forEach(section => {
+                    section.segments.forEach(segment => {
+                        for (let p = segment.start_page; p <= segment.end_page; p++) {
+                            map[p] = section.id;
+                        }
+                    })
                 })
-            })
 
-            setPageMap(map);
+                setPageMap(map);
+            } catch (err) {
+                console.error("Failed to load issue details", err);
+            }
         }
 
         void load();
+        return () => { isMounted = false };
     }, [slug, edition]);
 
     useEffect(() => {
-        getSections().then(setAvailableSections);
+        let isMounted = true;
+        getSections()
+            .then(data => { if (isMounted) setAvailableSections(data); })
+            .catch(console.error);
+        return () => { isMounted = false };
     }, []);
 
     async function createSection() {
@@ -128,6 +140,9 @@ export function useIssueEditor(slug: string, edition: string) {
             setTimeout(() => {
                 setSavedSections(prev => ({ ...prev, [sectionId]: false }))
             }, 2000);
+        } catch (error) {
+            console.error("Failed to save section", error);
+            alert("Failed to save section. Please try again.");
         } finally {
             setSavingSections(prev => ({ ...prev, [sectionId]: false }))
         }

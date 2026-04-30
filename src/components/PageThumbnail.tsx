@@ -12,13 +12,10 @@ export default function PageThumbnail({ page, image, sectionId, onClick }: Props
                 e.stopPropagation()
                 onClick()
             }}
-            style={{
-                border: sectionId ? "3px solid blue" : "1px solid #ccc",
-                cursor: "pointer"
-            }}
+            className={`cursor-pointer border ${sectionId ? "border-[3px] border-blue-500" : "border-[#ccc]"}`}
         >
-            <img src={image} style={{ width: "100%" }} />
-            <div style={{ textAlign: "center" }}>{page}</div>
+            <img src={image} className="w-full" alt={`Page ${page}`} />
+            <div className="text-center">{page}</div>
         </div>
     )
 }

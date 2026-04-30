@@ -22,12 +22,6 @@ export default function SectionCard({ section, slug, edition, issueId, }: Props)
                 <div className="font-medium">
                     {section.title || section.section.name}
                 </div>
-
-                {section.page && (
-                    <div className="text-sm text-gray-500">
-                        Page {section.page}
-                    </div>
-                )}
             </div>
 
             {/* THUMBNAIL */}
