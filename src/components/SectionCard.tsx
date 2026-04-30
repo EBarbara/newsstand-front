@@ -20,7 +20,7 @@ export default function SectionCard({ section, slug, edition, issueId, }: Props)
         >
             <div className="flex flex-col flex-1 min-w-0">
                 <div className="font-medium">
-                    {section.section.name}
+                    {section.title || section.section.name}
                 </div>
 
                 {section.page && (

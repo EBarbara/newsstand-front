@@ -58,12 +58,19 @@ export default async function Page({ params }: Props) {
             </header>
 
             {/* ACTIONS */}
-            <div>
+            <div className="flex gap-2">
                 <Link
                     href={`/reader/${issueData.id}`}
                     className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
                     Read Issue
+                </Link>
+
+                <Link
+                    href={`/magazines/${slug}/${edition}/edit`}
+                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                >
+                    Edit Issue
                 </Link>
             </div>
 
