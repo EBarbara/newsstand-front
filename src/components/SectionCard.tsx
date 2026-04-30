@@ -1,17 +1,21 @@
 import Link from "next/link";
 
-import { getPageImageUrl } from "@/lib/issues";
+import { getMediaUrl } from "@/lib/issues";
 import { IssueSection } from "@/@types/issueSection";
+import { Render } from "@/@types/render";
 
 type Props = {
     section: IssueSection;
     slug: string;
     edition: string;
     issueId: number;
+    renders: Render[];
 };
 
-export default function SectionCard({ section, slug, edition, issueId, }: Props) {
+export default function SectionCard({ section, slug, edition, issueId, renders }: Props) {
     const firstIndex = section.segments[0]?.start_page;
+    const render = renders?.find((r) => r.order === firstIndex);
+    const imageUrl = render ? getMediaUrl(render.image) : null;
 
     return (
         <Link
@@ -25,9 +29,9 @@ export default function SectionCard({ section, slug, edition, issueId, }: Props)
             </div>
 
             {/* THUMBNAIL */}
-            {firstIndex !== undefined && (
+            {imageUrl && (
                 <img
-                    src={getPageImageUrl(issueId, firstIndex)}
+                    src={imageUrl}
                     className="h-40 w-auto shrink-0 object-contain bg-gray-950 rounded shadow p-1"
                     alt={section.section.name}
                     loading="lazy"

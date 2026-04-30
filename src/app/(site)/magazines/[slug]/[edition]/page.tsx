@@ -91,6 +91,7 @@ export default async function Page({ params }: Props) {
                                 slug={slug}
                                 edition={edition}
                                 issueId={issueData.id}
+                                renders={issueData.renders}
                             />
                         ))}
                     </ul>

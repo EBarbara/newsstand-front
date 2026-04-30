@@ -4,6 +4,8 @@ import { Issue } from "@/@types/issue";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
 
+import { Render } from "@/@types/render";
+
 export function getRecentIssues() {
     return request<Issue[]>('/issues/recent/');
 }
@@ -14,6 +16,13 @@ export function getIssuesByMagazine(slug: string) {
 
 export function getIssueDetail(slug: string, edition: string) {
     return request<Issue>(`/magazines/${slug}/issues/${edition}/`);
+}
+
+export function getMediaUrl(path: string) {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    const apiHost = new URL(process.env.NEXT_PUBLIC_API_URL!).origin;
+    return `${apiHost}${path}`;
 }
 
 export function getPageImageUrl(id: number, index: number) {
