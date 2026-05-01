@@ -1,6 +1,6 @@
 "use client"
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 import { pagesToSegments } from "@/lib/editor";
 import { createIssueSection, getIssueDetail, getSections, updateIssueSection } from "@/lib/issues";
@@ -132,11 +132,15 @@ export function useIssueEditor(slug: string, edition: string) {
                 .map(([page]) => Number(page));
 
             const segments = pagesToSegments(pages);
-
             await updateIssueSection(issue.id, sectionId, {
                 segments,
                 title: section.title ?? ""
             });
+
+            // Update local state to reflect the new segments
+            setSections(prev => prev.map(s =>
+                s.id === sectionId ? { ...s, segments } : s
+            ));
 
             setSavedSections(prev => ({ ...prev, [sectionId]: true }))
 
@@ -151,9 +155,17 @@ export function useIssueEditor(slug: string, edition: string) {
         }
     }
 
+    const sortedSections = useMemo(() => {
+        return [...sections].sort((a, b) => {
+            const aMin = a.segments.length > 0 ? Math.min(...a.segments.map(s => s.start_page)) : Infinity;
+            const bMin = b.segments.length > 0 ? Math.min(...b.segments.map(s => s.start_page)) : Infinity;
+            return aMin - bMin;
+        });
+    }, [sections]);
+
     return {
         issue,
-        sections,
+        sections: sortedSections,
         availableSections,
 
         selectedSectionId,
