@@ -26,6 +26,7 @@ export type IssueEditorState = {
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
+    error: string | null
 }
 
 export function useIssueEditor(slug: string, edition: string) {
@@ -40,6 +41,7 @@ export function useIssueEditor(slug: string, edition: string) {
     const [savedSections, setSavedSections] = useState<Record<number, boolean>>({})
 
     const [pageMap, setPageMap] = useState<PageMap>({});
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -65,6 +67,7 @@ export function useIssueEditor(slug: string, edition: string) {
                 setPageMap(map);
             } catch (err) {
                 console.error("Failed to load issue details", err);
+                setError("Failed to load issue details. Make sure the API is reachable.");
             }
         }
 
@@ -168,5 +171,6 @@ export function useIssueEditor(slug: string, edition: string) {
         saveSection,
         savingSections,
         savedSections,
+        error,
     }
 }

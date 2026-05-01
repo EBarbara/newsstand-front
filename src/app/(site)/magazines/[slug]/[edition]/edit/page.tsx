@@ -1,10 +1,10 @@
 import IssueEditor from "@/components/editor/IssueEditor";
 
 type Props = {
-    params: {
+    params: Promise<{
         slug: string
         edition: string
-    }
+    }>
 }
 
 export default async function IssueEditorPage({ params }: Props) {

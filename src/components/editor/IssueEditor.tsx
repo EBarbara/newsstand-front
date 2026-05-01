@@ -12,6 +12,7 @@ type Props = {
 export default function IssueEditor({ slug, edition }: Props) {
     const editor = useIssueEditor(slug, edition);
 
+    if (editor.error) return <div className="p-10 text-red-500 font-bold">{editor.error}</div>
     if (!editor.issue) return <div>Loading...</div>
 
     return (

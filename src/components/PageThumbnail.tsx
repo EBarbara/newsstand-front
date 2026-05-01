@@ -1,3 +1,5 @@
+import { getMediaUrl } from "@/lib/issues";
+
 type Props = {
     page: number
     image: string
@@ -14,7 +16,7 @@ export default function PageThumbnail({ page, image, sectionId, onClick }: Props
             }}
             className={`cursor-pointer border ${sectionId ? "border-[3px] border-blue-500" : "border-[#ccc]"}`}
         >
-            <img src={image} className="w-full" alt={`Page ${page}`} />
+            <img src={getMediaUrl(image)} className="w-full" alt={`Page ${page}`} />
             <div className="text-center">{page}</div>
         </div>
     )
