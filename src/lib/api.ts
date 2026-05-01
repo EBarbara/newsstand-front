@@ -1,19 +1,25 @@
 const IS_SERVER = typeof window === 'undefined';
 
-// Next.js inlines NEXT_PUBLIC_ variables at build time.
-// If missing at runtime in the browser, we try to deduce it from the current location.
-let PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
+// 1. Get the Public URL
+// This is what the browser uses, and what the server uses for image links.
+let publicUrl = process.env.NEXT_PUBLIC_API_URL;
 
-if (!IS_SERVER && !PUBLIC_API_URL) {
-    const host = window.location.hostname;
-    const protocol = window.location.protocol;
-    PUBLIC_API_URL = `${protocol}//${host}:8000/api/v2`;
+if (!IS_SERVER && !publicUrl) {
+    publicUrl = `${window.location.protocol}//${window.location.hostname}:8080/api/v2`;
 }
 
-const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
+if (IS_SERVER && !publicUrl) {
+    // Default fallback for SSR if no env is provided during build
+    publicUrl = 'http://192.168.0.10:8080/api/v2';
+}
 
-let _api_url = (IS_SERVER && INTERNAL_API_URL) ? INTERNAL_API_URL : PUBLIC_API_URL;
-let _media_url = PUBLIC_API_URL;
+// 2. Media URL is ALWAYS the one accessible by the user's browser.
+let _media_url = publicUrl;
+
+// 3. API URL for server-side fetching.
+// If INTERNAL_API_URL is set (e.g. in Docker), we use it for faster SSR-to-Backend calls.
+const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
+let _api_url = (IS_SERVER && INTERNAL_API_URL) ? INTERNAL_API_URL : publicUrl;
 
 // Ensure protocols
 if (_api_url && !_api_url.startsWith('http')) _api_url = `http://${_api_url}`;
