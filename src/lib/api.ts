@@ -2,24 +2,39 @@ const IS_SERVER = typeof window === 'undefined';
 const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL!;
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
 
-const API_URL = (IS_SERVER && INTERNAL_API_URL) ? INTERNAL_API_URL : PUBLIC_API_URL;
+let API_URL = (IS_SERVER && INTERNAL_API_URL) ? INTERNAL_API_URL : PUBLIC_API_URL;
+
+// Ensure API_URL has a protocol
+if (API_URL && !API_URL.startsWith('http')) {
+    API_URL = `http://${API_URL}`;
+}
 
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | undefined>;
 }
 
 function buildUrl(path: string, params?: RequestOptions['params']) {
-    const url = new URL(`${API_URL}${path}`);
-
-    if (params) {
-        Object.entries(params).forEach(([key, value]) => {
-            if (value !== undefined) {
-                url.searchParams.append(key, String(value));
-            }
-        });
+    if (!API_URL) {
+        console.error("API_URL is not defined. Check your environment variables.");
+        throw new Error("API_URL is not defined");
     }
 
-    return url.toString();
+    try {
+        const url = new URL(`${API_URL}${path}`);
+
+        if (params) {
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    url.searchParams.append(key, String(value));
+                }
+            });
+        }
+
+        return url.toString();
+    } catch (e) {
+        console.error(`Failed to construct URL with API_URL="${API_URL}" and path="${path}"`);
+        throw e;
+    }
 }
 
 export async function request<T>(
