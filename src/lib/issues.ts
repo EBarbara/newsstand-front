@@ -4,7 +4,6 @@ import { Issue } from "@/@types/issue";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
 
-import { Render } from "@/@types/render";
 
 export function getRecentIssues() {
     return request<Issue[]>('/issues/recent/');
