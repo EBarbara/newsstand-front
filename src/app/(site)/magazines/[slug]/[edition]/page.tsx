@@ -18,7 +18,13 @@ export default async function Page({ params }: Props) {
     }
 
     const issueData = await getIssueDetail(slug, edition);
-    console.log("issueData:", issueData);
+
+    // Sort sections by their earliest page assignment
+    const sortedSections = [...issueData.sections].sort((a, b) => {
+        const aMin = a.segments.length > 0 ? Math.min(...a.segments.map((s: any) => s.start_page)) : Infinity;
+        const bMin = b.segments.length > 0 ? Math.min(...b.segments.map((s: any) => s.start_page)) : Infinity;
+        return aMin - bMin;
+    });
 
     return (
         <div className="flex flex-col gap-8">
@@ -85,7 +91,7 @@ export default async function Page({ params }: Props) {
                     </p>
                 ) : (
                     <ul className="flex flex-col gap-2">
-                        {issueData.sections.map((section) => (
+                        {sortedSections.map((section) => (
                             <SectionCard
                                 key={section.id}
                                 section={section}
