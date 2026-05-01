@@ -12,7 +12,7 @@ type Props = {
     issue: Issue
 }
 
-export default function Reader({ issue }: Props){
+export default function Reader({ issue }: Props) {
     const [index, setIndex] = useState(0);
     const [mode, setMode] = useState<"image" | "text">("image");
     const [showControls, setShowControls] = useState(true);

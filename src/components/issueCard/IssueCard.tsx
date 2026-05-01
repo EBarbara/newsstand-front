@@ -4,6 +4,7 @@ import styles from "./IssueCard.module.css";
 import IssueCover from "@/components/issueCover/IssueCover";
 import { formatIssueDate } from "@/lib/date";
 import { Issue } from "@/@types/issue";
+import { getMediaUrl } from "@/lib/issues";
 
 export default function IssueCard({ issue }: { issue: Issue }) {
     return (
@@ -14,7 +15,7 @@ export default function IssueCard({ issue }: { issue: Issue }) {
                 className={styles.coverWrapper}
             >
                 <IssueCover
-                    imageUrl={issue.cover}
+                    imageUrl={getMediaUrl(issue.cover)}
                     altText={`Cover for issue ${issue.id}`}
                     defaultWidth={240}
                 />

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import SectionCard from "@/components/SectionCard";
-import { getIssueDetail } from "@/lib/issues";
+import { getIssueDetail, getMediaUrl } from "@/lib/issues";
 
 type Props = {
     params: Promise<{
@@ -18,6 +18,7 @@ export default async function Page({ params }: Props) {
     }
 
     const issueData = await getIssueDetail(slug, edition);
+    console.log("issueData:", issueData);
 
     return (
         <div className="flex flex-col gap-8">
@@ -38,7 +39,7 @@ export default async function Page({ params }: Props) {
                 {/* COVER */}
                 {issueData.cover && (
                     <img
-                        src={issueData.cover}
+                        src={getMediaUrl(issueData.cover)}
                         alt="Cover"
                         className="w-40 rounded shadow"
                     />

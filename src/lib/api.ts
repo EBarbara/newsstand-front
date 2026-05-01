@@ -40,8 +40,7 @@ function buildUrl(path: string, params?: RequestOptions['params']) {
 
     try {
         const fullUrl = `${API_URL}${path}`;
-        console.log(`[API Request] ${IS_SERVER ? 'SERVER' : 'CLIENT'}: ${fullUrl}`);
-        
+
         const url = new URL(fullUrl);
 
         if (params) {
