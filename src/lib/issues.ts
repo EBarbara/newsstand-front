@@ -14,7 +14,7 @@ export function getIssuesByMagazine(slug: string) {
 }
 
 export function getIssueDetail(slug: string, edition: string) {
-    return request<Issue>(`/magazines/${slug}/issues/${edition}/`);
+    return request<Issue>(`/magazines/${encodeURIComponent(slug)}/issues/${encodeURIComponent(edition)}/`);
 }
 
 export function getMediaUrl(path: string | null) {
