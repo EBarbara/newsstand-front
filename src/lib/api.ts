@@ -1,10 +1,20 @@
 const IS_SERVER = typeof window === 'undefined';
-const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL!;
+
+// Next.js inlines NEXT_PUBLIC_ variables at build time.
+// If missing at runtime in the browser, we try to deduce it from the current location.
+let PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!IS_SERVER && !PUBLIC_API_URL) {
+    const host = window.location.hostname;
+    const protocol = window.location.protocol;
+    PUBLIC_API_URL = `${protocol}//${host}:8000/api/v2`;
+}
+
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
 
 let API_URL = (IS_SERVER && INTERNAL_API_URL) ? INTERNAL_API_URL : PUBLIC_API_URL;
 
-// Ensure API_URL has a protocol
+// Ensure API_URL has a protocol (fallback for manually set envs without it)
 if (API_URL && !API_URL.startsWith('http')) {
     API_URL = `http://${API_URL}`;
 }
