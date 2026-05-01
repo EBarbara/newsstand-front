@@ -1,25 +1,28 @@
 const IS_SERVER = typeof window === 'undefined';
 
-// 1. Get the Public URL from environment or fallback
-let publicUrl = process.env.NEXT_PUBLIC_API_URL;
+// 1. API URL for Fetching
+// Server-side: uses INTERNAL_API_URL (can be Docker service name or IP)
+// Client-side: uses NEXT_PUBLIC_API_URL (must be accessible by browser)
+let _api = (IS_SERVER ? process.env.INTERNAL_API_URL : process.env.NEXT_PUBLIC_API_URL) || process.env.NEXT_PUBLIC_API_URL || '';
 
-if (!IS_SERVER && !publicUrl) {
-    // Client-side fallback
-    publicUrl = `${window.location.protocol}//${window.location.hostname}:8080/api/v2`;
+// 2. Media URL for Images
+// Uses NEXT_PUBLIC_IMAGE_HOSTNAME if defined, otherwise fallbacks to Public API URL.
+let _media = process.env.NEXT_PUBLIC_IMAGE_HOSTNAME || process.env.NEXT_PUBLIC_API_URL || '';
+
+// Browser-only fallback if everything is missing
+if (!IS_SERVER && !_api) {
+    _api = `${window.location.protocol}//${window.location.hostname}:8080/api/v2`;
+}
+if (!IS_SERVER && !_media) {
+    _media = `${window.location.protocol}//${window.location.hostname}:8080/api/v2`;
 }
 
-if (IS_SERVER && !publicUrl) {
-    // Server-side fallback (for local development without .env)
-    publicUrl = 'http://localhost:8080/api/v2';
-}
+// Ensure protocols
+if (_api && !_api.startsWith('http')) _api = `http://${_api}`;
+if (_media && !_media.startsWith('http')) _media = `http://${_media}`;
 
-// Ensure protocol
-if (publicUrl && !publicUrl.startsWith('http')) {
-    publicUrl = `http://${publicUrl}`;
-}
-
-export const API_URL = publicUrl || '';
-export const MEDIA_API_URL = publicUrl || '';
+export const API_URL = _api;
+export const MEDIA_API_URL = _media;
 
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | undefined>;
