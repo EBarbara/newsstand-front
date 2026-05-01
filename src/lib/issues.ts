@@ -1,5 +1,5 @@
 // lib/issues.ts
-import { request } from './api';
+import { request, MEDIA_API_URL } from './api';
 import { Issue } from "@/@types/issue";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
@@ -21,12 +21,11 @@ export function getIssueDetail(slug: string, edition: string) {
 export function getMediaUrl(path: string) {
     if (!path) return "";
     if (path.startsWith("http")) return path;
-    const apiHost = new URL(process.env.NEXT_PUBLIC_API_URL!).origin;
-    return `${apiHost}${path}`;
+    return `${MEDIA_API_URL}${path}`;
 }
 
 export function getPageImageUrl(id: number, index: number) {
-    return `${process.env.NEXT_PUBLIC_API_URL}/issues/${id}/pages/${index}/`;
+    return `${MEDIA_API_URL}/issues/${id}/pages/${index}/`;
 }
 
 export function getSections() {

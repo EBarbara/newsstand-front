@@ -12,12 +12,15 @@ if (!IS_SERVER && !PUBLIC_API_URL) {
 
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL;
 
-let API_URL = (IS_SERVER && INTERNAL_API_URL) ? INTERNAL_API_URL : PUBLIC_API_URL;
+let _api_url = (IS_SERVER && INTERNAL_API_URL) ? INTERNAL_API_URL : PUBLIC_API_URL;
+let _media_url = PUBLIC_API_URL;
 
-// Ensure API_URL has a protocol (fallback for manually set envs without it)
-if (API_URL && !API_URL.startsWith('http')) {
-    API_URL = `http://${API_URL}`;
-}
+// Ensure protocols
+if (_api_url && !_api_url.startsWith('http')) _api_url = `http://${_api_url}`;
+if (_media_url && !_media_url.startsWith('http')) _media_url = `http://${_media_url}`;
+
+export const API_URL = _api_url;
+export const MEDIA_API_URL = _media_url;
 
 type RequestOptions = RequestInit & {
     params?: Record<string, string | number | undefined>;
