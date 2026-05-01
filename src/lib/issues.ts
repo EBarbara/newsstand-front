@@ -17,11 +17,26 @@ export function getIssueDetail(slug: string, edition: string) {
     return request<Issue>(`/magazines/${slug}/issues/${edition}/`);
 }
 
-export function getMediaUrl(path: string) {
+export function getMediaUrl(path: string | null) {
     if (!path) return "";
-    if (path.startsWith("http")) return path;
-    console.log("MEDIA_API_URL:", MEDIA_API_URL);
-    return `${MEDIA_API_URL}${path}`;
+    
+    let cleanPath = path;
+    
+    // If Django returns a full URL (which it does during SSR), we strip the host
+    // and replace it with our public MEDIA_API_URL
+    if (path.startsWith("http")) {
+        try {
+            const url = new URL(path);
+            cleanPath = url.pathname;
+        } catch (e) {
+            // fallback
+        }
+    }
+    
+    // Ensure cleanPath starts with /
+    if (!cleanPath.startsWith('/')) cleanPath = `/${cleanPath}`;
+
+    return `${MEDIA_API_URL}${cleanPath}`;
 }
 
 export function getPageImageUrl(id: number, index: number) {

@@ -6,8 +6,12 @@ const IS_SERVER = typeof window === 'undefined';
 let _api = (IS_SERVER ? process.env.INTERNAL_API_URL : process.env.NEXT_PUBLIC_API_URL) || process.env.NEXT_PUBLIC_API_URL || '';
 
 // 2. Media URL for Images
-// Uses NEXT_PUBLIC_IMAGE_HOSTNAME if defined, otherwise fallbacks to Public API URL.
+// We want just the BASE host (e.g., http://192.168.0.10:8080) because media paths already include /media/
 let _media = process.env.NEXT_PUBLIC_IMAGE_HOSTNAME || process.env.NEXT_PUBLIC_API_URL || '';
+
+if (_media.includes('/api/v2')) {
+    _media = _media.split('/api/v2')[0];
+}
 
 // Browser-only fallback if everything is missing
 if (!IS_SERVER && !_api) {
