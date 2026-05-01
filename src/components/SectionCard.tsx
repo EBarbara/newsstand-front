@@ -16,6 +16,7 @@ export default function SectionCard({ section, slug, edition, issueId, renders }
     const firstIndex = section.segments[0]?.start_page;
     const render = renders?.find((r) => r.order === firstIndex);
     const imageUrl = render ? getMediaUrl(render.image) : null;
+    console.log("imageUrl:", imageUrl);
 
     return (
         <Link

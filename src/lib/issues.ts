@@ -20,6 +20,7 @@ export function getIssueDetail(slug: string, edition: string) {
 export function getMediaUrl(path: string) {
     if (!path) return "";
     if (path.startsWith("http")) return path;
+    console.log("MEDIA_API_URL:", MEDIA_API_URL);
     return `${MEDIA_API_URL}${path}`;
 }
 
