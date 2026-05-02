@@ -64,10 +64,13 @@ export async function request<T>(
 ): Promise<T> {
     const { params, ...fetchOptions } = options;
 
+    const isFormData = typeof FormData !== 'undefined' && fetchOptions.body instanceof FormData;
+    const defaultHeaders = isFormData ? {} : { 'Content-Type': 'application/json' };
+
     const res = await fetch(buildUrl(path, params), {
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
+            ...defaultHeaders,
             ...fetchOptions.headers,
         },
         ...fetchOptions,
