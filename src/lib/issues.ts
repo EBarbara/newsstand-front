@@ -53,6 +53,8 @@ export function updateIssueSection(
     data: {
         segments: { start_page: number; end_page: number }[],
         title: string,
+        text_content?: string,
+        section_id?: number,
     }
 ) {
     return request(
@@ -76,6 +78,19 @@ export function createIssueSection(
     return request<IssueSection>(`/issues/${issueId}/sections/`, {
         method: "POST",
         body: JSON.stringify(data),
+    })
+}
+
+export function deleteIssueSection(issueId: number, sectionId: number) {
+    return request(`/issues/${issueId}/sections/${sectionId}/`, {
+        method: "DELETE",
+    })
+}
+
+export function createSectionType(name: string) {
+    return request<Section>("/sections/", {
+        method: "POST",
+        body: JSON.stringify({ name }),
     })
 }
 

@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 import { pagesToSegments } from "@/lib/editor";
-import { createIssueSection, getIssueDetail, getSections, updateIssueSection } from "@/lib/issues";
+import { createIssueSection, createSectionType, deleteIssueSection, getIssueDetail, getSections, updateIssueSection } from "@/lib/issues";
 import { Issue } from "@/@types/issue";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
@@ -22,7 +22,11 @@ export type IssueEditorState = {
     pageMap: PageMap
     assignPage: (page: number) => void
     createSection: () => void
+    deleteSection: (sectionId: number) => void
     updateSectionTitle: (sectionId: number, title: string) => void
+    updateSectionText: (sectionId: number, text: string) => void
+    updateSectionType: (sectionId: number, typeId: number) => void
+    createNewSectionType: (name: string) => Promise<void>
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
@@ -100,6 +104,40 @@ export function useIssueEditor(slug: string, edition: string) {
         setSelectedSectionId(newSection.id)
     }
 
+    async function deleteSection(sectionId: number) {
+        if (!issue) return
+        if (!confirm("Are you sure you want to delete this section?")) return
+
+        try {
+            await deleteIssueSection(issue.id, sectionId)
+            setSections(prev => prev.filter(s => s.id !== sectionId))
+            setPageMap(prev => {
+                const newMap = { ...prev }
+                Object.keys(newMap).forEach(page => {
+                    if (newMap[Number(page)] === sectionId) {
+                        newMap[Number(page)] = null
+                    }
+                })
+                return newMap
+            })
+            if (selectedSectionId === sectionId) setSelectedSectionId(null)
+        } catch (error) {
+            console.error("Failed to delete section", error);
+            alert("Failed to delete section.");
+        }
+    }
+
+    async function createNewSectionType(name: string) {
+        try {
+            const newType = await createSectionType(name)
+            setAvailableSections(prev => [...prev, newType])
+            setSelectedTemplate(newType.id)
+        } catch (error) {
+            console.error("Failed to create section type", error);
+            alert("Failed to create section type.");
+        }
+    }
+
     function assignPage(page: number) {
         if (!selectedSectionId) return;
 
@@ -113,6 +151,25 @@ export function useIssueEditor(slug: string, edition: string) {
         setSections(prev =>
             prev.map(s =>
                 s.id === sectionId ? { ...s, title } : s
+            )
+        )
+    }
+
+    function updateSectionText(sectionId: number, text: string) {
+        setSections(prev =>
+            prev.map(s =>
+                s.id === sectionId ? { ...s, text_content: text } : s
+            )
+        )
+    }
+
+    function updateSectionType(sectionId: number, typeId: number) {
+        const type = availableSections.find(t => t.id === typeId)
+        if (!type) return
+
+        setSections(prev =>
+            prev.map(s =>
+                s.id === sectionId ? { ...s, section: type } : s
             )
         )
     }
@@ -134,7 +191,9 @@ export function useIssueEditor(slug: string, edition: string) {
             const segments = pagesToSegments(pages);
             await updateIssueSection(issue.id, sectionId, {
                 segments,
-                title: section.title ?? ""
+                title: section.title ?? "",
+                text_content: section.text_content ?? "",
+                section_id: section.section.id,
             });
 
             // Update local state to reflect the new segments
@@ -178,7 +237,11 @@ export function useIssueEditor(slug: string, edition: string) {
         assignPage,
 
         createSection,
+        deleteSection,
         updateSectionTitle,
+        updateSectionText,
+        updateSectionType,
+        createNewSectionType,
 
         saveSection,
         savingSections,
