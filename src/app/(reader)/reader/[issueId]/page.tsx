@@ -15,14 +15,22 @@ async function getIssue(issueId: string) {
 
 type Props = {
     params: Promise<{ issueId: string }>;
+    searchParams: Promise<{ page?: string }>;
 };
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
     const { issueId } = await params;
+    const { page } = await searchParams;
 
     const issue = await getIssue(issueId);
 
     if (!issue) return notFound();
 
-    return <Reader issue={issue} />;
+    const initialPage = page ? parseInt(page) : 1;
+    const initialIndex = issue.renders.findIndex(
+        (r: any) => r.order === initialPage
+    );
+    const safeInitialIndex = initialIndex !== -1 ? initialIndex : 0;
+
+    return <Reader issue={issue} initialIndex={safeInitialIndex} />;
 }

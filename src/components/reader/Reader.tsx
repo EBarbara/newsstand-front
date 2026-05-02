@@ -9,11 +9,12 @@ import TextView from "./TextView";
 import styles from "./Reader.module.css"
 
 type Props = {
-    issue: Issue
-}
+    issue: Issue;
+    initialIndex?: number;
+};
 
-export default function Reader({ issue }: Props) {
-    const [index, setIndex] = useState(0);
+export default function Reader({ issue, initialIndex = 0 }: Props) {
+    const [index, setIndex] = useState(initialIndex);
     const [mode, setMode] = useState<"image" | "text">("image");
     const [showControls, setShowControls] = useState(true);
 

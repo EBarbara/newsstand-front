@@ -19,7 +19,7 @@ export default function SectionCard({ section, slug, edition, issueId, renders }
 
     return (
         <Link
-            href={`/reader/${issueId}?section=${section.id}`}
+            href={`/reader/${issueId}?page=${firstIndex}`}
             className="flex items-center gap-4 border p-4 rounded hover:bg-gray-900 transition"
         >
             <div className="flex flex-col flex-1 min-w-0">
