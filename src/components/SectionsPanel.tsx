@@ -142,7 +142,7 @@ export default function SectionsPanel({
                                 />
                             ) : (
                                 <span className="text-sm font-semibold truncate block">
-                                    {s.title || s.section.name}
+                                    {s.title || s.section?.name || "Untitled"}
                                 </span>
                             )}
                         </div>
@@ -162,7 +162,7 @@ export default function SectionsPanel({
                             <div className="flex flex-col gap-1">
                                 <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Type</label>
                                 <select
-                                    value={s.section.id}
+                                    value={s.section?.id}
                                     onChange={(e) => updateSectionType(s.id, Number(e.target.value))}
                                     className="w-full p-1 bg-[#252a33] border border-blue-400/30 rounded text-xs text-white focus:outline-none"
                                 >

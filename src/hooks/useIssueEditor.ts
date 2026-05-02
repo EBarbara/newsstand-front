@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 import { pagesToSegments } from "@/lib/editor";
-import { createIssueSection, createSectionType, deleteIssueSection, getIssueDetail, getSections, updateIssueSection } from "@/lib/issues";
+import { createIssueSection, createSectionType, deleteIssuePage, deleteIssueSection, getIssueDetail, getSections, replaceIssuePage, updateIssueSection, uploadIssuePage } from "@/lib/issues";
 import { Issue } from "@/@types/issue";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
@@ -30,6 +30,9 @@ export type IssueEditorState = {
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
+    handleUploadPage: (file: File, order?: number) => Promise<void>
+    handleReplacePage: (renderId: number, file: File) => Promise<void>
+    handleDeletePage: (renderId: number) => Promise<void>
     error: string | null
 }
 
@@ -214,6 +217,64 @@ export function useIssueEditor(slug: string, edition: string) {
         }
     }
 
+    async function handleUploadPage(file: File, order?: number) {
+        if (!issue) return
+        try {
+            const updatedIssue = await uploadIssuePage(issue.id, file, order)
+            setIssue(updatedIssue)
+            setSections(updatedIssue.sections)
+            // Re-calculate page map
+            const map: PageMap = {}
+            updatedIssue.sections.forEach(section => {
+                section.segments.forEach(segment => {
+                    for (let p = segment.start_page; p <= segment.end_page; p++) {
+                        map[p] = section.id;
+                    }
+                })
+            })
+            setPageMap(map)
+        } catch (error) {
+            console.error("Failed to upload page", error)
+            alert("Failed to upload page.")
+        }
+    }
+
+    async function handleReplacePage(renderId: number, file: File) {
+        if (!issue) return
+        try {
+            const updatedIssue = await replaceIssuePage(issue.id, renderId, file)
+            setIssue(updatedIssue)
+            // Note: Replace doesn't change segments, but it might change dimensions
+        } catch (error) {
+            console.error("Failed to replace page", error)
+            alert("Failed to replace page.")
+        }
+    }
+
+    async function handleDeletePage(renderId: number) {
+        if (!issue) return
+        if (!confirm("Are you sure you want to delete this page? This will shift subsequent pages and adjust sections.")) return
+
+        try {
+            const updatedIssue = await deleteIssuePage(issue.id, renderId)
+            setIssue(updatedIssue)
+            setSections(updatedIssue.sections)
+            // Re-calculate page map
+            const map: PageMap = {}
+            updatedIssue.sections.forEach(section => {
+                section.segments.forEach(segment => {
+                    for (let p = segment.start_page; p <= segment.end_page; p++) {
+                        map[p] = section.id;
+                    }
+                })
+            })
+            setPageMap(map)
+        } catch (error) {
+            console.error("Failed to delete page", error)
+            alert("Failed to delete page.")
+        }
+    }
+
     const sortedSections = useMemo(() => {
         return [...sections].sort((a, b) => {
             const aMin = a.segments.length > 0 ? Math.min(...a.segments.map(s => s.start_page)) : Infinity;
@@ -246,6 +307,10 @@ export function useIssueEditor(slug: string, edition: string) {
         saveSection,
         savingSections,
         savedSections,
+
+        handleUploadPage,
+        handleReplacePage,
+        handleDeletePage,
         error,
     }
 }

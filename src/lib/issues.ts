@@ -17,7 +17,7 @@ export function getIssueDetail(slug: string, edition: string) {
     return request<Issue>(`/magazines/${encodeURIComponent(slug)}/issues/${encodeURIComponent(edition)}/`);
 }
 
-export function getMediaUrl(path: string | null) {
+export function getMediaUrl(path: string | null, cacheBust: boolean = false) {
     if (!path) return "";
     
     let cleanPath = path;
@@ -36,7 +36,11 @@ export function getMediaUrl(path: string | null) {
     // Ensure cleanPath starts with /
     if (!cleanPath.startsWith('/')) cleanPath = `/${cleanPath}`;
 
-    return `${MEDIA_API_URL}${cleanPath}`;
+    let url = `${MEDIA_API_URL}${cleanPath}`;
+    if (cacheBust) {
+        url += `?t=${Date.now()}`;
+    }
+    return url;
 }
 
 export function getPageImageUrl(id: number, index: number) {
@@ -104,5 +108,32 @@ export function importCbz(file: File, magazineSlug?: string, edition?: string, d
     return request<Issue>('/issues/import_cbz/', {
         method: 'POST',
         body: formData,
+    });
+}
+
+export function uploadIssuePage(issueId: number, file: File, order?: number) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (order !== undefined) formData.append('order', order.toString());
+
+    return request<Issue>(`/issues/${issueId}/upload-page/`, {
+        method: 'POST',
+        body: formData,
+    });
+}
+
+export function replaceIssuePage(issueId: number, renderId: number, file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return request<Issue>(`/issues/${issueId}/replace-page/${renderId}/`, {
+        method: 'POST',
+        body: formData,
+    });
+}
+
+export function deleteIssuePage(issueId: number, renderId: number) {
+    return request<Issue>(`/issues/${issueId}/delete-page/${renderId}/`, {
+        method: 'DELETE',
     });
 }
