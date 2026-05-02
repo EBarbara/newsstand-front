@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { getIssuesByMagazine } from "@/lib/issues";
 import IssueCard from "@/components/issueCard/IssueCard";
+import ImportCbzButton from "@/components/ImportCbzButton";
 
 type Props = {
     params: Promise<{ slug: string; }>
@@ -21,13 +22,18 @@ export default async function Page({ params }: Props) {
             </nav>
 
             {/* HEADER */}
-            <header>
-                <h1 className="text-3xl font-bold">
-                    {magazineName}
-                </h1>
-                <p className="text-gray-500">
-                    All issues from this magazine.
-                </p>
+            <header className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-3xl font-bold">
+                        {magazineName}
+                    </h1>
+                    <p className="text-gray-500">
+                        All issues from this magazine.
+                    </p>
+                </div>
+                <div>
+                    <ImportCbzButton magazineSlug={slug} />
+                </div>
             </header>
 
             {/* EMPTY STATE */}

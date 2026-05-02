@@ -78,3 +78,16 @@ export function createIssueSection(
         body: JSON.stringify(data),
     })
 }
+
+export function importCbz(file: File, magazineSlug?: string, edition?: string, date?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (magazineSlug) formData.append('magazine', magazineSlug);
+    if (edition) formData.append('edition', edition);
+    if (date) formData.append('date', date);
+
+    return request<Issue>('/issues/import_cbz/', {
+        method: 'POST',
+        body: formData,
+    });
+}
