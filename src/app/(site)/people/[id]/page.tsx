@@ -493,27 +493,67 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                         {!person.credits || person.credits.length === 0 ? (
                             <p className="text-gray-500 italic">No recorded credits yet.</p>
                         ) : (
-                            <div className="grid grid-cols-1 gap-4">
-                                {person.credits.map(credit => (
+                            <div className="grid grid-cols-1 gap-6">
+                                {Object.values(person.credits.reduce((acc, credit) => {
+                                    const key = credit.issue_id;
+                                    if (!acc[key]) {
+                                        acc[key] = {
+                                            issue_id: credit.issue_id,
+                                            magazine_name: credit.magazine_name,
+                                            magazine_slug: credit.magazine_slug,
+                                            issue_edition: credit.issue_edition,
+                                            issue_cover: credit.issue_cover,
+                                            items: [] as any[]
+                                        };
+                                    }
+                                    acc[key].items.push(credit);
+                                    return acc;
+                                }, {} as Record<number, any>)).map((group: any) => (
                                     <Link 
-                                        key={credit.id}
-                                        href={`/magazines/${credit.magazine_slug}/${credit.issue_edition}`}
-                                        className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl p-4 flex items-center justify-between transition-all hover:scale-[1.01] active:scale-100"
+                                        key={group.issue_id}
+                                        href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                        className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl overflow-hidden flex flex-col sm:flex-row transition-all hover:scale-[1.01] active:scale-100 shadow-lg"
                                     >
-                                        <div className="min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-xs font-bold text-blue-400 uppercase">{credit.magazine_name}</span>
-                                                <span className="text-xs text-gray-600">|</span>
-                                                <span className="text-xs text-gray-400">Ed. {credit.issue_edition}</span>
-                                            </div>
-                                            <h3 className="font-semibold text-gray-200 truncate group-hover:text-white">
-                                                {credit.section_title || credit.section_type}
-                                            </h3>
+                                        {/* Issue Cover */}
+                                        <div className="w-full sm:w-24 aspect-[3/4] bg-gray-800 shrink-0">
+                                            {group.issue_cover ? (
+                                                <img 
+                                                    src={getMediaUrl(group.issue_cover)} 
+                                                    alt={`Issue ${group.issue_edition}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="text-right">
-                                            <span className="inline-block px-2 py-1 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider">
-                                                {credit.role || "Contributor"}
-                                            </span>
+
+                                        <div className="flex-1 p-5 flex flex-col justify-center min-w-0">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">{group.magazine_name}</span>
+                                                <span className="text-xs text-gray-700">/</span>
+                                                <span className="text-sm text-gray-300 font-medium">Edition {group.issue_edition}</span>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                {group.items.map((item: any) => (
+                                                    <div key={item.id} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                                        <h3 className="font-semibold text-gray-100 group-hover:text-blue-200 transition-colors">
+                                                            {item.section_title || item.section_type}
+                                                        </h3>
+                                                        <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">
+                                                            {item.role || "Contributor"}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="hidden sm:flex items-center px-6 text-gray-600 group-hover:text-blue-400 transition-colors">
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9 5l7 7-7 7" />
+                                            </svg>
                                         </div>
                                     </Link>
                                 ))}
