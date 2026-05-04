@@ -223,7 +223,7 @@ export function useIssueEditor(slug: string, edition: string) {
                 .map(([page]) => Number(page));
 
             const segments = pagesToSegments(pages);
-            await updateIssueSection(issue.id, sectionId, {
+            const updatedSection = await updateIssueSection(issue.id, sectionId, {
                 segments,
                 title: section.title ?? "",
                 text_content: section.text_content ?? "",
@@ -234,9 +234,9 @@ export function useIssueEditor(slug: string, edition: string) {
                 })),
             });
 
-            // Update local state to reflect the new segments
+            // Update local state with the actual data from the server
             setSections(prev => prev.map(s =>
-                s.id === sectionId ? { ...s, segments } : s
+                s.id === sectionId ? updatedSection : s
             ));
 
             setSavedSections(prev => ({ ...prev, [sectionId]: true }))

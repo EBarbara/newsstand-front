@@ -21,8 +21,31 @@ export default function Sidebar({ issue, section, onReadText }: SidebarProps) {
             {section && (
                 <div>
                     <strong>Section</strong>
-                    <div>{section.section.name}</div>
+                    <div>
+                        {!section.title || section.title === section.section.name 
+                            ? section.section.name 
+                            : `${section.title} (${section.section.name})`}
+                    </div>
                 </div>
+            )}
+
+            {section && section.credits && section.credits.length > 0 && (
+                <>
+                    <hr />
+                    <div className={styles.credits}>
+                        <strong>Credits</strong>
+                        <ul className={styles.creditsList}>
+                            {section.credits.map((credit, i) => (
+                                <li key={i}>
+                                    <a href={`/people/${credit.person?.id}`} className={styles.personLink}>
+                                        {credit.person?.name}
+                                    </a>
+                                    {credit.role && ` (${credit.role})`}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </>
             )}
 
             <hr />

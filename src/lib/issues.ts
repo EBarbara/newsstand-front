@@ -62,7 +62,7 @@ export function updateIssueSection(
         credits?: { person_id: number; role: string | null }[],
     }
 ) {
-    return request(
+    return request<IssueSection>(
         `/issues/${issueId}/sections/${sectionId}/`,
         {
             method: "PATCH",

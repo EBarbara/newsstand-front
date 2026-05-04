@@ -26,6 +26,16 @@ export default function SectionCard({ section, slug, edition, issueId, renders }
                 <div className="font-medium">
                     {section.title || section.section.name}
                 </div>
+                {section.credits && section.credits.length > 0 && (
+                    <div className="text-sm text-gray-500 mt-1 truncate">
+                        {section.credits.map((c, i) => (
+                            <span key={i}>
+                                {c.person?.name}{c.role ? ` (${c.role})` : ""}
+                                {i < section.credits.length - 1 ? ", " : ""}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* THUMBNAIL */}
