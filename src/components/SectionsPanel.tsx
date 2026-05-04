@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IssueEditorState } from "@/hooks/useIssueEditor";
+import { getPeople } from "@/lib/people";
+import { Person } from "@/@types/person";
 
 type Props = Pick<
     IssueEditorState,
@@ -18,6 +20,9 @@ type Props = Pick<
     | "setSelectedTemplate"
     | "savingSections"
     | "savedSections"
+    | "addCreditToSection"
+    | "removeCreditFromSection"
+    | "updateCreditRole"
 >
 
 export default function SectionsPanel({
@@ -35,10 +40,21 @@ export default function SectionsPanel({
                                           selectedTemplate,
                                           setSelectedTemplate,
                                           savingSections,
-                                          savedSections
+                                          savedSections,
+                                          addCreditToSection,
+                                          removeCreditFromSection,
+                                          updateCreditRole
 }: Props) {
     const [newTypeName, setNewTypeName] = useState("");
     const [isCreatingType, setIsCreatingType] = useState(false);
+
+    const [people, setPeople] = useState<Person[]>([]);
+    const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
+    const [newCreditRole, setNewCreditRole] = useState("");
+
+    useEffect(() => {
+        getPeople(1, 100).then(res => setPeople(res.results)).catch(console.error);
+    }, []);
 
     const handleCreateType = async () => {
         if (!newTypeName.trim()) return;
@@ -183,6 +199,70 @@ export default function SectionsPanel({
                                     placeholder="Optional text..."
                                     className="w-full h-24 p-2 bg-[#252a33] border border-blue-400/30 rounded text-xs text-white focus:outline-none resize-none scrollbar-thin scrollbar-thumb-gray-600"
                                 />
+                            </div>
+
+                            {/* CREDITS */}
+                            <div className="flex flex-col gap-2 mt-1">
+                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Credits</label>
+                                
+                                <div className="flex flex-col gap-1.5">
+                                    {(s.credits || []).map((credit, idx) => (
+                                        <div key={idx} className="flex gap-2 items-center bg-[#1a1d23] p-1.5 rounded border border-gray-800">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[10px] font-bold text-gray-400 truncate">
+                                                    {credit.person?.name || people.find(p => p.id === credit.person_id)?.name || "Unknown"}
+                                                </div>
+                                                <input 
+                                                    value={credit.role || ""}
+                                                    onChange={(e) => updateCreditRole(s.id, idx, e.target.value)}
+                                                    placeholder="Role (e.g. Artist)"
+                                                    className="w-full bg-transparent text-[11px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
+                                                />
+                                            </div>
+                                            <button 
+                                                onClick={() => removeCreditFromSection(s.id, idx)}
+                                                className="text-gray-500 hover:text-red-400 p-1"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* ADD CREDIT */}
+                                <div className="flex flex-col gap-1.5 mt-1 p-2 bg-[#1a1d23]/50 rounded border border-dashed border-gray-700">
+                                    <select 
+                                        value={selectedPersonId ?? ""}
+                                        onChange={(e) => setSelectedPersonId(Number(e.target.value))}
+                                        className="w-full p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
+                                    >
+                                        <option value="">Select person...</option>
+                                        {people.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                    </select>
+                                    <div className="flex gap-1.5">
+                                        <input 
+                                            value={newCreditRole}
+                                            onChange={(e) => setNewCreditRole(e.target.value)}
+                                            placeholder="Role..."
+                                            className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
+                                        />
+                                        <button 
+                                            onClick={() => {
+                                                if (selectedPersonId) {
+                                                    addCreditToSection(s.id, selectedPersonId, newCreditRole);
+                                                    setSelectedPersonId(null);
+                                                    setNewCreditRole("");
+                                                }
+                                            }}
+                                            disabled={!selectedPersonId}
+                                            className="px-2 bg-blue-600 text-white rounded text-[10px] hover:bg-blue-500 disabled:opacity-50"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="flex gap-2 mt-1">

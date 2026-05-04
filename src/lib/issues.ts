@@ -59,6 +59,7 @@ export function updateIssueSection(
         title: string,
         text_content?: string,
         section_id?: number,
+        credits?: { person_id: number; role: string | null }[],
     }
 ) {
     return request(

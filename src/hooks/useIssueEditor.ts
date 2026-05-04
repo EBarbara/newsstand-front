@@ -27,6 +27,9 @@ export type IssueEditorState = {
     updateSectionText: (sectionId: number, text: string) => void
     updateSectionType: (sectionId: number, typeId: number) => void
     createNewSectionType: (name: string) => Promise<void>
+    addCreditToSection: (sectionId: number, personId: number, role: string | null) => void
+    removeCreditFromSection: (sectionId: number, creditIndex: number) => void
+    updateCreditRole: (sectionId: number, creditIndex: number, role: string) => void
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
@@ -177,6 +180,34 @@ export function useIssueEditor(slug: string, edition: string) {
         )
     }
 
+    function addCreditToSection(sectionId: number, personId: number, role: string | null) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            return {
+                ...s,
+                credits: [...(s.credits || []), { person_id: personId, role }]
+            }
+        }));
+    }
+
+    function removeCreditFromSection(sectionId: number, creditIndex: number) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            const newCredits = [...(s.credits || [])];
+            newCredits.splice(creditIndex, 1);
+            return { ...s, credits: newCredits };
+        }));
+    }
+
+    function updateCreditRole(sectionId: number, creditIndex: number, role: string) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            const newCredits = [...(s.credits || [])];
+            newCredits[creditIndex] = { ...newCredits[creditIndex], role };
+            return { ...s, credits: newCredits };
+        }));
+    }
+
     async function saveSection(sectionId: number) {
         if (!issue) return
 
@@ -197,6 +228,10 @@ export function useIssueEditor(slug: string, edition: string) {
                 title: section.title ?? "",
                 text_content: section.text_content ?? "",
                 section_id: section.section.id,
+                credits: (section.credits || []).map(c => ({
+                    person_id: c.person_id,
+                    role: c.role
+                })),
             });
 
             // Update local state to reflect the new segments
@@ -303,6 +338,10 @@ export function useIssueEditor(slug: string, edition: string) {
         updateSectionText,
         updateSectionType,
         createNewSectionType,
+
+        addCreditToSection,
+        removeCreditFromSection,
+        updateCreditRole,
 
         saveSection,
         savingSections,
