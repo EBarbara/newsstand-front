@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getIssuesByMagazine } from "@/lib/issues";
 import IssueCard from "@/components/issueCard/IssueCard";
 import ImportCbzButton from "@/components/ImportCbzButton";
+import CreateEmptyIssueButton from "@/components/CreateEmptyIssueButton";
 
 type Props = {
     params: Promise<{ slug: string; }>
@@ -32,7 +33,8 @@ export default async function Page({ params }: Props) {
                         All issues from this magazine.
                     </p>
                 </div>
-                <div>
+                <div className="flex gap-3">
+                    <CreateEmptyIssueButton magazineSlug={slug} />
                     <ImportCbzButton magazineSlug={slug} />
                 </div>
             </header>
