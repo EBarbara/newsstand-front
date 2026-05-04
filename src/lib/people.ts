@@ -12,11 +12,18 @@ export function createPerson(name: string) {
     });
 }
 
-export function updatePerson(id: number, name: string) {
-    return request<Person>(`/people/${id}/`, {
+export function updatePerson(id: number, data: any) {
+    const options: RequestInit = {
         method: 'PATCH',
-        body: JSON.stringify({ name }),
-    });
+    };
+
+    if (data instanceof FormData) {
+        options.body = data;
+    } else {
+        options.body = JSON.stringify(data);
+    }
+
+    return request<Person>(`/people/${id}/`, options);
 }
 
 export function deletePerson(id: number) {

@@ -1,18 +1,145 @@
-import { getPersonDetail } from "@/lib/people";
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState, use } from "react";
+import { getPersonDetail, updatePerson } from "@/lib/people";
+import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getMediaUrl } from "@/lib/issues";
+import { Person, PersonLink } from "@/@types/person";
 
-export default async function PersonPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const person = await getPersonDetail(Number(id)).catch(() => null);
+export default function PersonPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    const router = useRouter();
+    
+    const [person, setPerson] = useState<Person | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
+    // Edit state
+    const [editName, setEditName] = useState("");
+    const [editBio, setEditBio] = useState("");
+    const [editBirthDate, setEditBirthDate] = useState("");
+    const [editCountry, setEditCountry] = useState("");
+    const [editLinks, setEditLinks] = useState<Omit<PersonLink, 'id'>[]>([]);
+    const [photoFile, setPhotoFile] = useState<File | null>(null);
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+    useEffect(() => {
+        getPersonDetail(Number(id))
+            .then(data => {
+                setPerson(data);
+                setEditName(data.name);
+                setEditBio(data.biography || "");
+                setEditBirthDate(data.birth_date || "");
+                setEditCountry(data.country || "");
+                setEditLinks(data.links || []);
+                setLoading(false);
+            })
+            .catch(() => {
+                setLoading(false);
+            });
+    }, [id]);
+
+    const handleSave = async () => {
+        if (!person) return;
+        setIsSaving(true);
+
+        try {
+            const formData = new FormData();
+            formData.append("name", editName);
+            formData.append("biography", editBio);
+            formData.append("birth_date", editBirthDate);
+            formData.append("country", editCountry);
+            formData.append("links", JSON.stringify(editLinks)); // Wait, DRF nested serializer expects a list of objects
+
+            if (photoFile) {
+                formData.append("photo", photoFile);
+            }
+
+            // Note: Sending JSON as part of FormData for nested fields can be tricky with DRF 
+            // unless we use a custom parser or handle it as separate fields.
+            // But since I'm using MultiPartParser, I might need to send links as a JSON string and parse it in the backend,
+            // OR just use a JSON request if there's no photo.
+            
+            // Let's try sending as a JSON request if there's no photo, or fix the links format.
+            // Actually, for nested PersonLink, I'll update the serializer to handle JSON string if needed, 
+            // or just send as multiple fields.
+            
+            // Simpler: If photo exists, use FormData for everything. 
+            // If not, we can use JSON. 
+            
+            // For links in FormData, DRF usually expects links[0]url, links[0]label etc.
+            // To keep it simple, I'll update the backend to parse the links JSON if it's a string.
+            
+            const result = await updatePerson(person.id, formData);
+            setPerson(result);
+            setIsEditing(false);
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to update person:", error);
+            alert("Failed to update person.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const addLink = () => {
+        setEditLinks([...editLinks, { url: "", label: "" }]);
+    };
+
+    const removeLink = (index: number) => {
+        setEditLinks(editLinks.filter((_, i) => i !== index));
+    };
+
+    const updateLink = (index: number, field: 'url' | 'label', value: string) => {
+        const newLinks = [...editLinks];
+        newLinks[index] = { ...newLinks[index], [field]: value };
+        setEditLinks(newLinks);
+    };
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setPhotoFile(file);
+            setPhotoPreview(URL.createObjectURL(file));
+        }
+    };
+
+    if (loading) return <div className="p-10 text-white">Loading...</div>;
     if (!person) return notFound();
 
-    const photoUrl = person.photo ? getMediaUrl(person.photo) : null;
+    const photoUrl = photoPreview || (person.photo ? getMediaUrl(person.photo) : null);
 
     return (
         <div className="max-w-6xl mx-auto p-6 md:p-10 text-white">
+            <div className="flex justify-end mb-6">
+                {!isEditing ? (
+                    <button 
+                        onClick={() => setIsEditing(true)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-colors"
+                    >
+                        Edit Profile
+                    </button>
+                ) : (
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={() => setIsEditing(false)}
+                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
+                        >
+                            {isSaving ? "Saving..." : "Save Changes"}
+                        </button>
+                    </div>
+                )}
+            </div>
+
             <div className="flex flex-col md:flex-row gap-10">
                 {/* SIDEBAR: Photo & Basic Info */}
                 <div className="w-full md:w-1/3 flex flex-col gap-6">
@@ -30,59 +157,121 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
                                 </svg>
                             </div>
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
-                        <div className="absolute bottom-6 left-6">
-                            <h1 className="text-3xl font-bold tracking-tight">{person.name}</h1>
+                        
+                        {isEditing && (
+                            <label className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="text-sm font-bold">Change Photo</span>
+                                <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
+                            </label>
+                        )}
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 pointer-events-none" />
+                        <div className="absolute bottom-6 left-6 right-6">
+                            {isEditing ? (
+                                <input 
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    className="w-full bg-black/40 border border-white/20 rounded px-2 py-1 text-2xl font-bold focus:outline-none focus:border-blue-500"
+                                />
+                            ) : (
+                                <h1 className="text-3xl font-bold tracking-tight">{person.name}</h1>
+                            )}
                         </div>
                     </div>
 
                     <div className="bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm space-y-4">
-                        {person.birth_date && (
-                            <div>
-                                <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Birth Date</label>
-                                <p className="text-gray-200">{new Date(person.birth_date).toLocaleDateString()}</p>
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Birth Date</label>
+                            {isEditing ? (
+                                <input 
+                                    type="date"
+                                    value={editBirthDate}
+                                    onChange={(e) => setEditBirthDate(e.target.value)}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none"
+                                />
+                            ) : (
+                                <p className="text-gray-200">{person.birth_date ? new Date(person.birth_date).toLocaleDateString() : "Unknown"}</p>
+                            )}
+                        </div>
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Country</label>
+                            {isEditing ? (
+                                <input 
+                                    value={editCountry}
+                                    onChange={(e) => setEditCountry(e.target.value)}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none"
+                                />
+                            ) : (
+                                <p className="text-gray-200">{person.country || "Unknown"}</p>
+                            )}
+                        </div>
+                        
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Links</label>
+                            <div className="flex flex-col gap-2 mt-2">
+                                {(isEditing ? editLinks : person.links || []).map((link, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        {isEditing ? (
+                                            <>
+                                                <input 
+                                                    value={link.label}
+                                                    onChange={(e) => updateLink(idx, 'label', e.target.value)}
+                                                    placeholder="Label"
+                                                    className="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
+                                                />
+                                                <input 
+                                                    value={link.url}
+                                                    onChange={(e) => updateLink(idx, 'url', e.target.value)}
+                                                    placeholder="URL"
+                                                    className="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
+                                                />
+                                                <button onClick={() => removeLink(idx)} className="text-red-500 hover:text-red-400">✕</button>
+                                            </>
+                                        ) : (
+                                            <a 
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-3 py-1 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-full text-sm text-blue-300 transition-colors w-fit"
+                                            >
+                                                {link.label}
+                                            </a>
+                                        )}
+                                    </div>
+                                ))}
+                                {isEditing && (
+                                    <button 
+                                        onClick={addLink}
+                                        className="text-xs text-blue-400 hover:text-blue-300 mt-1"
+                                    >
+                                        + Add Link
+                                    </button>
+                                )}
                             </div>
-                        )}
-                        {person.country && (
-                            <div>
-                                <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Country</label>
-                                <p className="text-gray-200">{person.country}</p>
-                            </div>
-                        )}
-                        {person.links && person.links.length > 0 && (
-                            <div>
-                                <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Links</label>
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {person.links.map(link => (
-                                        <a 
-                                            key={link.id}
-                                            href={link.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="px-3 py-1 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-full text-sm text-blue-300 transition-colors"
-                                        >
-                                            {link.label}
-                                        </a>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        </div>
                     </div>
                 </div>
 
                 {/* MAIN CONTENT: Bio & Credits */}
                 <div className="flex-1 space-y-10">
-                    {person.biography && (
-                        <section>
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <span className="w-8 h-[1px] bg-blue-500"></span>
-                                Biography
-                            </h2>
+                    <section>
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span className="w-8 h-[1px] bg-blue-500"></span>
+                            Biography
+                        </h2>
+                        {isEditing ? (
+                            <textarea 
+                                value={editBio}
+                                onChange={(e) => setEditBio(e.target.value)}
+                                className="w-full h-48 bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 leading-relaxed focus:outline-none focus:border-blue-500"
+                                placeholder="Write something about this person..."
+                            />
+                        ) : (
                             <div className="prose prose-invert max-w-none text-gray-400 leading-relaxed whitespace-pre-wrap">
-                                {person.biography}
+                                {person.biography || "No biography available."}
                             </div>
-                        </section>
-                    )}
+                        )}
+                    </section>
 
                     <section>
                         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
