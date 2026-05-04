@@ -10,7 +10,8 @@ type Props = {
 
 export default async function Page({ params }: Props) {
     const { slug } = await params;
-    const issues = await getIssuesByMagazine(slug)
+    const response = await getIssuesByMagazine(slug);
+    const issues = response.results;
     const magazineName = issues.length > 0 ? issues[0].magazine.name : slug;
 
     return (

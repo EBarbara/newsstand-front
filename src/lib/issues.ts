@@ -1,16 +1,16 @@
-// lib/issues.ts
 import { request, MEDIA_API_URL } from './api';
 import { Issue } from "@/@types/issue";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
+import { PaginatedResponse } from "@/@types/api";
 
 
 export function getRecentIssues() {
     return request<Issue[]>('/issues/recent/');
 }
 
-export function getIssuesByMagazine(slug: string) {
-    return request<Issue[]>(`/magazines/${slug}/issues/`);
+export function getIssuesByMagazine(slug: string, page: number = 1) {
+    return request<PaginatedResponse<Issue>>(`/magazines/${slug}/issues/?page=${page}`);
 }
 
 export function getIssueDetail(slug: string, edition: string) {

@@ -2,7 +2,8 @@ import { getMagazines } from "@/lib/magazines";
 import MagazineCard from "@/components/MagazineCard";
 
 export default async function Page() {
-    const magazines = await getMagazines();
+    const response = await getMagazines();
+    const magazines = response.results;
 
     return (
         <div className="flex flex-col gap-8">
