@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { IssueEditorState } from "@/hooks/useIssueEditor";
 import { getPeople } from "@/lib/people";
 import { Person } from "@/@types/person";
 
 type Props = Pick<
     IssueEditorState,
+    | "issue"
     | "sections"
     | "availableSections"
     | "selectedSectionId"
@@ -26,6 +28,7 @@ type Props = Pick<
 >
 
 export default function SectionsPanel({
+                                          issue,
                                           sections,
                                           selectedSectionId,
                                           setSelectedSectionId,
@@ -64,6 +67,14 @@ export default function SectionsPanel({
     };
     return (
         <div className="w-[300px] h-full overflow-y-auto p-2.5 border-r border-gray-800 bg-[#0b0e14] scrollbar-thin scrollbar-thumb-gray-700">
+            {issue && (
+                <Link 
+                    href={`/magazines/${issue.magazine.slug}/${issue.edition}`}
+                    className="flex items-center gap-2 mb-4 p-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded transition-colors"
+                >
+                    ← Back to Issue
+                </Link>
+            )}
 
             {/* SELECT & CREATE TYPE */}
             <div className="flex flex-col gap-2 mb-4">

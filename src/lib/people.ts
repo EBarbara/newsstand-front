@@ -24,3 +24,7 @@ export function deletePerson(id: number) {
         method: 'DELETE',
     });
 }
+
+export function getPersonDetail(id: number) {
+    return request<Person>(`/people/${id}/`);
+}
