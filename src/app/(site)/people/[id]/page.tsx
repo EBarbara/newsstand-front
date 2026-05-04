@@ -105,8 +105,8 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
         <div className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center p-6 backdrop-blur-md">
             <div className="max-w-md w-full space-y-6">
                 <div className="text-center">
-                    <h3 className="text-xl font-bold text-white">Adjust Photo</h3>
-                    <p className="text-gray-400 text-sm">Drag to move, slider to zoom</p>
+                    <h3 className="text-xl font-bold text-white">Ajustar Foto</h3>
+                    <p className="text-gray-400 text-sm">Arraste para mover, use o controle para zoom</p>
                 </div>
 
                 <div 
@@ -155,13 +155,13 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
                             onClick={onCancel}
                             className="flex-1 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-bold transition-colors"
                         >
-                            Cancel
+                            Cancelar
                         </button>
                         <button 
                             onClick={handleConfirm}
                             className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold transition-colors"
                         >
-                            Crop & Save
+                            Recortar e Salvar
                         </button>
                     </div>
                 </div>
@@ -241,7 +241,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             router.refresh();
         } catch (error) {
             console.error("Failed to update person:", error);
-            alert("Failed to update person.");
+            alert("Falha ao atualizar pessoa.");
         } finally {
             setIsSaving(false);
         }
@@ -281,13 +281,13 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
     };
 
     const formatDate = (dateStr?: string) => {
-        if (!dateStr) return "Unknown";
+        if (!dateStr) return "Desconhecido";
         const [year, month, day] = dateStr.split('-');
         if (!year || !month || !day) return dateStr;
         return `${day}/${month}/${year}`;
     };
 
-    if (loading) return <div className="p-10 text-white">Loading...</div>;
+    if (loading) return <div className="p-10 text-white">Carregando...</div>;
     if (!person) return notFound();
 
     const photoUrl = photoPreview || (person.photo ? getMediaUrl(person.photo) : null);
@@ -311,7 +311,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                         onClick={() => setIsEditing(true)}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-colors"
                     >
-                        Edit Profile
+                        Editar Perfil
                     </button>
                 ) : (
                     <div className="flex gap-2">
@@ -323,14 +323,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                             }}
                             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition-colors"
                         >
-                            Cancel
+                            Cancelar
                         </button>
                         <button 
                             onClick={handleSave}
                             disabled={isSaving}
                             className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
                         >
-                            {isSaving ? "Saving..." : "Save Changes"}
+                            {isSaving ? "Salvando..." : "Salvar Alterações"}
                         </button>
                     </div>
                 )}
@@ -378,7 +378,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
                     <div className="bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm space-y-4">
                         <div>
-                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Full Name</label>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Nome Completo</label>
                             {isEditing ? (
                                 <input 
                                     value={editName}
@@ -390,7 +390,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                             )}
                         </div>
                         <div>
-                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Birth Date</label>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Data de Nascimento</label>
                             {isEditing ? (
                                 <input 
                                     type="date"
@@ -403,7 +403,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                             )}
                         </div>
                         <div>
-                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Country</label>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">País</label>
                             {isEditing ? (
                                 <input 
                                     value={editCountry}
@@ -411,7 +411,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                     className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
                                 />
                             ) : (
-                                <p className="text-gray-200">{person.country || "Unknown"}</p>
+                                <p className="text-gray-200">{person.country || "Desconhecido"}</p>
                             )}
                         </div>
                         
@@ -425,7 +425,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                 <input 
                                                     value={link.label}
                                                     onChange={(e) => updateLink(idx, 'label', e.target.value)}
-                                                    placeholder="Label"
+                                                    placeholder="Rótulo"
                                                     className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200 focus:border-blue-500 transition-colors"
                                                 />
                                                 <div className="flex gap-1">
@@ -455,7 +455,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                         onClick={addLink}
                                         className="text-xs text-blue-400 hover:text-blue-300 mt-1 font-bold"
                                     >
-                                        + Add Link
+                                        + Adicionar Link
                                     </button>
                                 )}
                             </div>
@@ -468,18 +468,18 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                     <section>
                         <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-400">
                             <span className="w-8 h-[1px] bg-blue-500"></span>
-                            Biography
+                            Biografia
                         </h2>
                         {isEditing ? (
                             <textarea 
                                 value={editBio}
                                 onChange={(e) => setEditBio(e.target.value)}
                                 className="w-full h-64 bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 leading-relaxed focus:outline-none focus:border-blue-500 transition-colors"
-                                placeholder="Write something about this person..."
+                                placeholder="Escreva algo sobre esta pessoa..."
                             />
                         ) : (
                             <div className="prose prose-invert max-w-none text-gray-400 leading-relaxed whitespace-pre-wrap text-lg">
-                                {person.biography || "No biography available."}
+                                {person.biography || "Nenhuma biografia disponível."}
                             </div>
                         )}
                     </section>
@@ -487,11 +487,11 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                     <section>
                         <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">
                             <span className="w-8 h-[1px] bg-blue-500"></span>
-                            Contributions
+                            Contribuições
                         </h2>
                         
                         {!person.credits || person.credits.length === 0 ? (
-                            <p className="text-gray-500 italic">No recorded credits yet.</p>
+                            <p className="text-gray-500 italic">Nenhum crédito registrado ainda.</p>
                         ) : (
                             <div className="grid grid-cols-1 gap-6">
                                 {Object.values(person.credits.reduce((acc, credit) => {
@@ -533,7 +533,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                             <div className="flex items-center gap-2 mb-2">
                                                 <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">{group.magazine_name}</span>
                                                 <span className="text-xs text-gray-700">/</span>
-                                                <span className="text-sm text-gray-300 font-medium">Edition {group.issue_edition}</span>
+                                                <span className="text-sm text-gray-300 font-medium">Edição {group.issue_edition}</span>
                                             </div>
 
                                             <div className="space-y-3">
@@ -543,7 +543,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                             {item.section_title || item.section_type}
                                                         </h3>
                                                         <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">
-                                                            {item.role || "Contributor"}
+                                                            {item.role || "Colaborador"}
                                                         </span>
                                                     </div>
                                                 ))}

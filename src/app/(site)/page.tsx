@@ -16,16 +16,16 @@ export default async function Home() {
         <div className="flex flex-col gap-8">
             {/* HEADER */}
             <header className={styles.header}>
-                <h1 className={styles.title}>Recent Issues</h1>
+                <h1 className={styles.title}>Edições Recentes</h1>
                 <p className={styles.subtitle}>
-                    Manage and read your magazine collection.
+                    Gerencie e leia sua coleção de revistas.
                 </p>
             </header>
 
             {/* EMPTY STATE */}
             {issues.length === 0 ? (
                 <div className={styles.empty}>
-                    <p>No issues found or API is offline.</p>
+                    <p>Nenhuma edição encontrada ou API está offline.</p>
                 </div>
             ) : (
                 /* GRID */

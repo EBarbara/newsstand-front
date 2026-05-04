@@ -72,7 +72,7 @@ export default function SectionsPanel({
                     href={`/magazines/${issue.magazine.slug}/${issue.edition}`}
                     className="flex items-center gap-2 mb-4 p-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded transition-colors"
                 >
-                    ← Back to Issue
+                    ← Voltar para Edição
                 </Link>
             )}
 
@@ -83,7 +83,7 @@ export default function SectionsPanel({
                         <input
                             value={newTypeName}
                             onChange={(e) => setNewTypeName(e.target.value)}
-                            placeholder="New type name..."
+                            placeholder="Nome do novo tipo..."
                             className="flex-1 p-1.5 bg-[#1a1d23] border border-blue-500 rounded text-gray-200 text-sm focus:outline-none"
                             autoFocus
                             onKeyDown={(e) => e.key === "Enter" && handleCreateType()}
@@ -92,7 +92,7 @@ export default function SectionsPanel({
                             onClick={handleCreateType}
                             className="px-3 bg-blue-600 text-white rounded text-sm hover:bg-blue-500"
                         >
-                            Add
+                            Adicionar
                         </button>
                         <button
                             onClick={() => setIsCreatingType(false)}
@@ -111,7 +111,7 @@ export default function SectionsPanel({
                             }}
                             className="flex-1 p-1.5 bg-[#1a1d23] border border-gray-700 rounded text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
-                            <option value="">Select section type</option>
+                            <option value="">Selecionar tipo de seção</option>
                             {availableSections.map((s) => (
                                 <option key={s.id} value={s.id}>
                                     {s.name}
@@ -120,7 +120,7 @@ export default function SectionsPanel({
                         </select>
                         <button
                             onClick={() => setIsCreatingType(true)}
-                            title="Create new section type"
+                            title="Criar novo tipo de seção"
                             className="px-3 bg-gray-800 text-gray-300 rounded border border-gray-700 hover:bg-gray-700 hover:text-white"
                         >
                             +
@@ -139,7 +139,7 @@ export default function SectionsPanel({
                         : "bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-95"
                 }`}
             >
-                + Add Section
+                + Adicionar Seção
             </button>
 
             {/* LISTA */}
@@ -164,19 +164,19 @@ export default function SectionsPanel({
                                     onChange={(e) => updateSectionTitle(s.id, e.target.value)}
                                     onClick={(e) => e.stopPropagation()}
                                     className="w-full px-2 py-1 border border-blue-400 rounded text-sm bg-white text-gray-900 font-bold"
-                                    placeholder="Section Title"
+                                    placeholder="Título da Seção"
                                     autoFocus
                                 />
                             ) : (
                                 <span className="text-sm font-semibold truncate block">
-                                    {s.title || (s.section && s.section.name) || "Untitled"}
+                                    {s.title || (s.section && s.section.name) || "Sem título"}
                                 </span>
                             )}
                         </div>
                         
                         {s.segments.length === 0 && (
                             <span 
-                                title="Incomplete (no pages assigned)" 
+                                title="Incompleto (sem páginas atribuídas)" 
                                 className={`text-xs shrink-0 ${selectedSectionId === s.id ? "text-yellow-200" : "text-amber-500"}`}
                             >
                                 ⚠️
@@ -187,13 +187,13 @@ export default function SectionsPanel({
                     {selectedSectionId === s.id && (
                         <div className="mt-3 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Type</label>
+                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Tipo</label>
                                 <select
                                     value={s.section?.id || ""}
                                     onChange={(e) => updateSectionType(s.id, Number(e.target.value))}
                                     className="w-full p-1 bg-[#252a33] border border-blue-400/30 rounded text-xs text-white focus:outline-none"
                                 >
-                                    <option value="" disabled>Select type...</option>
+                                    <option value="" disabled>Selecionar tipo...</option>
                                     {availableSections.map((t) => (
                                         <option key={t.id} value={t.id}>
                                             {t.name}
@@ -203,18 +203,18 @@ export default function SectionsPanel({
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Text Content</label>
+                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Conteúdo de Texto</label>
                                 <textarea
                                     value={s.text_content || ""}
                                     onChange={(e) => updateSectionText(s.id, e.target.value)}
-                                    placeholder="Optional text..."
+                                    placeholder="Texto opcional..."
                                     className="w-full h-24 p-2 bg-[#252a33] border border-blue-400/30 rounded text-xs text-white focus:outline-none resize-none scrollbar-thin scrollbar-thumb-gray-600"
                                 />
                             </div>
 
                             {/* CREDITS */}
                             <div className="flex flex-col gap-2 mt-1">
-                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Credits</label>
+                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Créditos</label>
                                 
                                 <div className="flex flex-col gap-1.5">
                                     {(s.credits || []).map((credit, idx) => (
@@ -226,7 +226,7 @@ export default function SectionsPanel({
                                                 <input 
                                                     value={credit.role || ""}
                                                     onChange={(e) => updateCreditRole(s.id, idx, e.target.value)}
-                                                    placeholder="Role (e.g. Artist)"
+                                                    placeholder="Papel (ex: Artista)"
                                                     className="w-full bg-transparent text-[11px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
                                                 />
                                             </div>
@@ -247,7 +247,7 @@ export default function SectionsPanel({
                                         onChange={(e) => setSelectedPersonId(Number(e.target.value))}
                                         className="w-full p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
                                     >
-                                        <option value="">Select person...</option>
+                                        <option value="">Selecionar pessoa...</option>
                                         {people.map(p => (
                                             <option key={p.id} value={p.id}>{p.name}</option>
                                         ))}
@@ -256,7 +256,7 @@ export default function SectionsPanel({
                                         <input 
                                             value={newCreditRole}
                                             onChange={(e) => setNewCreditRole(e.target.value)}
-                                            placeholder="Role..."
+                                            placeholder="Papel..."
                                             className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
                                         />
                                         <button 
@@ -270,7 +270,7 @@ export default function SectionsPanel({
                                             disabled={!selectedPersonId}
                                             className="px-2 bg-blue-600 text-white rounded text-[10px] hover:bg-blue-500 disabled:opacity-50"
                                         >
-                                            Add
+                                            Adicionar
                                         </button>
                                     </div>
                                 </div>
@@ -288,11 +288,11 @@ export default function SectionsPanel({
                                                 : "bg-white text-blue-700 hover:bg-gray-100"
                                     }`}
                                 >
-                                    {savingSections[s.id] ? "Saving..." : savedSections[s.id] ? "Saved ✓" : "Save"}
+                                    {savingSections[s.id] ? "Salvando..." : savedSections[s.id] ? "Salvo ✓" : "Salvar"}
                                 </button>
                                 <button
                                     onClick={() => deleteSection(s.id)}
-                                    title="Delete section"
+                                    title="Excluir seção"
                                     className="px-3 bg-red-900/50 text-red-200 border border-red-800/50 rounded hover:bg-red-800 hover:text-white transition-all"
                                 >
                                     🗑️

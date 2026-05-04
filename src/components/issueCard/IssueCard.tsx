@@ -16,7 +16,7 @@ export default function IssueCard({ issue }: { issue: Issue }) {
             >
                 <IssueCover
                     imageUrl={getMediaUrl(issue.cover)}
-                    altText={`Cover for issue ${issue.id}`}
+                    altText={`Capa da edição ${issue.id}`}
                     defaultWidth={240}
                 />
             </Link>

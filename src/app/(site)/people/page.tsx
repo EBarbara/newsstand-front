@@ -44,7 +44,7 @@ export default function PeoplePage() {
             fetchPeople(currentPage);
         } catch (error) {
             console.error("Error creating person:", error);
-            alert("Failed to create person. Name might already exist.");
+            alert("Falha ao criar pessoa. O nome pode já existir.");
         } finally {
             setIsSaving(false);
         }
@@ -57,15 +57,15 @@ export default function PeoplePage() {
             {/* HEADER */}
             <header className={styles.header}>
                 <div className={styles.titleSection}>
-                    <h1 className={styles.title}>People</h1>
-                    <p className={styles.subtitle}>Directory of contributors and credits.</p>
+                    <h1 className={styles.title}>Pessoas</h1>
+                    <p className={styles.subtitle}>Diretório de colaboradores e créditos.</p>
                 </div>
                 <div className={styles.actions}>
                     <button 
                         className={styles.addButton}
                         onClick={() => setIsModalOpen(true)}
                     >
-                        <span>+</span> New Person
+                        <span>+</span> Nova Pessoa
                     </button>
                 </div>
             </header>
@@ -73,16 +73,16 @@ export default function PeoplePage() {
             {/* LIST / GRID */}
             {loading ? (
                 <div className={styles.empty}>
-                    <p>Loading directory...</p>
+                    <p>Carregando diretório...</p>
                 </div>
             ) : !data || data.results.length === 0 ? (
                 <div className={styles.empty}>
-                    <p>No people found in the directory.</p>
+                    <p>Ninguém encontrado no diretório.</p>
                     <button 
                         className={styles.addButton}
                         onClick={() => setIsModalOpen(true)}
                     >
-                        Create your first entry
+                        Crie sua primeira entrada
                     </button>
                 </div>
             ) : (
@@ -119,7 +119,7 @@ export default function PeoplePage() {
                                 disabled={currentPage === 1}
                                 onClick={() => setCurrentPage(prev => prev - 1)}
                             >
-                                Previous
+                                Anterior
                             </button>
                             
                             {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
@@ -137,7 +137,7 @@ export default function PeoplePage() {
                                 disabled={currentPage === totalPages}
                                 onClick={() => setCurrentPage(prev => prev + 1)}
                             >
-                                Next
+                                Próximo
                             </button>
                         </div>
                     )}
@@ -149,18 +149,18 @@ export default function PeoplePage() {
                 <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
                     <div className={styles.modal} onClick={e => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h2 className={styles.modalTitle}>Add New Person</h2>
-                            <p className={styles.subtitle}>Create a new entry in the credits directory.</p>
+                            <h2 className={styles.modalTitle}>Adicionar Nova Pessoa</h2>
+                            <p className={styles.subtitle}>Crie uma nova entrada no diretório de créditos.</p>
                         </div>
                         
                         <form onSubmit={handleAddPerson} className={styles.modalBody}>
                             <div className={styles.inputGroup}>
-                                <label htmlFor="personName">Full Name</label>
+                                <label htmlFor="personName">Nome Completo</label>
                                 <input 
                                     id="personName"
                                     type="text" 
                                     className={styles.input}
-                                    placeholder="e.g. John Doe"
+                                    placeholder="ex: João Silva"
                                     value={newPersonName}
                                     onChange={e => setNewPersonName(e.target.value)}
                                     autoFocus
@@ -174,14 +174,14 @@ export default function PeoplePage() {
                                     className={styles.cancelButton}
                                     onClick={() => setIsModalOpen(false)}
                                 >
-                                    Cancel
+                                    Cancelar
                                 </button>
                                 <button 
                                     type="submit"
                                     className={styles.saveButton}
                                     disabled={isSaving}
                                 >
-                                    {isSaving ? "Saving..." : "Create Person"}
+                                    {isSaving ? "Salvando..." : "Criar Pessoa"}
                                 </button>
                             </div>
                         </form>

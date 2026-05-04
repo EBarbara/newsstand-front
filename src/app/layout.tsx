@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: "Magazine List PRO",
-    description: "Mag Issue Reader and Manager",
+    description: "Leitor e Gerenciador de Revistas",
 };
 
 export default function RootLayout({
@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
     return (
         <html
-            lang="en"
+            lang="pt-BR"
             className={`${geistSans.variable} ${geistMono.variable}`}
         >
         <body className="flex flex-col min-h-screen">

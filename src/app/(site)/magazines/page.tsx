@@ -11,17 +11,17 @@ export default async function Page() {
             {/* HEADER */}
             <header>
                 <h1 className="text-3xl font-bold">
-                    Magazines
+                    Revistas
                 </h1>
                 <p className="text-gray-500">
-                    Browse your magazine collection.
+                    Navegue pela sua coleção de revistas.
                 </p>
             </header>
 
             {/* EMPTY */}
             {magazines.length === 0 ? (
                 <div className="text-center p-10 border rounded-lg text-gray-500">
-                    No magazines found.
+                    Nenhuma revista encontrada.
                 </div>
             ) : (
                 <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
