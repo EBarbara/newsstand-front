@@ -110,6 +110,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         setFocusY(Math.round(y));
     };
 
+    const formatDate = (dateStr?: string) => {
+        if (!dateStr) return "Unknown";
+        // Manual split to avoid timezone issues with 'new Date()'
+        const [year, month, day] = dateStr.split('-');
+        if (!year || !month || !day) return dateStr;
+        return `${day}/${month}/${year}`;
+    };
+
     if (loading) return <div className="p-10 text-white">Loading...</div>;
     if (!person) return notFound();
 
@@ -224,7 +232,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                     className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none"
                                 />
                             ) : (
-                                <p className="text-gray-200">{person.birth_date ? new Date(person.birth_date).toLocaleDateString() : "Unknown"}</p>
+                                <p className="text-gray-200">{formatDate(person.birth_date)}</p>
                             )}
                         </div>
                         <div>
