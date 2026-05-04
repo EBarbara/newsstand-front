@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useRef } from "react";
 import { getPersonDetail, updatePerson } from "@/lib/people";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,8 +22,12 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
     const [editBirthDate, setEditBirthDate] = useState("");
     const [editCountry, setEditCountry] = useState("");
     const [editLinks, setEditLinks] = useState<Omit<PersonLink, 'id'>[]>([]);
+    const [focusX, setFocusX] = useState(50);
+    const [focusY, setFocusY] = useState(50);
     const [photoFile, setPhotoFile] = useState<File | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+    const photoRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         getPersonDetail(Number(id))
@@ -34,6 +38,8 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 setEditBirthDate(data.birth_date || "");
                 setEditCountry(data.country || "");
                 setEditLinks(data.links || []);
+                setFocusX(data.photo_focus_x ?? 50);
+                setFocusY(data.photo_focus_y ?? 50);
                 setLoading(false);
             })
             .catch(() => {
@@ -51,30 +57,19 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             formData.append("biography", editBio);
             formData.append("birth_date", editBirthDate);
             formData.append("country", editCountry);
-            formData.append("links", JSON.stringify(editLinks)); // Wait, DRF nested serializer expects a list of objects
+            formData.append("photo_focus_x", focusX.toString());
+            formData.append("photo_focus_y", focusY.toString());
+            formData.append("links", JSON.stringify(editLinks));
 
             if (photoFile) {
                 formData.append("photo", photoFile);
             }
 
-            // Note: Sending JSON as part of FormData for nested fields can be tricky with DRF 
-            // unless we use a custom parser or handle it as separate fields.
-            // But since I'm using MultiPartParser, I might need to send links as a JSON string and parse it in the backend,
-            // OR just use a JSON request if there's no photo.
-            
-            // Let's try sending as a JSON request if there's no photo, or fix the links format.
-            // Actually, for nested PersonLink, I'll update the serializer to handle JSON string if needed, 
-            // or just send as multiple fields.
-            
-            // Simpler: If photo exists, use FormData for everything. 
-            // If not, we can use JSON. 
-            
-            // For links in FormData, DRF usually expects links[0]url, links[0]label etc.
-            // To keep it simple, I'll update the backend to parse the links JSON if it's a string.
-            
             const result = await updatePerson(person.id, formData);
             setPerson(result);
             setIsEditing(false);
+            setPhotoFile(null);
+            setPhotoPreview(null);
             router.refresh();
         } catch (error) {
             console.error("Failed to update person:", error);
@@ -106,6 +101,15 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         }
     };
 
+    const handlePhotoClick = (e: React.MouseEvent) => {
+        if (!isEditing || !photoRef.current) return;
+        const rect = photoRef.current.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        setFocusX(Math.round(x));
+        setFocusY(Math.round(y));
+    };
+
     if (loading) return <div className="p-10 text-white">Loading...</div>;
     if (!person) return notFound();
 
@@ -124,7 +128,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 ) : (
                     <div className="flex gap-2">
                         <button 
-                            onClick={() => setIsEditing(false)}
+                            onClick={() => {
+                                setIsEditing(false);
+                                setPhotoPreview(null);
+                                setPhotoFile(null);
+                                // Reset to current values
+                                setFocusX(person.photo_focus_x ?? 50);
+                                setFocusY(person.photo_focus_y ?? 50);
+                            }}
                             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition-colors"
                         >
                             Cancel
@@ -143,43 +154,66 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             <div className="flex flex-col md:flex-row gap-10">
                 {/* SIDEBAR: Photo & Basic Info */}
                 <div className="w-full md:w-1/3 flex flex-col gap-6">
-                    <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-gray-900 group">
-                        {photoUrl ? (
-                            <img 
-                                src={photoUrl} 
-                                alt={person.name}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-700">
-                                <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                </svg>
-                            </div>
-                        )}
-                        
-                        {isEditing && (
-                            <label className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                                <span className="text-sm font-bold">Change Photo</span>
-                                <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
-                            </label>
-                        )}
+                    <div className="flex flex-col gap-2">
+                        <div 
+                            ref={photoRef}
+                            onClick={handlePhotoClick}
+                            className={`relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-gray-900 group ${isEditing ? 'cursor-crosshair' : ''}`}
+                        >
+                            {photoUrl ? (
+                                <img 
+                                    src={photoUrl} 
+                                    alt={person.name}
+                                    style={{ objectPosition: `${focusX}% ${focusY}%` }}
+                                    className="w-full h-full object-cover transition-all duration-300"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                    <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
+                                </div>
+                            )}
+                            
+                            {isEditing && (
+                                <>
+                                    <div 
+                                        className="absolute w-6 h-6 border-2 border-white rounded-full shadow-lg pointer-events-none flex items-center justify-center"
+                                        style={{ left: `${focusX}%`, top: `${focusY}%`, transform: 'translate(-50%, -50%)' }}
+                                    >
+                                        <div className="w-1 h-1 bg-white rounded-full" />
+                                    </div>
+                                    <label className="absolute bottom-4 right-4 bg-black/60 p-2 rounded-lg cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
+                                    </label>
+                                </>
+                            )}
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 pointer-events-none" />
-                        <div className="absolute bottom-6 left-6 right-6">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 pointer-events-none" />
+                            <div className="absolute bottom-6 left-6 right-6 pointer-events-none">
+                                {!isEditing && <h1 className="text-3xl font-bold tracking-tight">{person.name}</h1>}
+                            </div>
+                        </div>
+                        {isEditing && <p className="text-[10px] text-gray-500 text-center">Click on image to set focus point</p>}
+                    </div>
+
+                    <div className="bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm space-y-4">
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Full Name</label>
                             {isEditing ? (
                                 <input 
                                     value={editName}
                                     onChange={(e) => setEditName(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/20 rounded px-2 py-1 text-2xl font-bold focus:outline-none focus:border-blue-500"
+                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none"
                                 />
                             ) : (
-                                <h1 className="text-3xl font-bold tracking-tight">{person.name}</h1>
+                                <p className="text-gray-200">{person.name}</p>
                             )}
                         </div>
-                    </div>
-
-                    <div className="bg-white/5 rounded-2xl p-6 border border-white/10 backdrop-blur-sm space-y-4">
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Birth Date</label>
                             {isEditing ? (
@@ -212,21 +246,23 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                 {(isEditing ? editLinks : person.links || []).map((link, idx) => (
                                     <div key={idx} className="flex gap-2">
                                         {isEditing ? (
-                                            <>
+                                            <div className="flex flex-col gap-1 flex-1">
                                                 <input 
                                                     value={link.label}
                                                     onChange={(e) => updateLink(idx, 'label', e.target.value)}
                                                     placeholder="Label"
-                                                    className="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
+                                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200"
                                                 />
-                                                <input 
-                                                    value={link.url}
-                                                    onChange={(e) => updateLink(idx, 'url', e.target.value)}
-                                                    placeholder="URL"
-                                                    className="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
-                                                />
-                                                <button onClick={() => removeLink(idx)} className="text-red-500 hover:text-red-400">✕</button>
-                                            </>
+                                                <div className="flex gap-1">
+                                                    <input 
+                                                        value={link.url}
+                                                        onChange={(e) => updateLink(idx, 'url', e.target.value)}
+                                                        placeholder="URL"
+                                                        className="flex-1 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200"
+                                                    />
+                                                    <button onClick={() => removeLink(idx)} className="text-red-500 hover:text-red-400">✕</button>
+                                                </div>
+                                            </div>
                                         ) : (
                                             <a 
                                                 href={link.url}

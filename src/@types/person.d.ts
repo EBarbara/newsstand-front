@@ -7,6 +7,8 @@ export interface Person {
     country?: string;
     biography?: string;
     photo?: string;
+    photo_focus_x?: number;
+    photo_focus_y?: number;
     links?: PersonLink[];
     credits?: PersonCredit[];
 }
