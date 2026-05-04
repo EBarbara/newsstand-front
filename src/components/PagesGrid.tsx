@@ -26,6 +26,11 @@ export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionI
                     onClick={() => assignPage(r.order)}
                     onReplace={(file) => handleReplacePage(r.id, file)}
                     onDelete={() => handleDeletePage(r.id)}
+                    onInsert={async (files) => {
+                        for (let i = 0; i < files.length; i++) {
+                            await handleUploadPage(files[i], r.order + i);
+                        }
+                    }}
                 />
             ))}
 
@@ -42,9 +47,11 @@ export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionI
                     className="hidden" 
                     accept="image/*"
                     multiple
-                    onChange={(e) => {
+                    onChange={async (e) => {
                         const files = Array.from(e.target.files || []);
-                        files.forEach(file => handleUploadPage(file));
+                        for (const file of files) {
+                            await handleUploadPage(file);
+                        }
                     }}
                 />
             </div>

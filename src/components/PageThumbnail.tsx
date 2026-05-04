@@ -10,10 +10,12 @@ type Props = {
     onClick: () => void
     onReplace: (file: File) => void
     onDelete: () => void
+    onInsert: (files: File[]) => void
 }
 
-export default function PageThumbnail({ id, page, image, sectionId, isSelectedSection, onClick, onReplace, onDelete }: Props) {
+export default function PageThumbnail({ id, page, image, sectionId, isSelectedSection, onClick, onReplace, onDelete, onInsert }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const insertInputRef = useRef<HTMLInputElement>(null);
 
     return (
         <div
@@ -30,6 +32,17 @@ export default function PageThumbnail({ id, page, image, sectionId, isSelectedSe
                         : "border-gray-800 hover:border-gray-700"}
             `}
         >
+            {/* INSERT BEFORE BUTTON */}
+            <div 
+                onClick={(e) => {
+                    e.stopPropagation();
+                    insertInputRef.current?.click();
+                }}
+                className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-40 hover:scale-125 shadow-lg cursor-pointer border border-white/20"
+                title="Insert page before"
+            >
+                <span className="text-white text-lg font-bold leading-none">+</span>
+            </div>
             {/* HOVER OVERLAY */}
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex flex-col items-center justify-center gap-2 p-2">
                 <button
@@ -51,6 +64,18 @@ export default function PageThumbnail({ id, page, image, sectionId, isSelectedSe
                     DELETE
                 </button>
             </div>
+
+            <input
+                type="file"
+                ref={insertInputRef}
+                className="hidden"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length > 0) onInsert(files);
+                }}
+            />
 
             <input
                 type="file"
