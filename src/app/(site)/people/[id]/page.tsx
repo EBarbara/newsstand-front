@@ -512,7 +512,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                     <Link 
                                         key={group.issue_id}
                                         href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
-                                        className="group bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl overflow-hidden flex flex-col sm:flex-row transition-all hover:scale-[1.01] active:scale-100 shadow-lg"
+                                        className={`group bg-white/5 hover:bg-white/10 border border-white/10 overflow-hidden flex flex-col sm:flex-row transition-all hover:scale-[1.01] active:scale-100 shadow-lg ${group.issue_cover ? 'rounded-r-2xl rounded-l-none' : 'rounded-2xl'}`}
                                     >
                                         {/* Issue Cover */}
                                         <div className="w-full sm:w-24 aspect-[3/4] bg-gray-800 shrink-0">
