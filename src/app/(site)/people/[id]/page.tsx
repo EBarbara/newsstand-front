@@ -441,17 +441,19 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Nome Completo</label>
                             {isEditing ? (
-                                <input 
-                                    value={editName}
-                                    onChange={(e) => setEditName(e.target.value)}
-                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
-                                />
-                                <input 
-                                    value={editDisambiguation}
-                                    onChange={(e) => setEditDisambiguation(e.target.value)}
-                                    placeholder="Desambiguação (ex: Ator, UK, etc.)"
-                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-xs text-blue-300 focus:outline-none focus:border-blue-500 transition-colors"
-                                />
+                                <>
+                                    <input 
+                                        value={editName}
+                                        onChange={(e) => setEditName(e.target.value)}
+                                        className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                                    />
+                                    <input 
+                                        value={editDisambiguation}
+                                        onChange={(e) => setEditDisambiguation(e.target.value)}
+                                        placeholder="Desambiguação (ex: Ator, UK, etc.)"
+                                        className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-xs text-blue-300 focus:outline-none focus:border-blue-500 transition-colors"
+                                    />
+                                </>
                             ) : (
                                 <div className="flex flex-col">
                                     <p className="text-gray-200">{person.name}</p>
