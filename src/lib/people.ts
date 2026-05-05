@@ -1,8 +1,10 @@
 import { request } from './api';
 import { Person, PaginatedResponse, PersonCredit } from "@/@types/person";
 
-export function getPeople(page: number = 1, pageSize: number = 20) {
-    return request<PaginatedResponse<Person>>(`/people/?page=${page}&page_size=${pageSize}`);
+export function getPeople(page: number = 1, pageSize: number = 20, search?: string) {
+    let url = `/people/?page=${page}&page_size=${pageSize}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    return request<PaginatedResponse<Person>>(url);
 }
 
 export function createPerson(name: string) {

@@ -60,10 +60,25 @@ export default function SectionsPanel({
     const [people, setPeople] = useState<Person[]>([]);
     const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
     const [newCreditRole, setNewCreditRole] = useState("");
+    const [peopleSearch, setPeopleSearch] = useState("");
+    const [isLoadingPeople, setIsLoadingPeople] = useState(false);
 
     useEffect(() => {
-        getPeople(1, 100).then(res => setPeople(res.results)).catch(console.error);
-    }, []);
+        console.log("Searching people for:", peopleSearch);
+        setIsLoadingPeople(true);
+        const timer = setTimeout(() => {
+            getPeople(1, 1000, peopleSearch)
+                .then(res => {
+                    console.log("Found people:", res.results.length);
+                    setPeople(res.results);
+                })
+                .catch(err => {
+                    console.error("Search failed:", err);
+                })
+                .finally(() => setIsLoadingPeople(false));
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [peopleSearch]);
 
     const handleCreateType = async () => {
         if (!newTypeName.trim()) return;
@@ -318,16 +333,29 @@ export default function SectionsPanel({
 
                                 {/* ADD CREDIT */}
                                 <div className="flex flex-col gap-1.5 mt-1 p-2 bg-[#1a1d23]/50 rounded border border-dashed border-gray-700">
-                                    <select 
-                                        value={selectedPersonId ?? ""}
-                                        onChange={(e) => setSelectedPersonId(Number(e.target.value))}
-                                        className="w-full p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
-                                    >
-                                        <option value="">Selecionar pessoa...</option>
-                                        {people.map(p => (
-                                            <option key={p.id} value={p.id}>{p.name}</option>
-                                        ))}
-                                    </select>
+                                    <div className="flex flex-col gap-1">
+                                        <input 
+                                            type="text"
+                                            value={peopleSearch}
+                                            onChange={(e) => setPeopleSearch(e.target.value)}
+                                            placeholder="Buscar pessoa..."
+                                            className="w-full p-1 bg-[#161a20] border border-gray-800 rounded text-[10px] text-blue-300 focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <select 
+                                            key={`select-${people.length}-${peopleSearch}`}
+                                            value={selectedPersonId ?? ""}
+                                            onChange={(e) => setSelectedPersonId(Number(e.target.value))}
+                                            className="w-full p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
+                                        >
+                                            <option value="">{isLoadingPeople ? "Buscando..." : "Selecionar..."}</option>
+                                            {people.length === 0 && !isLoadingPeople && peopleSearch && (
+                                                <option disabled>Nenhum resultado encontrado</option>
+                                            )}
+                                            {people.map(p => (
+                                                <option key={p.id} value={p.id}>{p.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                     <div className="flex gap-1.5">
                                         <input 
                                             value={newCreditRole}
