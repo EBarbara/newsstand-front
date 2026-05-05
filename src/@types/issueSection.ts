@@ -8,7 +8,7 @@ export interface Credit {
     person_id: number;
     role: string | null;
     importance: number;
-    render_id?: number | null;
+    render_ids?: number[];
 }
 
 export type IssueSection = {

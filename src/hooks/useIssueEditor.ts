@@ -31,7 +31,7 @@ export type IssueEditorState = {
     removeCreditFromSection: (sectionId: number, creditIndex: number) => void
     updateCreditRole: (sectionId: number, creditIndex: number, role: string) => void
     updateCreditImportance: (sectionId: number, creditIndex: number, importance: number) => void
-    updateCreditPage: (sectionId: number, creditIndex: number, renderId: number | null) => void
+    updateCreditPage: (sectionId: number, creditIndex: number, renderIds: number[]) => void
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
@@ -220,11 +220,11 @@ export function useIssueEditor(slug: string, edition: string) {
         }));
     }
 
-    function updateCreditPage(sectionId: number, creditIndex: number, renderId: number | null) {
+    function updateCreditPage(sectionId: number, creditIndex: number, renderIds: number[]) {
         setSections(prev => prev.map(s => {
             if (s.id !== sectionId) return s;
             const newCredits = [...(s.credits || [])];
-            newCredits[creditIndex] = { ...newCredits[creditIndex], render_id: renderId };
+            newCredits[creditIndex] = { ...newCredits[creditIndex], render_ids: renderIds };
             return { ...s, credits: newCredits };
         }));
     }
@@ -255,7 +255,7 @@ export function useIssueEditor(slug: string, edition: string) {
                         person_id: (c.person_id || c.person?.id)!,
                         role: c.role,
                         importance: c.importance || 1,
-                        render_id: c.render_id
+                        render_ids: c.render_ids || []
                     })),
             });
 

@@ -31,28 +31,28 @@ type Props = Pick<
 >
 
 export default function SectionsPanel({
-                                          issue,
-                                          sections,
-                                          selectedSectionId,
-                                          setSelectedSectionId,
-                                          createSection,
-                                          deleteSection,
-                                          updateSectionTitle,
-                                          updateSectionText,
-                                          updateSectionType,
-                                          createNewSectionType,
-                                          saveSection,
-                                          availableSections,
-                                          selectedTemplate,
-                                          setSelectedTemplate,
-                                          savingSections,
-                                          savedSections,
-                                          addCreditToSection,
-                                          removeCreditFromSection,
-                                          updateCreditRole,
-                                          updateCreditImportance,
-                                          updateCreditPage,
-                                          updateIssueMetadata
+    issue,
+    sections,
+    selectedSectionId,
+    setSelectedSectionId,
+    createSection,
+    deleteSection,
+    updateSectionTitle,
+    updateSectionText,
+    updateSectionType,
+    createNewSectionType,
+    saveSection,
+    availableSections,
+    selectedTemplate,
+    setSelectedTemplate,
+    savingSections,
+    savedSections,
+    addCreditToSection,
+    removeCreditFromSection,
+    updateCreditRole,
+    updateCreditImportance,
+    updateCreditPage,
+    updateIssueMetadata
 }: Props) {
     const [newTypeName, setNewTypeName] = useState("");
     const [isCreatingType, setIsCreatingType] = useState(false);
@@ -90,7 +90,7 @@ export default function SectionsPanel({
         <div className="w-[300px] h-full overflow-y-auto p-2.5 border-r border-gray-800 bg-[#0b0e14] scrollbar-thin scrollbar-thumb-gray-700">
             {issue && (
                 <>
-                    <Link 
+                    <Link
                         href={`/magazines/${issue.magazine.slug}/${issue.edition}`}
                         className="flex items-center gap-2 mb-4 p-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded transition-colors"
                     >
@@ -102,7 +102,7 @@ export default function SectionsPanel({
                         <div className="flex flex-col gap-2.5">
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <div className="relative flex items-center">
-                                    <input 
+                                    <input
                                         type="checkbox"
                                         checked={issue.has_physical_copy}
                                         onChange={(e) => updateIssueMetadata({ has_physical_copy: e.target.checked })}
@@ -117,7 +117,7 @@ export default function SectionsPanel({
 
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <div className="relative flex items-center">
-                                    <input 
+                                    <input
                                         type="checkbox"
                                         checked={issue.is_digital_complete}
                                         onChange={(e) => updateIssueMetadata({ is_digital_complete: e.target.checked })}
@@ -191,11 +191,10 @@ export default function SectionsPanel({
             <button
                 onClick={createSection}
                 disabled={!selectedTemplate}
-                className={`w-full mb-4 p-2 text-white font-bold rounded transition-all ${
-                    !selectedTemplate 
-                        ? "bg-gray-800 text-gray-500 cursor-not-allowed" 
+                className={`w-full mb-4 p-2 text-white font-bold rounded transition-all ${!selectedTemplate
+                        ? "bg-gray-800 text-gray-500 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-95"
-                }`}
+                    }`}
             >
                 + Adicionar Seção
             </button>
@@ -208,11 +207,10 @@ export default function SectionsPanel({
                         e.stopPropagation()
                         setSelectedSectionId(prev => (prev === s.id ? null : s.id))
                     }}
-                    className={`p-2 mb-1.5 rounded-md cursor-pointer transition-all border ${
-                        selectedSectionId === s.id 
-                            ? "bg-blue-600 text-white border-blue-500 shadow-md" 
+                    className={`p-2 mb-1.5 rounded-md cursor-pointer transition-all border ${selectedSectionId === s.id
+                            ? "bg-blue-600 text-white border-blue-500 shadow-md"
                             : "bg-[#161a20] text-gray-300 border-gray-800 hover:bg-[#1e232b] hover:border-gray-700"
-                    }`}
+                        }`}
                 >
                     <div className="flex items-center justify-between gap-2">
                         <div className="flex-1 min-w-0">
@@ -231,10 +229,10 @@ export default function SectionsPanel({
                                 </span>
                             )}
                         </div>
-                        
+
                         {s.segments.length === 0 && (
-                            <span 
-                                title="Incompleto (sem páginas atribuídas)" 
+                            <span
+                                title="Incompleto (sem páginas atribuídas)"
                                 className={`text-xs shrink-0 ${selectedSectionId === s.id ? "text-yellow-200" : "text-amber-500"}`}
                             >
                                 ⚠️
@@ -273,7 +271,7 @@ export default function SectionsPanel({
                             {/* CREDITS */}
                             <div className="flex flex-col gap-2 mt-1">
                                 <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Créditos</label>
-                                
+
                                 <div className="flex flex-col gap-1.5">
                                     {(s.credits || []).map((credit, idx) => (
                                         <div key={idx} className="flex gap-2 items-center bg-[#1a1d23] p-1.5 rounded border border-gray-800">
@@ -281,46 +279,55 @@ export default function SectionsPanel({
                                                 <div className="text-[10px] font-bold text-gray-400 truncate">
                                                     {credit.person?.name || people.find(p => p.id === credit.person_id)?.name || "Unknown"}
                                                 </div>
-                                                    <input 
-                                                        value={credit.role || ""}
-                                                        onChange={(e) => updateCreditRole(s.id, idx, e.target.value)}
-                                                        placeholder="Papel (ex: Artista)"
-                                                        className="w-full bg-transparent text-[11px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
-                                                    />
-                                                    
-                                                    {/* PAGE ANCHOR SELECT */}
-                                                    <select 
-                                                        value={credit.render_id ?? ""}
-                                                        onChange={(e) => updateCreditPage(s.id, idx, e.target.value ? Number(e.target.value) : null)}
-                                                        className="w-full bg-transparent text-[9px] text-gray-500 hover:text-gray-400 focus:outline-none cursor-pointer mt-0.5"
-                                                    >
-                                                        <option value="" className="bg-[#1a1d23]">Sem página específica</option>
-                                                        {issue?.renders?.map(r => {
-                                                            const isInSection = s.segments.some(seg => r.order >= seg.start_page && r.order <= seg.end_page);
+                                                <input
+                                                    value={credit.role || ""}
+                                                    onChange={(e) => updateCreditRole(s.id, idx, e.target.value)}
+                                                    placeholder="Papel (ex: Artista)"
+                                                    className="w-full bg-transparent text-[11px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
+                                                />
+
+                                                {/* PAGE ANCHOR MULTI-SELECT */}
+                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                    <span className="text-[9px] text-gray-500 mr-1 uppercase font-bold opacity-50">Págs:</span>
+                                                    {issue?.renders?.filter(r => s.segments.some(seg => r.order >= seg.start_page && r.order <= seg.end_page))
+                                                        .map(r => {
+                                                            const isSelected = (credit.render_ids || []).includes(r.id);
                                                             return (
-                                                                <option key={r.id} value={r.id} className="bg-[#1a1d23]">
-                                                                    Página {r.order} {isInSection ? "★" : ""}
-                                                                </option>
-                                                            );
-                                                        })}
-                                                    </select>
+                                                                <button
+                                                                    key={r.id}
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        const current = credit.render_ids || [];
+                                                                        const next = isSelected ? current.filter(id => id !== r.id) : [...current, r.id];
+                                                                        updateCreditPage(s.id, idx, next);
+                                                                    }}
+                                                                    className={`text-[9px] px-1.5 py-0.5 rounded transition-all ${isSelected
+                                                                            ? "bg-blue-600 text-white font-bold"
+                                                                            : "bg-[#252a33] text-gray-500 hover:bg-[#2c323c]"
+                                                                        }`}
+                                                                >
+                                                                    {r.order}
+                                                                </button>
+                                                            )
+                                                        })
+                                                    }
                                                 </div>
-                                            
+                                            </div>
+
                                             <div className="flex flex-col gap-1 items-end">
-                                                <select 
+                                                <select
                                                     value={credit.importance || 1}
                                                     onChange={(e) => updateCreditImportance(s.id, idx, Number(e.target.value))}
-                                                    className={`text-[9px] font-bold uppercase rounded px-1 py-0.5 border-none focus:ring-0 cursor-pointer ${
-                                                        credit.importance === 1 ? "bg-amber-500/20 text-amber-400" :
-                                                        credit.importance === 2 ? "bg-blue-500/20 text-blue-400" :
-                                                        "bg-gray-500/20 text-gray-400"
-                                                    }`}
+                                                    className={`text-[9px] font-bold uppercase rounded px-1 py-0.5 border-none focus:ring-0 cursor-pointer ${credit.importance === 1 ? "bg-amber-500/20 text-amber-400" :
+                                                            credit.importance === 2 ? "bg-blue-500/20 text-blue-400" :
+                                                                "bg-gray-500/20 text-gray-400"
+                                                        }`}
                                                 >
                                                     <option value={1} className="bg-[#1a1d23]">Major</option>
                                                     <option value={2} className="bg-[#1a1d23]">Regular</option>
                                                     <option value={3} className="bg-[#1a1d23]">Minor</option>
                                                 </select>
-                                                <button 
+                                                <button
                                                     onClick={() => removeCreditFromSection(s.id, idx)}
                                                     className="text-gray-500 hover:text-red-400 p-0.5"
                                                 >
@@ -334,14 +341,14 @@ export default function SectionsPanel({
                                 {/* ADD CREDIT */}
                                 <div className="flex flex-col gap-1.5 mt-1 p-2 bg-[#1a1d23]/50 rounded border border-dashed border-gray-700">
                                     <div className="flex flex-col gap-1">
-                                        <input 
+                                        <input
                                             type="text"
                                             value={peopleSearch}
                                             onChange={(e) => setPeopleSearch(e.target.value)}
                                             placeholder="Buscar pessoa..."
                                             className="w-full p-1 bg-[#161a20] border border-gray-800 rounded text-[10px] text-blue-300 focus:border-blue-500 focus:outline-none"
                                         />
-                                        <select 
+                                        <select
                                             key={`select-${people.length}-${peopleSearch}`}
                                             value={selectedPersonId ?? ""}
                                             onChange={(e) => setSelectedPersonId(Number(e.target.value))}
@@ -352,8 +359,8 @@ export default function SectionsPanel({
                                                 <option disabled>Nenhum resultado encontrado</option>
                                             )}
                                             {people.map(p => {
-                                                const matchingAlias = p.aliases?.find(a => 
-                                                    a.toLowerCase().includes(peopleSearch.toLowerCase()) && 
+                                                const matchingAlias = p.aliases?.find(a =>
+                                                    a.toLowerCase().includes(peopleSearch.toLowerCase()) &&
                                                     !p.name.toLowerCase().includes(peopleSearch.toLowerCase())
                                                 );
                                                 return (
@@ -367,13 +374,13 @@ export default function SectionsPanel({
                                         </select>
                                     </div>
                                     <div className="flex gap-1.5">
-                                        <input 
+                                        <input
                                             value={newCreditRole}
                                             onChange={(e) => setNewCreditRole(e.target.value)}
                                             placeholder="Papel..."
                                             className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
                                         />
-                                        <button 
+                                        <button
                                             onClick={() => {
                                                 if (selectedPersonId) {
                                                     addCreditToSection(s.id, selectedPersonId, newCreditRole);
@@ -394,13 +401,12 @@ export default function SectionsPanel({
                                 <button
                                     onClick={() => saveSection(s.id)}
                                     disabled={savingSections[s.id]}
-                                    className={`flex-1 py-1.5 font-bold rounded text-sm transition-all shadow-sm ${
-                                        savingSections[s.id] 
-                                            ? "bg-blue-400 text-white" 
-                                            : savedSections[s.id] 
-                                                ? "bg-green-500 text-white" 
+                                    className={`flex-1 py-1.5 font-bold rounded text-sm transition-all shadow-sm ${savingSections[s.id]
+                                            ? "bg-blue-400 text-white"
+                                            : savedSections[s.id]
+                                                ? "bg-green-500 text-white"
                                                 : "bg-white text-blue-700 hover:bg-gray-100"
-                                    }`}
+                                        }`}
                                 >
                                     {savingSections[s.id] ? "Salvando..." : savedSections[s.id] ? "Salvo ✓" : "Salvar"}
                                 </button>

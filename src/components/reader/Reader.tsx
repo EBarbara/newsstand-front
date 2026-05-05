@@ -109,6 +109,7 @@ export default function Reader({ issue, initialIndex = 0 }: Props) {
             <Sidebar
                 issue={issue}
                 section={section}
+                currentPageId={current.id}
                 onReadText={() => setMode("text")}
             />
 
