@@ -10,4 +10,6 @@ export type Issue = {
     renders: Render[];
     sections: IssueSection[];
     cover: string;
+    has_physical_copy?: boolean;
+    is_digital_complete?: boolean;
 }

@@ -149,3 +149,10 @@ export function deleteIssuePage(issueId: number, renderId: number) {
         method: 'DELETE',
     });
 }
+
+export function updateIssue(issueId: number, data: Partial<Issue>) {
+    return request<Issue>(`/issues/${issueId}/`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+    });
+}

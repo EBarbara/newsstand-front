@@ -20,6 +20,7 @@
 /* COVER */
 
 .coverWrapper {
+    position: relative;
     background-color: var(--surface-hover);
 
     display: flex;
@@ -94,4 +95,37 @@
 
 .magazineLink:hover {
     text-decoration: underline;
+}
+
+.badgesOverlay {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.statusBadge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    cursor: help;
+}
+
+.statusBadge:hover {
+    transform: scale(1.1);
+    background: rgba(15, 23, 42, 0.8);
+    border-color: var(--primary);
 }

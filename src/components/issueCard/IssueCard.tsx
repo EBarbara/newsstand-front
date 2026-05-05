@@ -19,6 +19,20 @@ export default function IssueCard({ issue }: { issue: Issue }) {
                     altText={`Capa da edição ${issue.id}`}
                     defaultWidth={240}
                 />
+
+                {/* STATUS BADGES */}
+                <div className={styles.badgesOverlay}>
+                    {issue.has_physical_copy && (
+                        <div className={styles.statusBadge} title="Possuo a edição física (Papel)">
+                            📚
+                        </div>
+                    )}
+                    {issue.is_digital_complete && (
+                        <div className={styles.statusBadge} title="Coleção digital completa">
+                            ✅
+                        </div>
+                    )}
+                </div>
             </Link>
 
             {/* INFO */}

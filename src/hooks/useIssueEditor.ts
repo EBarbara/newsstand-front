@@ -38,6 +38,7 @@ export type IssueEditorState = {
     handleUploadPage: (file: File, order?: number) => Promise<void>
     handleReplacePage: (renderId: number, file: File) => Promise<void>
     handleDeletePage: (renderId: number) => Promise<void>
+    updateIssueMetadata: (data: Partial<Issue>) => Promise<void>
     error: string | null
 }
 
@@ -334,6 +335,18 @@ export function useIssueEditor(slug: string, edition: string) {
         }
     }
 
+    async function updateIssueMetadata(data: Partial<Issue>) {
+        if (!issue) return
+        try {
+            const { updateIssue } = await import("@/lib/issues");
+            const updated = await updateIssue(issue.id, data);
+            setIssue(updated);
+        } catch (error) {
+            console.error("Failed to update issue metadata", error);
+            alert("Failed to update issue status.");
+        }
+    }
+
     const sortedSections = useMemo(() => {
         return [...sections].sort((a, b) => {
             const aMin = a.segments.length > 0 ? Math.min(...a.segments.map(s => s.start_page)) : Infinity;
@@ -376,6 +389,7 @@ export function useIssueEditor(slug: string, edition: string) {
         handleUploadPage,
         handleReplacePage,
         handleDeletePage,
+        updateIssueMetadata,
         error,
     }
 }
