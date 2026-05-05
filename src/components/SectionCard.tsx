@@ -28,12 +28,26 @@ export default function SectionCard({ section, slug, edition, issueId, renders }
                 </div>
                 {section.credits && section.credits.length > 0 && (
                     <div className="text-sm text-gray-500 mt-1 truncate">
-                        {section.credits.map((c, i) => (
-                            <span key={i}>
+                        {/* Major Credits */}
+                        {section.credits.filter(c => c.importance === 1).map((c, i, arr) => (
+                            <span key={`major-${i}`} className="font-bold text-gray-300">
                                 {c.person?.name}{c.role ? ` (${c.role})` : ""}
-                                {i < section.credits.length - 1 ? ", " : ""}
+                                {(i < arr.length - 1 || section.credits.some(c => c.importance > 1)) && ", "}
                             </span>
                         ))}
+                        {/* Regular Credits */}
+                        {section.credits.filter(c => (c.importance === 2 || !c.importance)).map((c, i, arr) => (
+                            <span key={`reg-${i}`}>
+                                {c.person?.name}{c.role ? ` (${c.role})` : ""}
+                                {(i < arr.length - 1 || section.credits.some(c => c.importance === 3)) && ", "}
+                            </span>
+                        ))}
+                        {/* Minor Credits (Mentions) */}
+                        {section.credits.some(c => c.importance === 3) && (
+                             <span className="text-xs text-gray-600 italic">
+                                {` e mais ${section.credits.filter(c => c.importance === 3).length} menções`}
+                            </span>
+                        )}
                     </div>
                 )}
             </div>

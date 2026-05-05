@@ -35,14 +35,35 @@ export default function Sidebar({ issue, section, onReadText }: SidebarProps) {
                     <div className={styles.credits}>
                         <strong>Credits</strong>
                         <ul className={styles.creditsList}>
-                            {section.credits.map((credit, i) => (
+                            {/* Major & Regular Credits */}
+                            {section.credits.filter(c => c.importance !== 3).map((credit, i) => (
                                 <li key={i}>
-                                    <a href={`/people/${credit.person?.id}`} className={styles.personLink}>
+                                    <a 
+                                        href={`/people/${credit.person?.id}`} 
+                                        className={`${styles.personLink} ${credit.importance === 1 ? styles.majorName : ""}`}
+                                    >
                                         {credit.person?.name}
                                     </a>
                                     {credit.role && ` (${credit.role})`}
                                 </li>
                             ))}
+                            
+                            {/* Minor Credits (Mentions) */}
+                            {section.credits.some(c => c.importance === 3) && (
+                                <li className={styles.mentionsContainer}>
+                                    <div className={styles.mentionsTitle}>Menções</div>
+                                    <div className={styles.mentionsList}>
+                                        {section.credits.filter(c => c.importance === 3).map((c, i, arr) => (
+                                            <span key={i}>
+                                                <a href={`/people/${c.person?.id}`} className={styles.mentionLink}>
+                                                    {c.person?.name}
+                                                </a>
+                                                {i < arr.length - 1 ? ", " : ""}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </>

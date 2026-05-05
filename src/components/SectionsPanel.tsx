@@ -25,6 +25,7 @@ type Props = Pick<
     | "addCreditToSection"
     | "removeCreditFromSection"
     | "updateCreditRole"
+    | "updateCreditImportance"
 >
 
 export default function SectionsPanel({
@@ -46,7 +47,8 @@ export default function SectionsPanel({
                                           savedSections,
                                           addCreditToSection,
                                           removeCreditFromSection,
-                                          updateCreditRole
+                                          updateCreditRole,
+                                          updateCreditImportance
 }: Props) {
     const [newTypeName, setNewTypeName] = useState("");
     const [isCreatingType, setIsCreatingType] = useState(false);
@@ -230,12 +232,28 @@ export default function SectionsPanel({
                                                     className="w-full bg-transparent text-[11px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
                                                 />
                                             </div>
-                                            <button 
-                                                onClick={() => removeCreditFromSection(s.id, idx)}
-                                                className="text-gray-500 hover:text-red-400 p-1"
-                                            >
-                                                ✕
-                                            </button>
+                                            
+                                            <div className="flex flex-col gap-1 items-end">
+                                                <select 
+                                                    value={credit.importance || 1}
+                                                    onChange={(e) => updateCreditImportance(s.id, idx, Number(e.target.value))}
+                                                    className={`text-[9px] font-bold uppercase rounded px-1 py-0.5 border-none focus:ring-0 cursor-pointer ${
+                                                        credit.importance === 1 ? "bg-amber-500/20 text-amber-400" :
+                                                        credit.importance === 2 ? "bg-blue-500/20 text-blue-400" :
+                                                        "bg-gray-500/20 text-gray-400"
+                                                    }`}
+                                                >
+                                                    <option value={1} className="bg-[#1a1d23]">Major</option>
+                                                    <option value={2} className="bg-[#1a1d23]">Regular</option>
+                                                    <option value={3} className="bg-[#1a1d23]">Minor</option>
+                                                </select>
+                                                <button 
+                                                    onClick={() => removeCreditFromSection(s.id, idx)}
+                                                    className="text-gray-500 hover:text-red-400 p-0.5"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

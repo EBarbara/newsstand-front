@@ -7,6 +7,7 @@ export interface Credit {
     person?: Person;
     person_id: number;
     role: string | null;
+    importance: number;
 }
 
 export type IssueSection = {

@@ -30,6 +30,7 @@ export type IssueEditorState = {
     addCreditToSection: (sectionId: number, personId: number, role: string | null) => void
     removeCreditFromSection: (sectionId: number, creditIndex: number) => void
     updateCreditRole: (sectionId: number, creditIndex: number, role: string) => void
+    updateCreditImportance: (sectionId: number, creditIndex: number, importance: number) => void
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
@@ -185,7 +186,7 @@ export function useIssueEditor(slug: string, edition: string) {
             if (s.id !== sectionId) return s;
             return {
                 ...s,
-                credits: [...(s.credits || []), { person_id: personId, role }]
+                credits: [...(s.credits || []), { person_id: personId, role, importance: 2 }]
             }
         }));
     }
@@ -204,6 +205,15 @@ export function useIssueEditor(slug: string, edition: string) {
             if (s.id !== sectionId) return s;
             const newCredits = [...(s.credits || [])];
             newCredits[creditIndex] = { ...newCredits[creditIndex], role };
+            return { ...s, credits: newCredits };
+        }));
+    }
+
+    function updateCreditImportance(sectionId: number, creditIndex: number, importance: number) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            const newCredits = [...(s.credits || [])];
+            newCredits[creditIndex] = { ...newCredits[creditIndex], importance };
             return { ...s, credits: newCredits };
         }));
     }
@@ -232,7 +242,8 @@ export function useIssueEditor(slug: string, edition: string) {
                     .filter(c => c.person_id || c.person?.id)
                     .map(c => ({
                         person_id: (c.person_id || c.person?.id)!,
-                        role: c.role
+                        role: c.role,
+                        importance: c.importance || 1
                     })),
             });
 
@@ -344,6 +355,7 @@ export function useIssueEditor(slug: string, edition: string) {
         addCreditToSection,
         removeCreditFromSection,
         updateCreditRole,
+        updateCreditImportance,
 
         saveSection,
         savingSections,
