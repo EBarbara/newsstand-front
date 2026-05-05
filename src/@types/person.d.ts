@@ -30,6 +30,7 @@ export interface PersonCredit {
     section_title: string | null;
     section_type: string;
     importance?: number;
+    start_page?: number | null;
 }
 
 export { type PaginatedResponse };

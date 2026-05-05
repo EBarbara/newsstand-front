@@ -572,12 +572,14 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                             </h2>
                                             <div className="grid grid-cols-1 gap-6">
                                                 {mainGroups.map((group: any) => (
-                                                    <Link 
+                                                    <div 
                                                         key={group.issue_id}
-                                                        href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
-                                                        className={`group bg-white/5 hover:bg-white/10 border border-white/10 overflow-hidden flex flex-col sm:flex-row transition-all hover:scale-[1.01] active:scale-100 shadow-lg ${group.issue_cover ? 'rounded-r-2xl rounded-l-none' : 'rounded-2xl'}`}
+                                                        className="group bg-white/5 border border-white/10 overflow-hidden flex flex-col sm:flex-row transition-all shadow-lg rounded-2xl"
                                                     >
-                                                        <div className="w-full sm:w-24 aspect-[3/4] bg-gray-800 shrink-0">
+                                                        <Link 
+                                                            href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                            className="w-full sm:w-24 aspect-[3/4] bg-gray-800 shrink-0 block hover:opacity-80 transition-opacity"
+                                                        >
                                                             {group.issue_cover ? (
                                                                 <img 
                                                                     src={getMediaUrl(group.issue_cover)} 
@@ -589,19 +591,26 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                                     <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                                                                 </div>
                                                             )}
-                                                        </div>
+                                                        </Link>
 
                                                         <div className="flex-1 p-5 flex flex-col justify-center min-w-0">
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">{group.magazine_name}</span>
+                                                            <Link 
+                                                                href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                                className="flex items-center gap-2 mb-3 group/title"
+                                                            >
+                                                                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest group-hover/title:text-blue-300 transition-colors">{group.magazine_name}</span>
                                                                 <span className="text-xs text-gray-700">/</span>
-                                                                <span className="text-sm text-gray-300 font-medium">Edição {group.issue_edition}</span>
-                                                            </div>
+                                                                <span className="text-sm text-gray-300 font-medium group-hover/title:text-white transition-colors">Edição {group.issue_edition}</span>
+                                                            </Link>
 
-                                                            <div className="space-y-3">
+                                                            <div className="space-y-2">
                                                                 {group.items.sort((a: any, b: any) => (a.importance || 2) - (b.importance || 2)).map((item: any) => (
-                                                                    <div key={item.id} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                                                        <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover:text-blue-200"}`}>
+                                                                    <Link 
+                                                                        key={item.id} 
+                                                                        href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`}
+                                                                        className="flex flex-wrap items-center gap-x-3 gap-y-1 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all group/item"
+                                                                    >
+                                                                        <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
                                                                             {item.section_title || item.section_type}
                                                                         </h3>
                                                                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
@@ -613,17 +622,26 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                                         }`}>
                                                                             {item.role || (item.importance === 1 ? "Estrela" : item.importance === 3 ? "Citação" : "Colaborador")}
                                                                         </span>
-                                                                    </div>
+                                                                        {item.start_page && (
+                                                                            <span className="ml-auto opacity-0 group-hover/item:opacity-100 text-[10px] font-bold text-blue-500 uppercase tracking-tighter transition-all translate-x-2 group-hover/item:translate-x-0">
+                                                                                Ler Seção →
+                                                                            </span>
+                                                                        )}
+                                                                    </Link>
                                                                 ))}
                                                             </div>
                                                         </div>
                                                         
-                                                        <div className="hidden sm:flex items-center px-6 text-gray-600 group-hover:text-blue-400 transition-colors">
-                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9 5l7 7-7 7" />
+                                                        <Link 
+                                                            href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                            className="hidden sm:flex items-center px-6 text-gray-700 hover:text-blue-400 transition-colors border-l border-white/5"
+                                                            title="Ver detalhes da edição"
+                                                        >
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                             </svg>
-                                                        </div>
-                                                    </Link>
+                                                        </Link>
+                                                    </div>
                                                 ))}
                                             </div>
                                         </section>
@@ -649,10 +667,21 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                         </div>
                                                         <div className="p-2 space-y-1">
                                                             {group.items.map((item: any) => (
-                                                                <div key={item.id} className="text-sm text-gray-400 px-1">
-                                                                    {item.section_title || item.section_type}
-                                                                    <span className="ml-2 text-[9px] text-gray-600 uppercase">({item.role || "Citação"})</span>
-                                                                </div>
+                                                                <Link 
+                                                                    key={item.id} 
+                                                                    href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`}
+                                                                    className="flex items-center justify-between text-sm text-gray-400 px-2 py-1 rounded-lg hover:bg-white/5 hover:text-blue-300 transition-all group/minor"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span>{item.section_title || item.section_type}</span>
+                                                                        <span className="text-[9px] text-gray-600 uppercase tracking-tighter">({item.role || "Citação"})</span>
+                                                                    </div>
+                                                                    {item.start_page && (
+                                                                        <span className="text-[9px] font-bold text-blue-500/50 group-hover/minor:text-blue-400 opacity-0 group-hover/minor:opacity-100 transition-opacity">
+                                                                            P.{item.start_page} ↗
+                                                                        </span>
+                                                                    )}
+                                                                </Link>
                                                             ))}
                                                         </div>
                                                     </div>
