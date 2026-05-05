@@ -228,10 +228,12 @@ export function useIssueEditor(slug: string, edition: string) {
                 title: section.title ?? "",
                 text_content: section.text_content ?? "",
                 section_id: section.section.id,
-                credits: (section.credits || []).map(c => ({
-                    person_id: c.person_id || c.person?.id,
-                    role: c.role
-                })),
+                credits: (section.credits || [])
+                    .filter(c => c.person_id || c.person?.id)
+                    .map(c => ({
+                        person_id: (c.person_id || c.person?.id)!,
+                        role: c.role
+                    })),
             });
 
             // Update local state with the actual data from the server
