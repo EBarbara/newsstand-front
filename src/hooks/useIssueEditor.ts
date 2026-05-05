@@ -229,7 +229,7 @@ export function useIssueEditor(slug: string, edition: string) {
                 text_content: section.text_content ?? "",
                 section_id: section.section.id,
                 credits: (section.credits || []).map(c => ({
-                    person_id: c.person_id,
+                    person_id: c.person_id || c.person?.id,
                     role: c.role
                 })),
             });

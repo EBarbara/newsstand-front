@@ -6,7 +6,7 @@ import clsx from "clsx";
 import styles from './IssueCover.module.css';
 
 interface IssueCoverProps {
-    imageUrl: string;
+    imageUrl: string | null | undefined;
     altText?: string;
     unfoldable?: boolean;
     defaultWidth?: number;
@@ -58,8 +58,8 @@ export default function IssueCover ({ imageUrl, altText = 'Issue Cover', unfolda
 
     // ================= DERIVED =================
 
-    const isLoading = status === "loading";
-    const hasError = status === "error";
+    const isLoading = status === "loading" && !!imageUrl;
+    const hasError = status === "error" || !imageUrl;
 
     const width = !isDoubleCover || isFolded
         ? defaultWidth
@@ -76,7 +76,7 @@ export default function IssueCover ({ imageUrl, altText = 'Issue Cover', unfolda
 
     return (
         <div className={className} onClick={handleClick} style={{ width }}>
-            {!hasError ? (
+            {!hasError && imageUrl ? (
                 <img
                     key={imageUrl}
                     ref={imgRef}
@@ -87,8 +87,8 @@ export default function IssueCover ({ imageUrl, altText = 'Issue Cover', unfolda
                     className={styles.image}
                 />
             ) : (
-                <div className={styles.placeholder}>
-                    Image unavailable
+                <div className={styles.placeholder} style={{ aspectRatio: '3/4' }}>
+                    Sem capa
                 </div>
             )}
         </div>
