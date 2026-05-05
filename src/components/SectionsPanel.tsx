@@ -351,9 +351,19 @@ export default function SectionsPanel({
                                             {people.length === 0 && !isLoadingPeople && peopleSearch && (
                                                 <option disabled>Nenhum resultado encontrado</option>
                                             )}
-                                            {people.map(p => (
-                                                <option key={p.id} value={p.id}>{p.name}</option>
-                                            ))}
+                                            {people.map(p => {
+                                                const matchingAlias = p.aliases?.find(a => 
+                                                    a.toLowerCase().includes(peopleSearch.toLowerCase()) && 
+                                                    !p.name.toLowerCase().includes(peopleSearch.toLowerCase())
+                                                );
+                                                return (
+                                                    <option key={p.id} value={p.id}>
+                                                        {p.name}
+                                                        {p.disambiguation ? ` [${p.disambiguation}]` : ""}
+                                                        {matchingAlias ? ` (aka ${matchingAlias})` : ""}
+                                                    </option>
+                                                );
+                                            })}
                                         </select>
                                     </div>
                                     <div className="flex gap-1.5">

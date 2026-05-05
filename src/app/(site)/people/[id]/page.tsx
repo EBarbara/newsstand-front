@@ -184,10 +184,12 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
     // Edit state
     const [editName, setEditName] = useState("");
+    const [editDisambiguation, setEditDisambiguation] = useState("");
     const [editBio, setEditBio] = useState("");
     const [editBirthDate, setEditBirthDate] = useState("");
     const [editCountry, setEditCountry] = useState("");
     const [editLinks, setEditLinks] = useState<Omit<PersonLink, 'id'>[]>([]);
+    const [editAliases, setEditAliases] = useState<string[]>([]);
     
     // Photo management
     const [photoFile, setPhotoFile] = useState<File | Blob | null>(null);
@@ -205,10 +207,12 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             .then(data => {
                 setPerson(data);
                 setEditName(data.name);
+                setEditDisambiguation(data.disambiguation || "");
                 setEditBio(data.biography || "");
                 setEditBirthDate(data.birth_date || "");
                 setEditCountry(data.country || "");
                 setEditLinks(data.links || []);
+                setEditAliases(data.aliases || []);
                 setLoading(false);
             })
             .catch(() => {
@@ -236,6 +240,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         try {
             const formData = new FormData();
             formData.append("name", editName);
+            formData.append("disambiguation", editDisambiguation);
             formData.append("biography", editBio);
             formData.append("birth_date", editBirthDate);
             formData.append("country", editCountry);
@@ -243,6 +248,9 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             // Filter out empty links
             const validLinks = editLinks.filter(l => l.url.trim() && l.label.trim());
             formData.append("links", JSON.stringify(validLinks));
+
+            // Append aliases
+            formData.append("aliases", JSON.stringify(editAliases.filter(a => a.trim())));
 
             if (photoFile) {
                 // If it's a blob from cropper, we give it a name
@@ -438,8 +446,67 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                     onChange={(e) => setEditName(e.target.value)}
                                     className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
                                 />
+                                <input 
+                                    value={editDisambiguation}
+                                    onChange={(e) => setEditDisambiguation(e.target.value)}
+                                    placeholder="Desambiguação (ex: Ator, UK, etc.)"
+                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-xs text-blue-300 focus:outline-none focus:border-blue-500 transition-colors"
+                                />
                             ) : (
-                                <p className="text-gray-200">{person.name}</p>
+                                <div className="flex flex-col">
+                                    <p className="text-gray-200">{person.name}</p>
+                                    {person.disambiguation && (
+                                        <p className="text-xs text-blue-400 font-bold">[{person.disambiguation}]</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Pseudônimos / Aliases</label>
+                            {isEditing ? (
+                                <div className="flex flex-col gap-2 mt-1">
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {editAliases.map((alias, idx) => (
+                                            <span key={idx} className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-md text-xs text-blue-300">
+                                                {alias}
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => setEditAliases(editAliases.filter((_, i) => i !== idx))}
+                                                    className="hover:text-red-400 font-bold"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <input 
+                                        type="text"
+                                        placeholder="Novo apelido (aperte Enter)..."
+                                        className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                const val = (e.target as HTMLInputElement).value.trim();
+                                                if (val && !editAliases.includes(val)) {
+                                                    setEditAliases([...editAliases, val]);
+                                                    (e.target as HTMLInputElement).value = "";
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-1.5 mt-1">
+                                    {person.aliases && person.aliases.length > 0 ? (
+                                        person.aliases.map((alias, idx) => (
+                                            <span key={idx} className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-xs text-gray-400">
+                                                {alias}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <p className="text-xs text-gray-600 italic">Nenhum pseudônimo</p>
+                                    )}
+                                </div>
                             )}
                         </div>
                         <div>

@@ -9,6 +9,8 @@ export interface Person {
     photo?: string;
     photo_focus_x?: number;
     photo_focus_y?: number;
+    aliases?: string[];
+    disambiguation?: string;
     links?: PersonLink[];
     credits?: PersonCredit[];
 }
