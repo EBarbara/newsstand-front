@@ -19,6 +19,10 @@
 
 /* COVER */
 
+.coverContainer {
+    position: relative;
+}
+
 .coverWrapper {
     position: relative;
     background-color: var(--surface-hover);
@@ -121,7 +125,41 @@
     font-size: 14px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
-    cursor: help;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    outline: none;
+}
+
+.statusBadge:disabled {
+    cursor: wait;
+    opacity: 0.5;
+}
+
+.active {
+    opacity: 1;
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.active:hover {
+    transform: scale(1.15);
+    background: rgba(15, 23, 42, 0.9);
+    border-color: var(--primary);
+}
+
+.inactive {
+    opacity: 0.15;
+    filter: grayscale(1);
+    transform: scale(0.9);
+}
+
+.inactive:hover {
+    opacity: 0.8;
+    filter: grayscale(0.5);
+    transform: scale(1);
+    background: rgba(15, 23, 42, 0.8);
+    border-color: var(--primary);
 }
 
 .statusBadge:hover {
