@@ -9,7 +9,7 @@ interface SidebarProps {
     onReadText: () => void
 }
 
-export default function Sidebar({ issue, section, onReadText }: SidebarProps) {
+export default function Sidebar({ issue, section, currentPageId, onReadText }: SidebarProps) {
     return (
         <div className={styles.sidebar}>
             <div>
