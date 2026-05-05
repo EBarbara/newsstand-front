@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, use, useRef } from "react";
-import { getPersonDetail, updatePerson } from "@/lib/people";
+import { getPersonDetail, updatePerson, getPersonCredits } from "@/lib/people";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getMediaUrl } from "@/lib/issues";
-import { Person, PersonLink } from "@/@types/person";
+import { Person, PersonLink, PersonCredit, PaginatedResponse } from "@/@types/person";
 
 // --- Image Cropper Component ---
 interface CropperProps {
@@ -194,6 +194,11 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
     const [isCropping, setIsCropping] = useState(false);
     const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
+    
+    // Credits pagination
+    const [creditsResponse, setCreditsResponse] = useState<PaginatedResponse<PersonCredit> | null>(null);
+    const [creditsLoading, setCreditsLoading] = useState(true);
+    const [creditsPage, setCreditsPage] = useState(1);
 
     useEffect(() => {
         getPersonDetail(Number(id))
@@ -210,6 +215,19 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 setLoading(false);
             });
     }, [id]);
+    
+    useEffect(() => {
+        setCreditsLoading(true);
+        getPersonCredits(Number(id), creditsPage)
+            .then(data => {
+                setCreditsResponse(data);
+                setCreditsLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to load credits", err);
+                setCreditsLoading(false);
+            });
+    }, [id, creditsPage]);
 
     const handleSave = async () => {
         if (!person) return;
@@ -521,8 +539,22 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
                     <section>
                         {(() => {
-                            const credits = person.credits || [];
-                            if (credits.length === 0) {
+                            if (creditsLoading && !creditsResponse) {
+                                return (
+                                    <div className="space-y-12 animate-pulse">
+                                        <section>
+                                            <div className="h-8 w-48 bg-white/5 rounded mb-6"></div>
+                                            <div className="space-y-6">
+                                                <div className="h-32 w-full bg-white/5 rounded-2xl"></div>
+                                                <div className="h-32 w-full bg-white/5 rounded-2xl"></div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                );
+                            }
+
+                            const credits = creditsResponse?.results || [];
+                            if (!creditsLoading && credits.length === 0) {
                                 return (
                                     <>
                                         <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">
@@ -561,8 +593,10 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                             const mainGroups = groups.filter((g: any) => g.maxImportance < 3);
                             const minorGroups = groups.filter((g: any) => g.maxImportance === 3);
 
+                            const totalPages = creditsResponse ? Math.ceil(creditsResponse.count / 20) : 0;
+
                             return (
-                                <div className="space-y-12">
+                                <div className={`space-y-12 transition-opacity duration-300 ${creditsLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                                     {/* MAIN APPEARANCES SECTION */}
                                     {mainGroups.length > 0 && (
                                         <section>
@@ -688,6 +722,47 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                 ))}
                                             </div>
                                         </section>
+                                    )}
+
+                                    {/* PAGINATION CONTROLS */}
+                                    {totalPages > 1 && (
+                                        <div className="flex justify-center items-center gap-6 mt-12 pt-8 border-t border-white/5">
+                                            {creditsResponse?.previous ? (
+                                                <button 
+                                                    onClick={() => {
+                                                        setCreditsPage(p => p - 1);
+                                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                    }}
+                                                    className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all"
+                                                >
+                                                    ← Anterior
+                                                </button>
+                                            ) : (
+                                                <span className="px-6 py-2 bg-transparent border border-white/5 text-gray-600 rounded-full text-sm font-medium cursor-not-allowed">
+                                                    ← Anterior
+                                                </span>
+                                            )}
+                                            
+                                            <span className="text-gray-400 text-sm font-mono">
+                                                {creditsPage} <span className="opacity-30">/</span> {totalPages}
+                                            </span>
+
+                                            {creditsResponse?.next ? (
+                                                <button 
+                                                    onClick={() => {
+                                                        setCreditsPage(p => p + 1);
+                                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                    }}
+                                                    className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all"
+                                                >
+                                                    Próximo →
+                                                </button>
+                                            ) : (
+                                                <span className="px-6 py-2 bg-transparent border border-white/5 text-gray-600 rounded-full text-sm font-medium cursor-not-allowed">
+                                                    Próximo →
+                                                </span>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             );

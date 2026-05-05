@@ -74,40 +74,49 @@ export default function SectionsPanel({
     return (
         <div className="w-[300px] h-full overflow-y-auto p-2.5 border-r border-gray-800 bg-[#0b0e14] scrollbar-thin scrollbar-thumb-gray-700">
             {issue && (
-                <div className="flex flex-col gap-3 mb-6 p-3 bg-white/[0.03] border border-white/5 rounded-xl shadow-inner">
-                    <label className="text-[10px] uppercase font-bold text-blue-200 opacity-50 tracking-widest">Status da Coleção</label>
-                    <div className="flex flex-col gap-2.5">
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <div className="relative flex items-center">
-                                <input 
-                                    type="checkbox"
-                                    checked={issue.has_physical_copy}
-                                    onChange={(e) => updateIssueMetadata({ has_physical_copy: e.target.checked })}
-                                    className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900 transition-all cursor-pointer"
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-xs font-semibold text-gray-200 group-hover:text-white transition-colors">Possuo Física 📚</span>
-                                <span className="text-[9px] text-gray-500 uppercase tracking-tighter">Edição em papel no acervo</span>
-                            </div>
-                        </label>
+                <>
+                    <Link 
+                        href={`/magazines/${issue.magazine.slug}/${issue.edition}`}
+                        className="flex items-center gap-2 mb-4 p-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded transition-colors"
+                    >
+                        ← Voltar para Edição
+                    </Link>
 
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <div className="relative flex items-center">
-                                <input 
-                                    type="checkbox"
-                                    checked={issue.is_digital_complete}
-                                    onChange={(e) => updateIssueMetadata({ is_digital_complete: e.target.checked })}
-                                    className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-green-600 focus:ring-green-500 focus:ring-offset-gray-900 transition-all cursor-pointer"
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-xs font-semibold text-gray-200 group-hover:text-white transition-colors">Digital Completa ✅</span>
-                                <span className="text-[9px] text-gray-500 uppercase tracking-tighter">Scan sem páginas faltando</span>
-                            </div>
-                        </label>
+                    <div className="flex flex-col gap-3 mb-6 p-3 bg-white/[0.03] border border-white/5 rounded-xl shadow-inner">
+                        <label className="text-[10px] uppercase font-bold text-blue-200 opacity-50 tracking-widest">Status da Coleção</label>
+                        <div className="flex flex-col gap-2.5">
+                            <label className="flex items-center gap-3 cursor-pointer group">
+                                <div className="relative flex items-center">
+                                    <input 
+                                        type="checkbox"
+                                        checked={issue.has_physical_copy}
+                                        onChange={(e) => updateIssueMetadata({ has_physical_copy: e.target.checked })}
+                                        className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900 transition-all cursor-pointer"
+                                    />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-200 group-hover:text-white transition-colors">Possuo Física 📚</span>
+                                    <span className="text-[9px] text-gray-500 uppercase tracking-tighter">Edição em papel no acervo</span>
+                                </div>
+                            </label>
+
+                            <label className="flex items-center gap-3 cursor-pointer group">
+                                <div className="relative flex items-center">
+                                    <input 
+                                        type="checkbox"
+                                        checked={issue.is_digital_complete}
+                                        onChange={(e) => updateIssueMetadata({ is_digital_complete: e.target.checked })}
+                                        className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-green-600 focus:ring-green-500 focus:ring-offset-gray-900 transition-all cursor-pointer"
+                                    />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-xs font-semibold text-gray-200 group-hover:text-white transition-colors">Digital Completa ✅</span>
+                                    <span className="text-[9px] text-gray-500 uppercase tracking-tighter">Scan sem páginas faltando</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
-                </div>
+                </>
             )}
 
             {/* SELECT & CREATE TYPE */}

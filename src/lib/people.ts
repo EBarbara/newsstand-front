@@ -1,5 +1,5 @@
 import { request } from './api';
-import { Person, PaginatedResponse } from "@/@types/person";
+import { Person, PaginatedResponse, PersonCredit } from "@/@types/person";
 
 export function getPeople(page: number = 1, pageSize: number = 20) {
     return request<PaginatedResponse<Person>>(`/people/?page=${page}&page_size=${pageSize}`);
@@ -34,4 +34,8 @@ export function deletePerson(id: number) {
 
 export function getPersonDetail(id: number) {
     return request<Person>(`/people/${id}/`);
+}
+
+export function getPersonCredits(id: number, page: number = 1) {
+    return request<PaginatedResponse<PersonCredit>>(`/people/${id}/credits/?page=${page}`);
 }
