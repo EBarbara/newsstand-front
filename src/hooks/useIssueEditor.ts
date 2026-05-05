@@ -31,6 +31,7 @@ export type IssueEditorState = {
     removeCreditFromSection: (sectionId: number, creditIndex: number) => void
     updateCreditRole: (sectionId: number, creditIndex: number, role: string) => void
     updateCreditImportance: (sectionId: number, creditIndex: number, importance: number) => void
+    updateCreditPage: (sectionId: number, creditIndex: number, renderId: number | null) => void
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
@@ -218,6 +219,15 @@ export function useIssueEditor(slug: string, edition: string) {
         }));
     }
 
+    function updateCreditPage(sectionId: number, creditIndex: number, renderId: number | null) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            const newCredits = [...(s.credits || [])];
+            newCredits[creditIndex] = { ...newCredits[creditIndex], render_id: renderId };
+            return { ...s, credits: newCredits };
+        }));
+    }
+
     async function saveSection(sectionId: number) {
         if (!issue) return
 
@@ -243,7 +253,8 @@ export function useIssueEditor(slug: string, edition: string) {
                     .map(c => ({
                         person_id: (c.person_id || c.person?.id)!,
                         role: c.role,
-                        importance: c.importance || 1
+                        importance: c.importance || 1,
+                        render_id: c.render_id
                     })),
             });
 
@@ -356,6 +367,7 @@ export function useIssueEditor(slug: string, edition: string) {
         removeCreditFromSection,
         updateCreditRole,
         updateCreditImportance,
+        updateCreditPage,
 
         saveSection,
         savingSections,

@@ -26,6 +26,7 @@ type Props = Pick<
     | "removeCreditFromSection"
     | "updateCreditRole"
     | "updateCreditImportance"
+    | "updateCreditPage"
 >
 
 export default function SectionsPanel({
@@ -48,7 +49,8 @@ export default function SectionsPanel({
                                           addCreditToSection,
                                           removeCreditFromSection,
                                           updateCreditRole,
-                                          updateCreditImportance
+                                          updateCreditImportance,
+    updateCreditPage
 }: Props) {
     const [newTypeName, setNewTypeName] = useState("");
     const [isCreatingType, setIsCreatingType] = useState(false);
@@ -225,13 +227,30 @@ export default function SectionsPanel({
                                                 <div className="text-[10px] font-bold text-gray-400 truncate">
                                                     {credit.person?.name || people.find(p => p.id === credit.person_id)?.name || "Unknown"}
                                                 </div>
-                                                <input 
-                                                    value={credit.role || ""}
-                                                    onChange={(e) => updateCreditRole(s.id, idx, e.target.value)}
-                                                    placeholder="Papel (ex: Artista)"
-                                                    className="w-full bg-transparent text-[11px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
-                                                />
-                                            </div>
+                                                    <input 
+                                                        value={credit.role || ""}
+                                                        onChange={(e) => updateCreditRole(s.id, idx, e.target.value)}
+                                                        placeholder="Papel (ex: Artista)"
+                                                        className="w-full bg-transparent text-[11px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
+                                                    />
+                                                    
+                                                    {/* PAGE ANCHOR SELECT */}
+                                                    <select 
+                                                        value={credit.render_id ?? ""}
+                                                        onChange={(e) => updateCreditPage(s.id, idx, e.target.value ? Number(e.target.value) : null)}
+                                                        className="w-full bg-transparent text-[9px] text-gray-500 hover:text-gray-400 focus:outline-none cursor-pointer mt-0.5"
+                                                    >
+                                                        <option value="" className="bg-[#1a1d23]">Sem página específica</option>
+                                                        {issue?.renders?.map(r => {
+                                                            const isInSection = s.segments.some(seg => r.order >= seg.start_page && r.order <= seg.end_page);
+                                                            return (
+                                                                <option key={r.id} value={r.id} className="bg-[#1a1d23]">
+                                                                    Página {r.order} {isInSection ? "★" : ""}
+                                                                </option>
+                                                            );
+                                                        })}
+                                                    </select>
+                                                </div>
                                             
                                             <div className="flex flex-col gap-1 items-end">
                                                 <select 
