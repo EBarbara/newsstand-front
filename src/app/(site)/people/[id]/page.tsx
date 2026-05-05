@@ -122,6 +122,7 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
                         src={image} 
                         alt="Crop preview"
                         draggable={false}
+                        crossOrigin="anonymous"
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-none transition-transform duration-75 ease-out"
                         style={{ 
                             transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px)) scale(${scale})`,
@@ -273,6 +274,27 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         }
     };
 
+    const handlePhotoUrlImport = async () => {
+        const url = window.prompt("Cole a URL da imagem (ex: https://site.com/foto.jpg):");
+        if (!url) return;
+
+        try {
+            // We try to fetch to avoid "Tainted Canvas" during cropping
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Falha ao carregar imagem");
+            const blob = await response.blob();
+            const localUrl = URL.createObjectURL(blob);
+            setTempPhotoUrl(localUrl);
+            setIsCropping(true);
+        } catch (error) {
+            console.error("Error fetching image URL:", error);
+            // Fallback: try direct URL, though it might fail in canvas if CORS is strict
+            setTempPhotoUrl(url);
+            setIsCropping(true);
+            alert("Atenção: A imagem pode não permitir recorte devido a restrições do site de origem (CORS). Se falhar ao salvar, tente baixar a imagem e fazer o upload manual.");
+        }
+    };
+
     const handleCropComplete = (croppedBlob: Blob) => {
         setPhotoFile(croppedBlob);
         setPhotoPreview(URL.createObjectURL(croppedBlob));
@@ -358,15 +380,28 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                             )}
                             
                             {isEditing && (
-                                <label className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
-                                    <div className="bg-white/20 p-3 rounded-full border border-white/30">
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-6 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
+                                    {/* File Upload */}
+                                    <label className="bg-white/20 p-3 rounded-full border border-white/30 cursor-pointer hover:bg-white/40 transition-colors group/btn" title="Upload de arquivo">
                                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                    </div>
-                                    <input type="file" className="hidden" accept="image/*" onChange={handlePhotoSelect} />
-                                </label>
+                                        <input type="file" className="hidden" accept="image/*" onChange={handlePhotoSelect} />
+                                    </label>
+
+                                    {/* URL Import */}
+                                    <button 
+                                        onClick={handlePhotoUrlImport}
+                                        className="bg-white/20 p-3 rounded-full border border-white/30 hover:bg-white/40 transition-colors group/btn"
+                                        title="Importar por URL"
+                                    >
+                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.172 13.828a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.102-1.101" />
+                                        </svg>
+                                    </button>
+                                </div>
                             )}
 
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 pointer-events-none" />
@@ -485,80 +520,149 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">
-                            <span className="w-8 h-[1px] bg-blue-500"></span>
-                            Contribuições
-                        </h2>
-                        
-                        {!person.credits || person.credits.length === 0 ? (
-                            <p className="text-gray-500 italic">Nenhum crédito registrado ainda.</p>
-                        ) : (
-                            <div className="grid grid-cols-1 gap-6">
-                                {Object.values(person.credits.reduce((acc, credit) => {
-                                    const key = credit.issue_id;
-                                    if (!acc[key]) {
-                                        acc[key] = {
-                                            issue_id: credit.issue_id,
-                                            magazine_name: credit.magazine_name,
-                                            magazine_slug: credit.magazine_slug,
-                                            issue_edition: credit.issue_edition,
-                                            issue_cover: credit.issue_cover,
-                                            items: [] as any[]
-                                        };
-                                    }
-                                    acc[key].items.push(credit);
-                                    return acc;
-                                }, {} as Record<number, any>)).map((group: any) => (
-                                    <Link 
-                                        key={group.issue_id}
-                                        href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
-                                        className={`group bg-white/5 hover:bg-white/10 border border-white/10 overflow-hidden flex flex-col sm:flex-row transition-all hover:scale-[1.01] active:scale-100 shadow-lg ${group.issue_cover ? 'rounded-r-2xl rounded-l-none' : 'rounded-2xl'}`}
-                                    >
-                                        {/* Issue Cover */}
-                                        <div className="w-full sm:w-24 aspect-[3/4] bg-gray-800 shrink-0">
-                                            {group.issue_cover ? (
-                                                <img 
-                                                    src={getMediaUrl(group.issue_cover)} 
-                                                    alt={`Issue ${group.issue_edition}`}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-700">
-                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-                                                </div>
-                                            )}
-                                        </div>
+                        {(() => {
+                            const credits = person.credits || [];
+                            if (credits.length === 0) {
+                                return (
+                                    <>
+                                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">
+                                            <span className="w-8 h-[1px] bg-blue-500"></span>
+                                            Contribuições
+                                        </h2>
+                                        <p className="text-gray-500 italic">Nenhum crédito registrado ainda.</p>
+                                    </>
+                                );
+                            }
 
-                                        <div className="flex-1 p-5 flex flex-col justify-center min-w-0">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">{group.magazine_name}</span>
-                                                <span className="text-xs text-gray-700">/</span>
-                                                <span className="text-sm text-gray-300 font-medium">Edição {group.issue_edition}</span>
+                            // 1. Group by issue
+                            const issueGroups = credits.reduce((acc, credit) => {
+                                const key = credit.issue_id;
+                                if (!acc[key]) {
+                                    acc[key] = {
+                                        issue_id: credit.issue_id,
+                                        magazine_name: credit.magazine_name,
+                                        magazine_slug: credit.magazine_slug,
+                                        issue_edition: credit.issue_edition,
+                                        issue_cover: credit.issue_cover,
+                                        maxImportance: 3, // Default to lowest
+                                        items: [] as any[]
+                                    };
+                                }
+                                acc[key].items.push(credit);
+                                // Update max importance (lower number is higher importance)
+                                const importance = credit.importance || 2;
+                                if (importance < acc[key].maxImportance) {
+                                    acc[key].maxImportance = importance;
+                                }
+                                return acc;
+                            }, {} as Record<number, any>);
+
+                            const groups = Object.values(issueGroups);
+                            const mainGroups = groups.filter((g: any) => g.maxImportance < 3);
+                            const minorGroups = groups.filter((g: any) => g.maxImportance === 3);
+
+                            return (
+                                <div className="space-y-12">
+                                    {/* MAIN APPEARANCES SECTION */}
+                                    {mainGroups.length > 0 && (
+                                        <section>
+                                            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">
+                                                <span className="w-8 h-[1px] bg-blue-500"></span>
+                                                Aparições Principais
+                                            </h2>
+                                            <div className="grid grid-cols-1 gap-6">
+                                                {mainGroups.map((group: any) => (
+                                                    <Link 
+                                                        key={group.issue_id}
+                                                        href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                        className={`group bg-white/5 hover:bg-white/10 border border-white/10 overflow-hidden flex flex-col sm:flex-row transition-all hover:scale-[1.01] active:scale-100 shadow-lg ${group.issue_cover ? 'rounded-r-2xl rounded-l-none' : 'rounded-2xl'}`}
+                                                    >
+                                                        <div className="w-full sm:w-24 aspect-[3/4] bg-gray-800 shrink-0">
+                                                            {group.issue_cover ? (
+                                                                <img 
+                                                                    src={getMediaUrl(group.issue_cover)} 
+                                                                    alt={`Issue ${group.issue_edition}`}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex-1 p-5 flex flex-col justify-center min-w-0">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">{group.magazine_name}</span>
+                                                                <span className="text-xs text-gray-700">/</span>
+                                                                <span className="text-sm text-gray-300 font-medium">Edição {group.issue_edition}</span>
+                                                            </div>
+
+                                                            <div className="space-y-3">
+                                                                {group.items.sort((a: any, b: any) => (a.importance || 2) - (b.importance || 2)).map((item: any) => (
+                                                                    <div key={item.id} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                                                        <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover:text-blue-200"}`}>
+                                                                            {item.section_title || item.section_type}
+                                                                        </h3>
+                                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
+                                                                            item.importance === 1 
+                                                                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+                                                                                : item.importance === 3
+                                                                                    ? "bg-gray-500/5 text-gray-500 border-gray-500/10"
+                                                                                    : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                                                                        }`}>
+                                                                            {item.role || (item.importance === 1 ? "Estrela" : item.importance === 3 ? "Citação" : "Colaborador")}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="hidden sm:flex items-center px-6 text-gray-600 group-hover:text-blue-400 transition-colors">
+                                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </div>
+                                                    </Link>
+                                                ))}
                                             </div>
+                                        </section>
+                                    )}
 
-                                            <div className="space-y-3">
-                                                {group.items.map((item: any) => (
-                                                    <div key={item.id} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                                        <h3 className="font-semibold text-gray-100 group-hover:text-blue-200 transition-colors">
-                                                            {item.section_title || item.section_type}
-                                                        </h3>
-                                                        <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider border border-blue-500/20">
-                                                            {item.role || "Colaborador"}
-                                                        </span>
+                                    {/* MINOR CREDITS (MENTIONS) SECTION */}
+                                    {minorGroups.length > 0 && (
+                                        <section className="pt-6 border-t border-white/5">
+                                            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-gray-400">
+                                                <span className="w-6 h-[1px] bg-gray-600"></span>
+                                                Menções e Notas
+                                            </h2>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                {minorGroups.map((group: any) => (
+                                                    <div key={group.issue_id} className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
+                                                        <div className="px-3 py-1.5 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
+                                                            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">
+                                                                {group.magazine_name} · Ed. {group.issue_edition}
+                                                            </span>
+                                                            <Link href={`/magazines/${group.magazine_slug}/${group.issue_edition}`} className="text-[10px] text-blue-500/50 hover:text-blue-400 transition-colors">
+                                                                Ver Edição →
+                                                            </Link>
+                                                        </div>
+                                                        <div className="p-2 space-y-1">
+                                                            {group.items.map((item: any) => (
+                                                                <div key={item.id} className="text-sm text-gray-400 px-1">
+                                                                    {item.section_title || item.section_type}
+                                                                    <span className="ml-2 text-[9px] text-gray-600 uppercase">({item.role || "Citação"})</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
-                                        </div>
-                                        
-                                        <div className="hidden sm:flex items-center px-6 text-gray-600 group-hover:text-blue-400 transition-colors">
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9 5l7 7-7 7" />
-                                            </svg>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
+                                        </section>
+                                    )}
+                                </div>
+                            );
+                        })()}
                     </section>
                 </div>
             </div>

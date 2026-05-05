@@ -29,6 +29,7 @@ export interface PersonCredit {
     issue_cover: string | null;
     section_title: string | null;
     section_type: string;
+    importance?: number;
 }
 
 export { type PaginatedResponse };
