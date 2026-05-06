@@ -90,14 +90,12 @@ export default function PersonCard({ person }: PersonCardProps) {
                 )}
             </div>
 
-            {/* Content Overlay */}
             <div className={styles.overlay}>
                 <div className={styles.info}>
                     <h3 className={styles.name}>
                         {person.name}
                         {age !== null && <span className={styles.age}>({age} anos)</span>}
                     </h3>
-                    <span className={styles.id}>#{person.id}</span>
                 </div>
             </div>
         </Link>
