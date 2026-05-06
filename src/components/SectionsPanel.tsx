@@ -62,6 +62,10 @@ export default function SectionsPanel({
     const [newCreditRole, setNewCreditRole] = useState("");
     const [peopleSearch, setPeopleSearch] = useState("");
     const [isLoadingPeople, setIsLoadingPeople] = useState(false);
+    
+    const sortedAvailableSections = [...availableSections].sort((a, b) => 
+        a.name.localeCompare(b.name)
+    );
 
     useEffect(() => {
         console.log("Searching people for:", peopleSearch);
@@ -170,7 +174,7 @@ export default function SectionsPanel({
                             className="flex-1 p-1.5 bg-[#1a1d23] border border-gray-700 rounded text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
                             <option value="">Selecionar tipo de seção</option>
-                            {availableSections.map((s) => (
+                            {sortedAvailableSections.map((s) => (
                                 <option key={s.id} value={s.id}>
                                     {s.name}
                                 </option>
@@ -250,7 +254,7 @@ export default function SectionsPanel({
                                     className="w-full p-1 bg-[#252a33] border border-blue-400/30 rounded text-xs text-white focus:outline-none"
                                 >
                                     <option value="" disabled>Selecionar tipo...</option>
-                                    {availableSections.map((t) => (
+                                    {sortedAvailableSections.map((t) => (
                                         <option key={t.id} value={t.id}>
                                             {t.name}
                                         </option>
