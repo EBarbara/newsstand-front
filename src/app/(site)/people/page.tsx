@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
 import Link from "next/link";
 import { getPeople, createPerson } from '@/lib/people';
-import { getMediaUrl } from "@/lib/issues";
 import { Person, PaginatedResponse } from '@/@types/person';
+import PersonCard from '@/components/PersonCard';
 
 export default function PeoplePage() {
     const [data, setData] = useState<PaginatedResponse<Person> | null>(null);
@@ -89,25 +89,7 @@ export default function PeoplePage() {
                 <>
                     <div className={styles.grid}>
                         {data.results.map(person => (
-                            <Link href={`/people/${person.id}`} key={person.id} className={styles.card}>
-                                {person.photo ? (
-                                    <img 
-                                        src={getMediaUrl(person.photo)} 
-                                        alt={person.name} 
-                                        className="w-12 h-12 rounded-full object-cover mb-2 border border-blue-500/30"
-                                    />
-                                ) : (
-                                    <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 mb-2 border border-gray-700">
-                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                                        </svg>
-                                    </div>
-                                )}
-                                <h3 className={styles.personName}>{person.name}</h3>
-                                <div className={styles.personMeta}>
-                                    ID: #{person.id}
-                                </div>
-                            </Link>
+                            <PersonCard key={person.id} person={person} />
                         ))}
                     </div>
 
