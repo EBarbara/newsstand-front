@@ -9,6 +9,7 @@ export interface Credit {
     role: string | null;
     importance: number;
     render_ids?: number[];
+    age_at_issue?: string | null;
 }
 
 export type IssueSection = {

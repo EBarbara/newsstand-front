@@ -146,3 +146,15 @@
     text-decoration: underline;
 }
 
+.age {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: normal;
+}
+
+.mentionAge {
+    font-size: 0.65rem;
+    color: #555;
+    font-weight: normal;
+}
+

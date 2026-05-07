@@ -715,6 +715,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                                     >
                                                                         <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
                                                                             {item.section_title || item.section_type}
+                                                                            {item.age_at_issue && <span className="ml-2 text-xs font-normal text-gray-500">{item.age_at_issue}</span>}
                                                                         </h3>
                                                                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
                                                                             item.importance === 1 
@@ -777,6 +778,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                                                 >
                                                                     <div className="flex items-center gap-2">
                                                                         <span>{item.section_title || item.section_type}</span>
+                                                                        {item.age_at_issue && <span className="text-[10px] text-gray-600">{item.age_at_issue}</span>}
                                                                         <span className="text-[9px] text-gray-600 uppercase tracking-tighter">({item.role || "Citação"})</span>
                                                                     </div>
                                                                     {item.start_page && (

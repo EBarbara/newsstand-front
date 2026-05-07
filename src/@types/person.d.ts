@@ -34,6 +34,7 @@ export interface PersonCredit {
     importance?: number;
     start_page?: number | null;
     render_ids?: number[];
+    age_at_issue?: string | null;
 }
 
 export { type PaginatedResponse };

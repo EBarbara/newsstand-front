@@ -31,14 +31,14 @@ export default function SectionCard({ section, slug, edition, issueId, renders }
                         {/* Major Credits */}
                         {section.credits.filter(c => c.importance === 1).map((c, i, arr) => (
                             <span key={`major-${i}`} className="font-bold text-gray-300">
-                                {c.person?.name}{c.role ? ` (${c.role})` : ""}
+                                {c.person?.name}{c.age_at_issue && ` ${c.age_at_issue}`}{c.role ? ` (${c.role})` : ""}
                                 {(i < arr.length - 1 || section.credits.some(c => c.importance > 1)) && ", "}
                             </span>
                         ))}
                         {/* Regular Credits */}
                         {section.credits.filter(c => (c.importance === 2 || !c.importance)).map((c, i, arr) => (
                             <span key={`reg-${i}`}>
-                                {c.person?.name}{c.role ? ` (${c.role})` : ""}
+                                {c.person?.name}{c.age_at_issue && ` ${c.age_at_issue}`}{c.role ? ` (${c.role})` : ""}
                                 {(i < arr.length - 1 || section.credits.some(c => c.importance === 3)) && ", "}
                             </span>
                         ))}

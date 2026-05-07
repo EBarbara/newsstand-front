@@ -57,6 +57,7 @@ export default function Sidebar({ issue, section, currentPageId, onReadText }: S
                                                 >
                                                     {credit.person?.name}
                                                 </a>
+                                                {credit.age_at_issue && <span className={styles.age}> {credit.age_at_issue}</span>}
                                                 {credit.role && ` (${credit.role})`}
                                             </li>
                                         ))}
@@ -71,6 +72,7 @@ export default function Sidebar({ issue, section, currentPageId, onReadText }: S
                                                             <a href={`/people/${c.person?.id}`} className={styles.mentionLink}>
                                                                 {c.person?.name}
                                                             </a>
+                                                            {c.age_at_issue && <span className={styles.mentionAge}> {c.age_at_issue}</span>}
                                                             {i < arr.length - 1 ? ", " : ""}
                                                         </span>
                                                     ))}
