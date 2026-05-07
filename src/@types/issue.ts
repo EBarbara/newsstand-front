@@ -1,6 +1,7 @@
 import { Magazine } from "@/@types/magazine";
 import { Render } from "@/@types/render";
 import { IssueSection } from "@/@types/issueSection";
+import { Tag } from "@/@types/tag";
 
 export type Issue = {
     id: number;
@@ -12,4 +13,6 @@ export type Issue = {
     cover: string;
     has_physical_copy?: boolean;
     is_digital_complete?: boolean;
+    is_special?: boolean;
+    tags?: Tag[];
 }

@@ -7,6 +7,9 @@ import { getPeople, createPerson } from '@/lib/people';
 import { Person, PaginatedResponse } from '@/@types/person';
 import PersonCard from '@/components/PersonCard';
 import Pagination from '@/components/Pagination';
+import { getTags } from '@/lib/tags';
+import { Tag } from '@/@types/tag';
+import PeopleFiltersModal from '@/components/PeopleFiltersModal';
 
 export default function PeoplePage() {
     const [data, setData] = useState<PaginatedResponse<Person> | null>(null);
@@ -15,11 +18,14 @@ export default function PeoplePage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newPersonName, setNewPersonName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+    const [tags, setTags] = useState<Tag[]>([]);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
 
-    const fetchPeople = useCallback(async (page: number) => {
+    const fetchPeople = useCallback(async (page: number, filters: Record<string, string>) => {
         setLoading(true);
         try {
-            const response = await getPeople(page);
+            const response = await getPeople(page, 20, filters);
             setData(response);
         } catch (error) {
             console.error("Error fetching people:", error);
@@ -29,8 +35,20 @@ export default function PeoplePage() {
     }, []);
 
     useEffect(() => {
-        fetchPeople(currentPage);
-    }, [currentPage, fetchPeople]);
+        const loadTags = async () => {
+            try {
+                const res = await getTags();
+                setTags(res.results);
+            } catch (e) {
+                console.error("Error loading tags", e);
+            }
+        };
+        loadTags();
+    }, []);
+
+    useEffect(() => {
+        fetchPeople(currentPage, activeFilters);
+    }, [currentPage, activeFilters, fetchPeople]);
 
     const handleAddPerson = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,7 +60,7 @@ export default function PeoplePage() {
             setNewPersonName("");
             setIsModalOpen(false);
             // Refresh current page or go to last page. For now, refresh current.
-            fetchPeople(currentPage);
+            fetchPeople(currentPage, activeFilters);
         } catch (error) {
             console.error("Error creating person:", error);
             alert("Falha ao criar pessoa. O nome pode já existir.");
@@ -63,6 +81,12 @@ export default function PeoplePage() {
                 </div>
                 <div className={styles.actions}>
                     <button 
+                        className="flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white px-4 py-2 rounded-xl transition-all font-bold text-sm"
+                        onClick={() => setIsFilterModalOpen(true)}
+                    >
+                        <span>🔍</span> Filtros {Object.keys(activeFilters).length > 0 && `(${Object.keys(activeFilters).length})`}
+                    </button>
+                    <button 
                         className={styles.addButton}
                         onClick={() => setIsModalOpen(true)}
                     >
@@ -70,6 +94,8 @@ export default function PeoplePage() {
                     </button>
                 </div>
             </header>
+
+            {/* QUICK FILTERS REMOVED IN FAVOR OF MODAL BUT COULD BE RESTORED IF NEEDED */}
 
             {/* LIST / GRID */}
             {loading ? (
@@ -104,6 +130,18 @@ export default function PeoplePage() {
                     )}
                 </>
             )}
+
+            {/* FILTER MODAL */}
+            <PeopleFiltersModal 
+                isOpen={isFilterModalOpen}
+                onClose={() => setIsFilterModalOpen(false)}
+                onApply={(filters) => {
+                    setActiveFilters(filters);
+                    setCurrentPage(1);
+                }}
+                currentFilters={activeFilters}
+                availableTags={tags}
+            />
 
             {/* NEW PERSON MODAL */}
             {isModalOpen && (

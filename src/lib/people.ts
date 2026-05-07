@@ -1,9 +1,15 @@
 import { request } from './api';
 import { Person, PaginatedResponse, PersonCredit } from "@/@types/person";
 
-export function getPeople(page: number = 1, pageSize: number = 20, search?: string) {
+export function getPeople(page: number = 1, pageSize: number = 20, filters: Record<string, string | number | undefined> = {}) {
     let url = `/people/?page=${page}&page_size=${pageSize}`;
-    if (search) url += `&search=${encodeURIComponent(search)}`;
+    
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== "") {
+            url += `&${key}=${encodeURIComponent(value.toString())}`;
+        }
+    });
+    
     return request<PaginatedResponse<Person>>(url);
 }
 

@@ -9,8 +9,12 @@ export function getRecentIssues() {
     return request<Issue[]>('/issues/recent/');
 }
 
-export function getIssuesByMagazine(slug: string, page: number = 1) {
-    return request<PaginatedResponse<Issue>>(`/magazines/${slug}/issues/?page=${page}`);
+export function getIssuesByMagazine(slug: string, page: number = 1, filters: { tag?: string, exclude_tag?: string, is_special?: string } = {}) {
+    let url = `/magazines/${slug}/issues/?page=${page}`;
+    if (filters.tag) url += `&tag=${filters.tag}`;
+    if (filters.exclude_tag) url += `&exclude_tag=${filters.exclude_tag}`;
+    if (filters.is_special) url += `&is_special=${filters.is_special}`;
+    return request<PaginatedResponse<Issue>>(url);
 }
 
 export function getIssueDetail(slug: string, edition: string) {

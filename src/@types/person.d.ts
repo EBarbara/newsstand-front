@@ -13,6 +13,9 @@ export interface Person {
     disambiguation?: string;
     links?: PersonLink[];
     credits?: PersonCredit[];
+    gender?: string;
+    gender_display?: string;
+    tags?: import("./tag").Tag[];
 }
 
 export interface PersonLink {

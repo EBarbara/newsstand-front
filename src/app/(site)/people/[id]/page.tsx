@@ -190,6 +190,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
     const [editCountry, setEditCountry] = useState("");
     const [editLinks, setEditLinks] = useState<Omit<PersonLink, 'id'>[]>([]);
     const [editAliases, setEditAliases] = useState<string[]>([]);
+    const [editGender, setEditGender] = useState("");
     
     // Photo management
     const [photoFile, setPhotoFile] = useState<File | Blob | null>(null);
@@ -213,6 +214,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 setEditCountry(data.country || "");
                 setEditLinks(data.links || []);
                 setEditAliases(data.aliases || []);
+                setEditGender(data.gender || "");
                 setLoading(false);
             })
             .catch(() => {
@@ -244,6 +246,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             formData.append("biography", editBio);
             formData.append("birth_date", editBirthDate);
             formData.append("country", editCountry);
+            formData.append("gender", editGender);
 
             // Filter out empty links
             const validLinks = editLinks.filter(l => l.url.trim() && l.label.trim());
@@ -534,6 +537,27 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                 />
                             ) : (
                                 <p className="text-gray-200">{person.country || "Desconhecido"}</p>
+                            )}
+                        </div>
+                        
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Gênero</label>
+                            {isEditing ? (
+                                <select 
+                                    value={editGender}
+                                    onChange={(e) => setEditGender(e.target.value)}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                                >
+                                    <option value="">Não informado</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Feminino</option>
+                                    <option value="TM">Transsexual Masculino</option>
+                                    <option value="TF">Transsexual Feminino</option>
+                                    <option value="I">Intersexual</option>
+                                    <option value="NB">Não-binário</option>
+                                </select>
+                            ) : (
+                                <p className="text-gray-200">{person.gender_display || "Não informado"}</p>
                             )}
                         </div>
                         

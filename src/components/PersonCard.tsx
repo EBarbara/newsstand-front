@@ -96,6 +96,11 @@ export default function PersonCard({ person }: PersonCardProps) {
                         {person.name}
                         {age !== null && <span className={styles.age}>({age} anos)</span>}
                     </h3>
+                    {person.gender_display && (
+                        <span className="text-[10px] text-blue-300 font-bold uppercase opacity-80 mt-1 block tracking-wider">
+                            {person.gender_display}
+                        </span>
+                    )}
                 </div>
             </div>
         </Link>
