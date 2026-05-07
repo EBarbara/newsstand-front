@@ -4,6 +4,7 @@ import { getIssuesByMagazine } from "@/lib/issues";
 import IssueCard from "@/components/issueCard/IssueCard";
 import ImportCbzButton from "@/components/ImportCbzButton";
 import CreateEmptyIssueButton from "@/components/CreateEmptyIssueButton";
+import Pagination from "@/components/Pagination";
 
 type Props = {
     params: Promise<{ slug: string; }>;
@@ -59,39 +60,11 @@ export default async function Page({ params, searchParams }: Props) {
                     </div>
 
                     {/* PAGINATION */}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center items-center gap-6 mt-12 pt-8 border-t border-gray-800">
-                            {response.previous ? (
-                                <Link 
-                                    href={`?page=${currentPage - 1}`}
-                                    className="px-6 py-2 bg-[#1a1d23] border border-gray-700 rounded-full text-sm font-medium hover:bg-gray-800 hover:border-gray-500 transition-all"
-                                >
-                                    ← Anterior
-                                </Link>
-                            ) : (
-                                <span className="px-6 py-2 bg-transparent border border-gray-800 text-gray-600 rounded-full text-sm font-medium cursor-not-allowed">
-                                    ← Anterior
-                                </span>
-                            )}
-                            
-                            <span className="text-gray-400 text-sm font-mono">
-                                {currentPage} <span className="opacity-30">/</span> {totalPages}
-                            </span>
-
-                            {response.next ? (
-                                <Link 
-                                    href={`?page=${currentPage + 1}`}
-                                    className="px-6 py-2 bg-[#1a1d23] border border-gray-700 rounded-full text-sm font-medium hover:bg-gray-800 hover:border-gray-500 transition-all"
-                                >
-                                    Próximo →
-                                </Link>
-                            ) : (
-                                <span className="px-6 py-2 bg-transparent border border-gray-800 text-gray-600 rounded-full text-sm font-medium cursor-not-allowed">
-                                    Próximo →
-                                </span>
-                            )}
-                        </div>
-                    )}
+                        <Pagination 
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            baseUrl={`/magazines/${slug}`}
+                        />
                 </>
             )}
         </div>

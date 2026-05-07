@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getPeople, createPerson } from '@/lib/people';
 import { Person, PaginatedResponse } from '@/@types/person';
 import PersonCard from '@/components/PersonCard';
+import Pagination from '@/components/Pagination';
 
 export default function PeoplePage() {
     const [data, setData] = useState<PaginatedResponse<Person> | null>(null);
@@ -95,33 +96,11 @@ export default function PeoplePage() {
 
                     {/* PAGINATION */}
                     {totalPages > 1 && (
-                        <div className={styles.pagination}>
-                            <button 
-                                className={styles.pageButton}
-                                disabled={currentPage === 1}
-                                onClick={() => setCurrentPage(prev => prev - 1)}
-                            >
-                                Anterior
-                            </button>
-                            
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                <button 
-                                    key={page}
-                                    className={`${styles.pageButton} ${currentPage === page ? styles.active : ''}`}
-                                    onClick={() => setCurrentPage(page)}
-                                >
-                                    {page}
-                                </button>
-                            ))}
-
-                            <button 
-                                className={styles.pageButton}
-                                disabled={currentPage === totalPages}
-                                onClick={() => setCurrentPage(prev => prev + 1)}
-                            >
-                                Próximo
-                            </button>
-                        </div>
+                        <Pagination 
+                            currentPage={currentPage}
+                            totalPages={Math.ceil((data?.count || 0) / 20)}
+                            onPageChange={(page) => setCurrentPage(page)}
+                        />
                     )}
                 </>
             )}
