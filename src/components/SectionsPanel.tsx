@@ -71,7 +71,7 @@ export default function SectionsPanel({
         console.log("Searching people for:", peopleSearch);
         setIsLoadingPeople(true);
         const timer = setTimeout(() => {
-            getPeople(1, 1000, peopleSearch)
+            getPeople(1, 1000, { search: peopleSearch })
                 .then(res => {
                     console.log("Found people:", res.results.length);
                     setPeople(res.results);
