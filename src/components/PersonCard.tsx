@@ -102,6 +102,11 @@ export default function PersonCard({ person }: PersonCardProps) {
                             </span>
                         )}
                     </h3>
+                    {person.disambiguation && (
+                        <span className="text-[10px] text-blue-400 font-bold block -mt-1 mb-1 tracking-wider uppercase">
+                            [{person.disambiguation}]
+                        </span>
+                    )}
                     {person.gender_display && (
                         <span className="text-[10px] text-blue-300 font-bold uppercase opacity-80 mt-1 block tracking-wider">
                             {person.gender_display}
