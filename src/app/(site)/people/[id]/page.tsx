@@ -191,6 +191,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
     const [editLinks, setEditLinks] = useState<Omit<PersonLink, 'id'>[]>([]);
     const [editAliases, setEditAliases] = useState<string[]>([]);
     const [editGender, setEditGender] = useState("");
+    const [editDeathDate, setEditDeathDate] = useState("");
     
     // Photo management
     const [photoFile, setPhotoFile] = useState<File | Blob | null>(null);
@@ -215,6 +216,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 setEditLinks(data.links || []);
                 setEditAliases(data.aliases || []);
                 setEditGender(data.gender || "");
+                setEditDeathDate(data.death_date || "");
                 setLoading(false);
             })
             .catch(() => {
@@ -245,6 +247,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
             formData.append("disambiguation", editDisambiguation);
             formData.append("biography", editBio);
             formData.append("birth_date", editBirthDate);
+            formData.append("death_date", editDeathDate);
             formData.append("country", editCountry);
             formData.append("gender", editGender);
 
@@ -331,7 +334,20 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         setTempPhotoUrl(null);
     };
 
-    const formatDate = (dateStr?: string) => {
+    const calculateAge = (birthDate: string, deathDate?: string) => {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    const end = deathDate ? new Date(deathDate) : today;
+    
+    let age = end.getFullYear() - birth.getFullYear();
+    const m = end.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
+        age--;
+    }
+    return age;
+};
+
+const formatDate = (dateStr?: string) => {
         if (!dateStr) return "Desconhecido";
         const [year, month, day] = dateStr.split('-');
         if (!year || !month || !day) return dateStr;
@@ -528,6 +544,19 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                             )}
                         </div>
                         <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Data de Falecimento</label>
+                            {isEditing ? (
+                                <input 
+                                    type="date"
+                                    value={editDeathDate}
+                                    onChange={(e) => setEditDeathDate(e.target.value)}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                                />
+                            ) : (
+                                <p className="text-gray-200">{person.death_date ? formatDate(person.death_date) : "—"}</p>
+                            )}
+                        </div>
+                        <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">País</label>
                             {isEditing ? (
                                 <input 
@@ -560,6 +589,16 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                                 <p className="text-gray-200">{person.gender_display || "Não informado"}</p>
                             )}
                         </div>
+
+                        {person.birth_date && !isEditing && (
+                            <div>
+                                <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Idade</label>
+                                <p className="text-gray-200">
+                                    {calculateAge(person.birth_date, person.death_date)} anos
+                                    {person.death_date && " †"}
+                                </p>
+                            </div>
+                        )}
                         
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Links</label>

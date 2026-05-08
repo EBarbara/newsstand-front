@@ -4,6 +4,7 @@ export interface Person {
     id: number;
     name: string;
     birth_date?: string;
+    death_date?: string;
     country?: string;
     biography?: string;
     photo?: string;

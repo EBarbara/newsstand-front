@@ -10,12 +10,14 @@ interface PersonCardProps {
     person: Person;
 }
 
-const calculateAge = (birthDate: string) => {
+const calculateAge = (birthDate: string, deathDate?: string) => {
     const birth = new Date(birthDate);
     const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    const end = deathDate ? new Date(deathDate) : today;
+    
+    let age = end.getFullYear() - birth.getFullYear();
+    const m = end.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
         age--;
     }
     return age;
@@ -55,7 +57,7 @@ const getCountryCode = (country: string) => {
 };
 
 export default function PersonCard({ person }: PersonCardProps) {
-    const age = person.birth_date ? calculateAge(person.birth_date) : null;
+    const age = person.birth_date ? calculateAge(person.birth_date, person.death_date) : null;
     
     const countryCode = person.country ? getCountryCode(person.country) : null;
     const flagUrl = countryCode ? `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png` : null;
@@ -94,7 +96,11 @@ export default function PersonCard({ person }: PersonCardProps) {
                 <div className={styles.info}>
                     <h3 className={styles.name}>
                         {person.name}
-                        {age !== null && <span className={styles.age}>({age} anos)</span>}
+                        {age !== null && (
+                            <span className={styles.age}>
+                                ({age} anos){person.death_date && " †"}
+                            </span>
+                        )}
                     </h3>
                     {person.gender_display && (
                         <span className="text-[10px] text-blue-300 font-bold uppercase opacity-80 mt-1 block tracking-wider">
