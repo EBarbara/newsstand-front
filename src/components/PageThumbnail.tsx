@@ -1,35 +1,59 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { getMediaUrl } from "@/lib/issues";
+import { Render } from "@/@types/render";
 
 type Props = {
     id: number
     page: number
     image: string
+    isCover: boolean
+    pageType: Render['page_type']
+    focusX: number
+    focusY: number
     sectionId: number | null
     isSelectedSection: boolean
     onClick: () => void
     onReplace: (file: File) => void
     onDelete: () => void
+    onUpdate: (data: Partial<Render>) => void
     onInsert: (files: File[]) => void
 }
 
-export default function PageThumbnail({ id, page, image, sectionId, isSelectedSection, onClick, onReplace, onDelete, onInsert }: Props) {
+export default function PageThumbnail({ 
+    id, page, image, isCover, pageType, focusX, focusY,
+    sectionId, isSelectedSection, onClick, onReplace, onDelete, onUpdate, onInsert 
+}: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const insertInputRef = useRef<HTMLInputElement>(null);
+    const [isAdjustingFocus, setIsAdjustingFocus] = useState(false);
+
+    const handleImageClick = (e: React.MouseEvent) => {
+        if (isAdjustingFocus) {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+            const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+            onUpdate({ focus_x: x, focus_y: y });
+            setIsAdjustingFocus(false);
+            return;
+        }
+        onClick();
+    };
 
     return (
         <div
             onClick={(e) => {
-                e.stopPropagation()
-                onClick()
+                e.stopPropagation();
+                if (!isAdjustingFocus) onClick();
             }}
             className={`
-                relative cursor-pointer group transition-all duration-200 border-2 rounded
+                relative cursor-pointer group transition-all duration-200 border-2 rounded flex flex-col bg-[#1a1f26]
                 ${isSelectedSection 
                     ? "border-blue-400 ring-4 ring-blue-500/30 z-10 shadow-[0_0_20px_rgba(59,130,246,0.6)] scale-[1.03]" 
                     : sectionId 
                         ? "border-blue-600/50" 
                         : "border-gray-800 hover:border-gray-700"}
+                ${isAdjustingFocus ? "ring-4 ring-orange-500" : ""}
             `}
         >
             {/* INSERT BEFORE BUTTONS */}
@@ -44,64 +68,107 @@ export default function PageThumbnail({ id, page, image, sectionId, isSelectedSe
                 >
                     <span className="text-white text-lg font-bold leading-none">+</span>
                 </div>
-                <div 
-                    onClick={async (e) => {
-                        e.stopPropagation();
-                        const url = window.prompt("URL da imagem para inserir antes:");
-                        if (!url) return;
-                        try {
-                            const res = await fetch(url);
-                            const blob = await res.blob();
-                            const filename = url.split('/').pop()?.split('?')[0] || "inserted.jpg";
-                            onInsert([new File([blob], filename, { type: blob.type })]);
-                        } catch (err) { alert("Erro ao importar."); }
-                    }}
-                    className="w-6 h-6 bg-blue-900 rounded-full flex items-center justify-center hover:scale-125 shadow-lg cursor-pointer border border-white/20"
-                    title="Insert by URL before"
-                >
-                    <span className="text-white text-[10px] font-bold">URL</span>
-                </div>
             </div>
 
-            {/* HOVER OVERLAY */}
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex flex-col items-center justify-center gap-2 p-2">
-                <div className="flex w-full gap-1">
+            {/* PAGE NUMBER & COVER BADGE */}
+            <div className="absolute top-0 left-0 right-0 p-1 flex justify-between items-start z-50 pointer-events-none">
+                <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdate({ is_cover: !isCover });
+                    }}
+                    className={`
+                        p-1 rounded shadow-sm pointer-events-auto transition-colors
+                        ${isCover ? "bg-yellow-500 text-white" : "bg-black/50 text-white/30 hover:text-white/70"}
+                    `}
+                    title={isCover ? "Remover Capa" : "Marcar como Capa"}
+                >
+                    <StarIcon size={12} fill={isCover ? "currentColor" : "none"} />
+                </button>
+
+                <div className={`
+                    px-1.5 py-0.5 text-[10px] font-bold rounded shadow-sm
+                    ${isSelectedSection 
+                        ? "bg-blue-500 text-white" 
+                        : sectionId 
+                            ? "bg-blue-900 text-blue-100" 
+                            : "bg-gray-900 text-gray-400"}
+                `}>
+                    {page}
+                </div>
+            </div>
+             {/* IMAGE AREA */}
+            <div className="relative w-full overflow-hidden" onClick={handleImageClick}>
+                <img 
+                    src={getMediaUrl(image, true)} 
+                    className={`
+                        w-full h-auto block transition-opacity 
+                        ${!sectionId && !isSelectedSection ? "opacity-60 grayscale-[0.3]" : "opacity-100"}
+                    `} 
+                    alt={`Page ${page}`} 
+                />
+                
+                {/* FOCUS POINT VISUALIZER */}
+                <div 
+                    className="absolute w-4 h-4 border-2 border-orange-500 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none shadow-[0_0_10px_rgba(249,115,22,0.8)]"
+                    style={{ left: `${focusX}%`, top: `${focusY}%` }}
+                />
+
+                {/* HOVER OVERLAY (NOW INSIDE IMAGE) */}
+                <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex flex-col items-center justify-center gap-2 p-2 ${isAdjustingFocus ? 'hidden' : ''}`}>
+                    <div className="flex w-full gap-1">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                fileInputRef.current?.click();
+                            }}
+                            className="flex-1 py-1 bg-blue-600 text-white text-[10px] font-bold rounded hover:bg-blue-500 transition-colors"
+                        >
+                            REPLACE
+                        </button>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsAdjustingFocus(true);
+                            }}
+                            className="flex-1 py-1 bg-orange-600 text-white text-[10px] font-bold rounded hover:bg-orange-500 transition-colors"
+                        >
+                            FOCUS
+                        </button>
+                    </div>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            fileInputRef.current?.click();
+                            onDelete();
                         }}
-                        className="flex-1 py-1 bg-blue-600 text-white text-[10px] font-bold rounded hover:bg-blue-500 transition-colors"
+                        className="w-full py-1 bg-red-600/80 text-white text-[10px] font-bold rounded hover:bg-red-500 transition-colors"
                     >
-                        REPLACE
-                    </button>
-                    <button
-                        onClick={async (e) => {
-                            e.stopPropagation();
-                            const url = window.prompt("Cole a URL da nova imagem:");
-                            if (!url) return;
-                            try {
-                                const res = await fetch(url);
-                                const blob = await res.blob();
-                                const filename = url.split('/').pop()?.split('?')[0] || "replaced.jpg";
-                                onReplace(new File([blob], filename, { type: blob.type }));
-                            } catch (err) { alert("Erro ao importar."); }
-                        }}
-                        className="px-2 py-1 bg-blue-900 text-white text-[10px] font-bold rounded hover:bg-blue-800 transition-colors"
-                        title="Replace by URL"
-                    >
-                        LINK
+                        DELETE
                     </button>
                 </div>
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete();
-                    }}
-                    className="w-full py-1 bg-red-600/80 text-white text-[10px] font-bold rounded hover:bg-red-500 transition-colors"
+
+                {/* FOCUS ADJUSTING OVERLAY (NOW INSIDE IMAGE) */}
+                {isAdjustingFocus && (
+                    <div className="absolute inset-0 z-40 bg-orange-500/20 flex items-center justify-center pointer-events-none">
+                        <div className="bg-orange-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-pulse">
+                            CLIQUE PARA DEFINIR FOCO
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* CONTROLS FOOTER */}
+            <div className="p-1.5 flex flex-col gap-1.5 border-t border-gray-800">
+                <select
+                    value={pageType}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => onUpdate({ page_type: e.target.value as any })}
+                    className="w-full bg-[#2a303c] text-[10px] text-gray-300 font-bold p-1 rounded border border-gray-700 focus:border-blue-500 outline-none"
                 >
-                    DELETE
-                </button>
+                    <option value="NORMAL">Normal</option>
+                    <option value="SPREAD">Página Dupla</option>
+                    <option value="GATEFOLD">Desdobrável</option>
+                </select>
             </div>
 
             <input
@@ -127,26 +194,26 @@ export default function PageThumbnail({ id, page, image, sectionId, isSelectedSe
                 }}
             />
 
-            <div className={`
-                absolute top-0 right-0 px-1.5 py-0.5 text-[10px] font-bold z-20 rounded-bl shadow-sm
-                ${isSelectedSection 
-                    ? "bg-blue-500 text-white" 
-                    : sectionId 
-                        ? "bg-blue-900 text-blue-100" 
-                        : "bg-gray-900 text-gray-400"}
-            `}>
-                {page}
-            </div>
-
-            <img 
-                src={getMediaUrl(image, true)} 
-                className={`w-full block rounded-sm transition-opacity ${!sectionId && !isSelectedSection ? "opacity-60 grayscale-[0.3]" : "opacity-100"}`} 
-                alt={`Page ${page}`} 
-            />
-
             {isSelectedSection && (
-                <div className="absolute inset-0 border-2 border-blue-400 rounded-sm pointer-events-none animate-pulse-subtle bg-blue-500/10" />
+                <div className="absolute inset-0 border-2 border-blue-400 rounded-sm pointer-events-none animate-pulse-subtle bg-blue-500/10 z-10" />
             )}
         </div>
     )
+}
+
+function StarIcon({ size = 16, fill = "none" }) {
+    return (
+        <svg 
+            width={size} 
+            height={size} 
+            viewBox="0 0 24 24" 
+            fill={fill} 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+        >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+    );
 }

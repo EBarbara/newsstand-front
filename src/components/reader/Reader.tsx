@@ -92,7 +92,7 @@ export default function Reader({ issue, initialIndex = 0 }: Props) {
     }
     return (
         <div className={styles.reader}>
-            <Canvas image={current.image} />
+            <Canvas render={current} />
 
             <Controls
                 page={pageNumber}

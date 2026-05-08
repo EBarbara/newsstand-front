@@ -1,13 +1,20 @@
+import { Render } from '@/@types/render';
 import styles from './Reader.module.css'
 
 interface CanvasProps {
-    image: string;
+    render: Render;
 }
 
-export default function Canvas({ image }: CanvasProps) {
+export default function Canvas({ render }: CanvasProps) {
+    const isWide = render.page_type === 'GATEFOLD' || render.page_type === 'SPREAD';
+    
     return (
-        <div className={styles.canvas}>
-            <img src={image} className={styles.image} alt={"page"} />
+        <div className={`${styles.canvas} ${isWide ? styles.wideCanvas : ''}`}>
+            <img 
+                src={render.image} 
+                className={`${styles.image} ${isWide ? styles.wideImage : ''}`} 
+                alt={"page"} 
+            />
         </div>
     );
 }

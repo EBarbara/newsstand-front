@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import SectionCard from "@/components/SectionCard";
+import CoverGallery from "@/components/CoverGallery";
 import { getIssueDetail, getMediaUrl } from "@/lib/issues";
 
 type Props = {
@@ -42,14 +43,11 @@ export default async function Page({ params }: Props) {
             {/* HEADER */}
             <header className="flex gap-6 items-start">
 
-                {/* COVER */}
-                {issueData.cover && (
-                    <img
-                        src={getMediaUrl(issueData.cover)}
-                        alt="Cover"
-                        className="w-40 rounded shadow"
-                    />
-                )}
+                {/* COVER GALLERY */}
+                <CoverGallery 
+                    renders={issueData.renders} 
+                    defaultCover={issueData.cover ? getMediaUrl(issueData.cover) : undefined} 
+                />
 
                 {/* INFO */}
                 <div className="flex flex-col gap-2">

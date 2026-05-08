@@ -5,10 +5,10 @@ import { Render } from "@/@types/render";
 
 type Props = Pick<
     IssueEditorState,
-    "issue" | "pageMap" | "assignPage" | "selectedSectionId" | "handleUploadPage" | "handleReplacePage" | "handleDeletePage"
+    "issue" | "pageMap" | "assignPage" | "selectedSectionId" | "handleUploadPage" | "handleReplacePage" | "handleDeletePage" | "handleUpdatePageMetadata"
 >
 
-export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionId, handleUploadPage, handleReplacePage, handleDeletePage }: Props) {
+export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionId, handleUploadPage, handleReplacePage, handleDeletePage, handleUpdatePageMetadata }: Props) {
     const uploadInputRef = useRef<HTMLInputElement>(null);
 
     if (!issue) return null;
@@ -41,11 +41,16 @@ export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionI
                     id={r.id}
                     page={r.order}
                     image={r.image}
+                    isCover={r.is_cover}
+                    pageType={r.page_type}
+                    focusX={r.focus_x}
+                    focusY={r.focus_y}
                     sectionId={pageMap[r.order]}
                     isSelectedSection={selectedSectionId !== null && pageMap[r.order] === selectedSectionId}
                     onClick={() => assignPage(r.order)}
                     onReplace={(file) => handleReplacePage(r.id, file)}
                     onDelete={() => handleDeletePage(r.id)}
+                    onUpdate={(data) => handleUpdatePageMetadata(r.id, data)}
                     onInsert={async (files) => {
                         for (let i = 0; i < files.length; i++) {
                             await handleUploadPage(files[i], r.order + i);

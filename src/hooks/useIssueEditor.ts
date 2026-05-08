@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { pagesToSegments } from "@/lib/editor";
 import { createIssueSection, createSectionType, deleteIssuePage, deleteIssueSection, getIssueDetail, getSections, replaceIssuePage, updateIssueSection, uploadIssuePage } from "@/lib/issues";
 import { Issue } from "@/@types/issue";
+import { Render } from "@/@types/render";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
 
@@ -38,6 +39,7 @@ export type IssueEditorState = {
     handleUploadPage: (file: File, order?: number) => Promise<void>
     handleReplacePage: (renderId: number, file: File) => Promise<void>
     handleDeletePage: (renderId: number) => Promise<void>
+    handleUpdatePageMetadata: (renderId: number, data: Partial<Render>) => Promise<void>
     updateIssueMetadata: (data: Partial<Issue>) => Promise<void>
     error: string | null
 }
@@ -335,6 +337,24 @@ export function useIssueEditor(slug: string, edition: string) {
         }
     }
 
+    async function handleUpdatePageMetadata(renderId: number, data: Partial<Render>) {
+        if (!issue) return
+        try {
+            const { updateRender } = await import("@/lib/issues");
+            const updatedRender = await updateRender(issue.id, renderId, data);
+            setIssue(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    renders: prev.renders.map(r => r.id === renderId ? updatedRender : r)
+                }
+            });
+        } catch (error) {
+            console.error("Failed to update render metadata", error);
+            alert("Failed to update page metadata.");
+        }
+    }
+
     async function updateIssueMetadata(data: Partial<Issue>) {
         if (!issue) return
         try {
@@ -389,6 +409,7 @@ export function useIssueEditor(slug: string, edition: string) {
         handleUploadPage,
         handleReplacePage,
         handleDeletePage,
+        handleUpdatePageMetadata,
         updateIssueMetadata,
         error,
     }

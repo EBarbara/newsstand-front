@@ -751,6 +751,7 @@ const formatDate = (dateStr?: string) => {
                                                                     src={getMediaUrl(group.issue_cover)} 
                                                                     alt={`Issue ${group.issue_edition}`}
                                                                     className="w-full h-full object-cover"
+                                                                    style={{ objectPosition: '0% 50%' }}
                                                                 />
                                                             ) : (
                                                                 <div className="w-full h-full flex items-center justify-center text-gray-700">

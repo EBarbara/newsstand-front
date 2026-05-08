@@ -24,6 +24,20 @@
     object-fit: contain;
 }
 
+.wideCanvas {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 20px;
+}
+
+.wideImage {
+    max-width: none;
+    max-height: 100%;
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+}
+
 .nav {
     position: absolute;
     bottom: 0;
@@ -84,6 +98,7 @@
 
     z-index: 20;
 }
+
 .credits {
     font-size: 0.9rem;
 }
@@ -157,4 +172,3 @@
     color: #555;
     font-weight: normal;
 }
-

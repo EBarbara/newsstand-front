@@ -1,5 +1,6 @@
 import { request, MEDIA_API_URL } from './api';
 import { Issue } from "@/@types/issue";
+import { Render } from "@/@types/render";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
 import { PaginatedResponse } from "@/@types/api";
@@ -151,6 +152,13 @@ export function replaceIssuePage(issueId: number, renderId: number, file: File) 
 export function deleteIssuePage(issueId: number, renderId: number) {
     return request<Issue>(`/issues/${issueId}/delete-page/${renderId}/`, {
         method: 'DELETE',
+    });
+}
+
+export function updateRender(issueId: number, renderId: number, data: Partial<Render>) {
+    return request<Render>(`/issues/${issueId}/update-page/${renderId}/`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
     });
 }
 
