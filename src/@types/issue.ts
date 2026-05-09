@@ -11,6 +11,8 @@ export type Issue = {
     renders: Render[];
     sections: IssueSection[];
     cover: string;
+    cover_focus_x?: number;
+    cover_focus_y?: number;
     has_physical_copy?: boolean;
     is_digital_complete?: boolean;
     is_special?: boolean;

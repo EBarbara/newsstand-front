@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { getMediaUrl } from "@/lib/issues";
 import { Render } from "@/@types/render";
+import FocusModal from "./editor/FocusModal";
 
 type Props = {
     id: number
@@ -28,15 +29,6 @@ export default function PageThumbnail({
     const [isAdjustingFocus, setIsAdjustingFocus] = useState(false);
 
     const handleImageClick = (e: React.MouseEvent) => {
-        if (isAdjustingFocus) {
-            e.stopPropagation();
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
-            const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
-            onUpdate({ focus_x: x, focus_y: y });
-            setIsAdjustingFocus(false);
-            return;
-        }
         onClick();
     };
 
@@ -44,7 +36,7 @@ export default function PageThumbnail({
         <div
             onClick={(e) => {
                 e.stopPropagation();
-                if (!isAdjustingFocus) onClick();
+                onClick();
             }}
             className={`
                 relative cursor-pointer group transition-all duration-200 border-2 rounded flex flex-col bg-[#1a1f26]
@@ -53,7 +45,6 @@ export default function PageThumbnail({
                     : sectionId 
                         ? "border-blue-600/50" 
                         : "border-gray-800 hover:border-gray-700"}
-                ${isAdjustingFocus ? "ring-4 ring-orange-500" : ""}
             `}
         >
             {/* INSERT BEFORE BUTTONS */}
@@ -97,7 +88,8 @@ export default function PageThumbnail({
                     {page}
                 </div>
             </div>
-             {/* IMAGE AREA */}
+
+            {/* IMAGE AREA */}
             <div className="relative w-full overflow-hidden" onClick={handleImageClick}>
                 <img 
                     src={getMediaUrl(image, true)} 
@@ -108,14 +100,16 @@ export default function PageThumbnail({
                     alt={`Page ${page}`} 
                 />
                 
-                {/* FOCUS POINT VISUALIZER */}
-                <div 
-                    className="absolute w-4 h-4 border-2 border-orange-500 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none shadow-[0_0_10px_rgba(249,115,22,0.8)]"
-                    style={{ left: `${focusX}%`, top: `${focusY}%` }}
-                />
+                {/* FOCUS POINT VISUALIZER (ONLY IF COVER) */}
+                {isCover && (
+                    <div 
+                        className="absolute w-4 h-4 border-2 border-orange-500 rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none shadow-[0_0_10px_rgba(249,115,22,0.8)]"
+                        style={{ left: `${focusX}%`, top: `${focusY}%` }}
+                    />
+                )}
 
-                {/* HOVER OVERLAY (NOW INSIDE IMAGE) */}
-                <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex flex-col items-center justify-center gap-2 p-2 ${isAdjustingFocus ? 'hidden' : ''}`}>
+                {/* HOVER OVERLAY */}
+                <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex flex-col items-center justify-center gap-2 p-2`}>
                     <div className="flex w-full gap-1">
                         <button
                             onClick={(e) => {
@@ -126,15 +120,17 @@ export default function PageThumbnail({
                         >
                             REPLACE
                         </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsAdjustingFocus(true);
-                            }}
-                            className="flex-1 py-1 bg-orange-600 text-white text-[10px] font-bold rounded hover:bg-orange-500 transition-colors"
-                        >
-                            FOCUS
-                        </button>
+                        {isCover && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsAdjustingFocus(true);
+                                }}
+                                className="flex-1 py-1 bg-orange-600 text-white text-[10px] font-bold rounded hover:bg-orange-500 transition-colors"
+                            >
+                                FOCUS
+                            </button>
+                        )}
                     </div>
                     <button
                         onClick={(e) => {
@@ -146,30 +142,23 @@ export default function PageThumbnail({
                         DELETE
                     </button>
                 </div>
-
-                {/* FOCUS ADJUSTING OVERLAY (NOW INSIDE IMAGE) */}
-                {isAdjustingFocus && (
-                    <div className="absolute inset-0 z-40 bg-orange-500/20 flex items-center justify-center pointer-events-none">
-                        <div className="bg-orange-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-pulse">
-                            CLIQUE PARA DEFINIR FOCO
-                        </div>
-                    </div>
-                )}
             </div>
 
-            {/* CONTROLS FOOTER */}
-            <div className="p-1.5 flex flex-col gap-1.5 border-t border-gray-800">
-                <select
-                    value={pageType}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => onUpdate({ page_type: e.target.value as any })}
-                    className="w-full bg-[#2a303c] text-[10px] text-gray-300 font-bold p-1 rounded border border-gray-700 focus:border-blue-500 outline-none"
-                >
-                    <option value="NORMAL">Normal</option>
-                    <option value="SPREAD">Página Dupla</option>
-                    <option value="GATEFOLD">Desdobrável</option>
-                </select>
-            </div>
+            {/* CONTROLS FOOTER (ONLY IF COVER) */}
+            {isCover && (
+                <div className="p-1.5 flex flex-col gap-1.5 border-t border-gray-800">
+                    <select
+                        value={pageType}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => onUpdate({ page_type: e.target.value as any })}
+                        className="w-full bg-[#2a303c] text-[10px] text-gray-300 font-bold p-1 rounded border border-gray-700 focus:border-blue-500 outline-none"
+                    >
+                        <option value="NORMAL">Normal</option>
+                        <option value="SPREAD">Página Dupla</option>
+                        <option value="GATEFOLD">Desdobrável</option>
+                    </select>
+                </div>
+            )}
 
             <input
                 type="file"
@@ -196,6 +185,20 @@ export default function PageThumbnail({
 
             {isSelectedSection && (
                 <div className="absolute inset-0 border-2 border-blue-400 rounded-sm pointer-events-none animate-pulse-subtle bg-blue-500/10 z-10" />
+            )}
+
+            {/* FOCUS MODAL */}
+            {isAdjustingFocus && (
+                <FocusModal 
+                    imageUrl={image}
+                    initialX={focusX}
+                    initialY={focusY}
+                    onSave={(x, y) => {
+                        onUpdate({ focus_x: x, focus_y: y });
+                        setIsAdjustingFocus(false);
+                    }}
+                    onClose={() => setIsAdjustingFocus(false)}
+                />
             )}
         </div>
     )

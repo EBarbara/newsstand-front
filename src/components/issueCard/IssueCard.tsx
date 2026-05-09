@@ -45,6 +45,8 @@ export default function IssueCard({ issue: initialIssue }: { issue: Issue }) {
                         imageUrl={getMediaUrl(issue.cover)}
                         altText={`Capa da edição ${issue.id}`}
                         defaultWidth={240}
+                        focusX={issue.cover_focus_x}
+                        focusY={issue.cover_focus_y}
                     />
                 </Link>
 

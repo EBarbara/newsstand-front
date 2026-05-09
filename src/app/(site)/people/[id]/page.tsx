@@ -708,6 +708,8 @@ const formatDate = (dateStr?: string) => {
                                         magazine_slug: credit.magazine_slug,
                                         issue_edition: credit.issue_edition,
                                         issue_cover: credit.issue_cover,
+                                        issue_cover_focus_x: credit.issue_cover_focus_x,
+                                        issue_cover_focus_y: credit.issue_cover_focus_y,
                                         maxImportance: 3, // Default to lowest
                                         items: [] as any[]
                                     };
@@ -751,7 +753,9 @@ const formatDate = (dateStr?: string) => {
                                                                     src={getMediaUrl(group.issue_cover)} 
                                                                     alt={`Issue ${group.issue_edition}`}
                                                                     className="w-full h-full object-cover"
-                                                                    style={{ objectPosition: '0% 50%' }}
+                                                                    style={{ 
+                                                                        objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%` 
+                                                                    }}
                                                                 />
                                                             ) : (
                                                                 <div className="w-full h-full flex items-center justify-center text-gray-700">

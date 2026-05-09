@@ -33,6 +33,8 @@ export interface PersonCredit {
     issue_edition: string;
     issue_id: number;
     issue_cover: string | null;
+    issue_cover_focus_x?: number;
+    issue_cover_focus_y?: number;
     section_title: string | null;
     section_type: string;
     importance?: number;

@@ -10,9 +10,14 @@ interface IssueCoverProps {
     altText?: string;
     unfoldable?: boolean;
     defaultWidth?: number;
+    focusX?: number;
+    focusY?: number;
 }
 
-export default function IssueCover ({ imageUrl, altText = 'Issue Cover', unfoldable = false, defaultWidth = 200 } : IssueCoverProps) {
+export default function IssueCover ({ 
+    imageUrl, altText = 'Issue Cover', unfoldable = false, defaultWidth = 200,
+    focusX = 0, focusY = 50
+} : IssueCoverProps) {
     const imgRef = useRef<HTMLImageElement>(null);
 
     const [isDoubleCover, setIsDoubleCover] = useState(false);
@@ -72,6 +77,12 @@ export default function IssueCover ({ imageUrl, altText = 'Issue Cover', unfolda
         isLoading ? styles.loading : styles.loaded
     );
 
+    const imageStyle: React.CSSProperties = {};
+    if (isDoubleCover && isFolded) {
+        // If it's a double cover and folded, we use focusX to shift
+        imageStyle.transform = `translateX(-${focusX / 2}%)`;
+    }
+
     // ================= RENDER =================
 
     return (
@@ -85,6 +96,7 @@ export default function IssueCover ({ imageUrl, altText = 'Issue Cover', unfolda
                     onLoad={handleImageLoad}
                     onError={handleError}
                     className={styles.image}
+                    style={imageStyle}
                 />
             ) : (
                 <div className={styles.placeholder} style={{ aspectRatio: '3/4' }}>
@@ -93,4 +105,4 @@ export default function IssueCover ({ imageUrl, altText = 'Issue Cover', unfolda
             )}
         </div>
     );
-}
+}
