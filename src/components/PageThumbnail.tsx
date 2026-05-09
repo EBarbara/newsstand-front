@@ -29,10 +29,6 @@ export default function PageThumbnail({
     const insertInputRef = useRef<HTMLInputElement>(null);
     const [isAdjustingFocus, setIsAdjustingFocus] = useState(false);
 
-    const handleImageClick = (e: React.MouseEvent) => {
-        onClick();
-    };
-
     return (
         <div
             onClick={(e) => {
@@ -115,7 +111,7 @@ export default function PageThumbnail({
             </div>
 
             {/* IMAGE AREA */}
-            <div className="relative w-full overflow-hidden" onClick={handleImageClick}>
+            <div className="relative w-full overflow-hidden">
                 <img 
                     src={getMediaUrl(image, true)} 
                     className={`
@@ -134,8 +130,8 @@ export default function PageThumbnail({
                 )}
 
                 {/* HOVER OVERLAY */}
-                <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex flex-col items-center justify-center gap-2 p-2`}>
-                    <div className="flex w-full gap-1">
+                <div className={`absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-30 flex flex-col items-center justify-center gap-2 p-2 pointer-events-none`}>
+                    <div className="flex w-full gap-1 pointer-events-auto">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -162,7 +158,7 @@ export default function PageThumbnail({
                             e.stopPropagation();
                             onDelete();
                         }}
-                        className="w-full py-1 bg-red-600/80 text-white text-[10px] font-bold rounded hover:bg-red-500 transition-colors"
+                        className="w-full py-1 bg-red-600/80 text-white text-[10px] font-bold rounded hover:bg-red-500 transition-colors pointer-events-auto"
                     >
                         DELETE
                     </button>
