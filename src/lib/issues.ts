@@ -168,3 +168,10 @@ export function updateIssue(issueId: number, data: Partial<Issue>) {
         body: JSON.stringify(data),
     });
 }
+
+export function reorderPages(issueId: number, renderIds: number[]) {
+    return request<Issue>(`/issues/${issueId}/reorder-pages/`, {
+        method: "POST",
+        body: JSON.stringify({ render_ids: renderIds }),
+    });
+}

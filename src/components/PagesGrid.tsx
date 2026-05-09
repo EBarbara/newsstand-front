@@ -5,10 +5,10 @@ import { Render } from "@/@types/render";
 
 type Props = Pick<
     IssueEditorState,
-    "issue" | "pageMap" | "assignPage" | "selectedSectionId" | "handleUploadPage" | "handleReplacePage" | "handleDeletePage" | "handleUpdatePageMetadata"
+    "issue" | "pageMap" | "assignPage" | "selectedSectionId" | "handleUploadPage" | "handleReplacePage" | "handleDeletePage" | "handleUpdatePageMetadata" | "handleMovePage"
 >
 
-export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionId, handleUploadPage, handleReplacePage, handleDeletePage, handleUpdatePageMetadata }: Props) {
+export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionId, handleUploadPage, handleReplacePage, handleDeletePage, handleUpdatePageMetadata, handleMovePage }: Props) {
     const uploadInputRef = useRef<HTMLInputElement>(null);
 
     if (!issue) return null;
@@ -51,6 +51,7 @@ export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionI
                     onReplace={(file) => handleReplacePage(r.id, file)}
                     onDelete={() => handleDeletePage(r.id)}
                     onUpdate={(data) => handleUpdatePageMetadata(r.id, data)}
+                    onMove={(dir) => handleMovePage(r.id, dir)}
                     onInsert={async (files) => {
                         for (let i = 0; i < files.length; i++) {
                             await handleUploadPage(files[i], r.order + i);

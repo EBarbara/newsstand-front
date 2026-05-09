@@ -12,16 +12,17 @@ interface IssueCoverProps {
     defaultWidth?: number;
     focusX?: number;
     focusY?: number;
+    forceUnfolded?: boolean;
 }
 
 export default function IssueCover ({ 
     imageUrl, altText = 'Issue Cover', unfoldable = false, defaultWidth = 200,
-    focusX = 0, focusY = 50
+    focusX = 0, focusY = 50, forceUnfolded = false
 } : IssueCoverProps) {
     const imgRef = useRef<HTMLImageElement>(null);
 
     const [isDoubleCover, setIsDoubleCover] = useState(false);
-    const [isFolded, setIsFolded] = useState(true);
+    const [isFolded, setIsFolded] = useState(!forceUnfolded);
     const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
 
     // ================= IMAGE PROCESSING =================

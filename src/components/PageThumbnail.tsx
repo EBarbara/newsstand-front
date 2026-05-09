@@ -18,11 +18,12 @@ type Props = {
     onDelete: () => void
     onUpdate: (data: Partial<Render>) => void
     onInsert: (files: File[]) => void
+    onMove: (direction: 'up' | 'down') => void
 }
 
 export default function PageThumbnail({ 
     id, page, image, isCover, pageType, focusX, focusY,
-    sectionId, isSelectedSection, onClick, onReplace, onDelete, onUpdate, onInsert 
+    sectionId, isSelectedSection, onClick, onReplace, onDelete, onUpdate, onInsert, onMove
 }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const insertInputRef = useRef<HTMLInputElement>(null);
@@ -77,15 +78,39 @@ export default function PageThumbnail({
                     <StarIcon size={12} fill={isCover ? "currentColor" : "none"} />
                 </button>
 
-                <div className={`
-                    px-1.5 py-0.5 text-[10px] font-bold rounded shadow-sm
-                    ${isSelectedSection 
-                        ? "bg-blue-500 text-white" 
-                        : sectionId 
-                            ? "bg-blue-900 text-blue-100" 
-                            : "bg-gray-900 text-gray-400"}
-                `}>
-                    {page}
+                <div className="flex gap-1 items-center pointer-events-auto">
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onMove('up');
+                        }}
+                        className="p-1 bg-black/50 text-white/50 hover:text-white hover:bg-blue-600 rounded transition-colors"
+                        title="Mover para esquerda"
+                    >
+                        <ChevronLeft size={10} />
+                    </button>
+                    
+                    <div className={`
+                        px-1.5 py-0.5 text-[10px] font-bold rounded shadow-sm
+                        ${isSelectedSection 
+                            ? "bg-blue-500 text-white" 
+                            : sectionId 
+                                ? "bg-blue-900 text-blue-100" 
+                                : "bg-gray-900 text-gray-400"}
+                    `}>
+                        {page}
+                    </div>
+
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onMove('down');
+                        }}
+                        className="p-1 bg-black/50 text-white/50 hover:text-white hover:bg-blue-600 rounded transition-colors"
+                        title="Mover para direita"
+                    >
+                        <ChevronRight size={10} />
+                    </button>
                 </div>
             </div>
 
@@ -217,6 +242,22 @@ function StarIcon({ size = 16, fill = "none" }) {
             strokeLinejoin="round"
         >
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+    );
+}
+
+function ChevronLeft({ size = 16 }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+        </svg>
+    );
+}
+
+function ChevronRight({ size = 16 }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m9 18 6-6-6-6"/>
         </svg>
     );
 }

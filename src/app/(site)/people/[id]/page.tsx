@@ -742,29 +742,35 @@ const formatDate = (dateStr?: string) => {
                                                 {mainGroups.map((group: any) => (
                                                     <div 
                                                         key={group.issue_id}
-                                                        className="group bg-white/5 border border-white/10 overflow-hidden flex flex-col sm:flex-row transition-all shadow-lg rounded-2xl"
+                                                        className="group bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start transition-all shadow-lg rounded-xl hover:border-white/20 min-h-[160px] overflow-hidden"
                                                     >
-                                                        <Link 
-                                                            href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
-                                                            className="w-full sm:w-24 aspect-[3/4] bg-gray-800 shrink-0 block hover:opacity-80 transition-opacity"
-                                                        >
-                                                            {group.issue_cover ? (
-                                                                <img 
-                                                                    src={getMediaUrl(group.issue_cover)} 
-                                                                    alt={`Issue ${group.issue_edition}`}
-                                                                    className="w-full h-full object-cover"
-                                                                    style={{ 
-                                                                        objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%` 
-                                                                    }}
-                                                                />
-                                                            ) : (
-                                                                <div className="w-full h-full flex items-center justify-center text-gray-700">
-                                                                    <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-                                                                </div>
-                                                            )}
-                                                        </Link>
+                                                        <div className="p-4 shrink-0 self-stretch flex items-center justify-center bg-black/20">
+                                                            <Link 
+                                                                href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                                className="w-24 sm:w-28 aspect-[3/4] bg-gray-800 shrink-0 block hover:opacity-90 transition-all relative rounded-sm overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-[1.02]"
+                                                            >
+                                                                {group.issue_cover ? (
+                                                                    <>
+                                                                        <img 
+                                                                            src={getMediaUrl(group.issue_cover)} 
+                                                                            alt={`Issue ${group.issue_edition}`}
+                                                                            className="w-full h-full object-cover"
+                                                                            style={{ 
+                                                                                objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%` 
+                                                                            }}
+                                                                        />
+                                                                        {/* Subtle paper-like gradient overlay */}
+                                                                        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent pointer-events-none" />
+                                                                    </>
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                                                                    </div>
+                                                                )}
+                                                            </Link>
+                                                        </div>
 
-                                                        <div className="flex-1 p-5 flex flex-col justify-center min-w-0">
+                                                        <div className="flex-1 p-5 flex flex-col justify-center min-w-0 self-stretch">
                                                             <Link 
                                                                 href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
                                                                 className="flex items-center gap-2 mb-3 group/title"

@@ -40,6 +40,7 @@ export type IssueEditorState = {
     handleReplacePage: (renderId: number, file: File) => Promise<void>
     handleDeletePage: (renderId: number) => Promise<void>
     handleUpdatePageMetadata: (renderId: number, data: Partial<Render>) => Promise<void>
+    handleMovePage: (renderId: number, direction: 'up' | 'down') => Promise<void>
     updateIssueMetadata: (data: Partial<Issue>) => Promise<void>
     error: string | null
 }
@@ -375,6 +376,31 @@ export function useIssueEditor(slug: string, edition: string) {
         });
     }, [sections]);
 
+    async function onMovePage(renderId: number, direction: 'up' | 'down') {
+        if (!issue) return;
+        const renders = [...issue.renders].sort((a, b) => a.order - b.order);
+        const currentIndex = renders.findIndex(r => r.id === renderId);
+        
+        try {
+            if (direction === 'up' && currentIndex > 0) {
+                const newRenders = [...renders];
+                [newRenders[currentIndex - 1], newRenders[currentIndex]] = [newRenders[currentIndex], newRenders[currentIndex - 1]];
+                const { reorderPages } = await import("@/lib/issues");
+                const updatedIssue = await reorderPages(issue.id, newRenders.map(r => r.id));
+                setIssue(updatedIssue);
+            } else if (direction === 'down' && currentIndex < renders.length - 1) {
+                const newRenders = [...renders];
+                [newRenders[currentIndex], newRenders[currentIndex + 1]] = [newRenders[currentIndex + 1], newRenders[currentIndex]];
+                const { reorderPages } = await import("@/lib/issues");
+                const updatedIssue = await reorderPages(issue.id, newRenders.map(r => r.id));
+                setIssue(updatedIssue);
+            }
+        } catch (error) {
+            console.error("Failed to reorder pages", error);
+            alert("Failed to move page.");
+        }
+    }
+
     return {
         issue,
         sections: sortedSections,
@@ -410,6 +436,7 @@ export function useIssueEditor(slug: string, edition: string) {
         handleReplacePage,
         handleDeletePage,
         handleUpdatePageMetadata,
+        handleMovePage: onMovePage,
         updateIssueMetadata,
         error,
     }
