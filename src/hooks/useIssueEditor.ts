@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 import { pagesToSegments } from "@/lib/editor";
-import { createIssueSection, createSectionType, deleteIssue, deleteIssuePage, deleteIssueSection, getIssueDetail, getSections, replaceIssuePage, updateIssueSection, uploadIssuePage } from "@/lib/issues";
+import { createIssueSection, createSectionType, deleteIssue, deleteIssuePage, deleteIssueSection, getIssueDetail, getSections, importCbzToIssue, replaceIssuePage, updateIssueSection, uploadIssuePage } from "@/lib/issues";
 import { Issue } from "@/@types/issue";
 import { Render } from "@/@types/render";
 import { IssueSection } from "@/@types/issueSection";
@@ -42,6 +42,7 @@ export type IssueEditorState = {
     handleDeletePage: (renderId: number) => Promise<void>
     handleUpdatePageMetadata: (renderId: number, data: Partial<Render>) => Promise<void>
     handleMovePage: (renderId: number, direction: 'up' | 'down') => Promise<void>
+    handleImportCbz: (file: File) => Promise<void>
     handleDeleteIssue: () => Promise<void>
     updateIssueMetadata: (data: Partial<Issue>) => Promise<void>
     error: string | null
@@ -305,6 +306,28 @@ export function useIssueEditor(slug: string, edition: string) {
         }
     }
 
+    async function handleImportCbz(file: File) {
+        if (!issue) return
+        try {
+            const updatedIssue = await importCbzToIssue(issue.id, file)
+            setIssue(updatedIssue)
+            setSections(updatedIssue.sections)
+            // Re-calculate page map
+            const map: PageMap = {}
+            updatedIssue.sections.forEach(section => {
+                section.segments.forEach(segment => {
+                    for (let p = segment.start_page; p <= segment.end_page; p++) {
+                        map[p] = section.id;
+                    }
+                })
+            })
+            setPageMap(map)
+        } catch (error) {
+            console.error("Failed to import CBZ", error)
+            alert("Failed to import CBZ.")
+        }
+    }
+
     async function handleReplacePage(renderId: number, file: File) {
         if (!issue) return
         try {
@@ -453,6 +476,7 @@ export function useIssueEditor(slug: string, edition: string) {
         handleDeletePage,
         handleUpdatePageMetadata,
         handleMovePage: onMovePage,
+        handleImportCbz,
         handleDeleteIssue,
         updateIssueMetadata,
         error,

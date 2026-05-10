@@ -117,6 +117,16 @@ export function importCbz(file: File, magazineSlug?: string, edition?: string, d
     });
 }
 
+export function importCbzToIssue(issueId: number, file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return request<Issue>(`/issues/${issueId}/import_cbz/`, {
+        method: 'POST',
+        body: formData,
+    });
+}
+
 export function createEmptyIssue(magazineSlug: string, edition: string, date: string) {
     return request<Issue>('/issues/create_empty/', {
         method: 'POST',

@@ -5,11 +5,12 @@ import { Render } from "@/@types/render";
 
 type Props = Pick<
     IssueEditorState,
-    "issue" | "pageMap" | "assignPage" | "selectedSectionId" | "handleUploadPage" | "handleReplacePage" | "handleDeletePage" | "handleUpdatePageMetadata" | "handleMovePage"
+    "issue" | "pageMap" | "assignPage" | "selectedSectionId" | "handleUploadPage" | "handleReplacePage" | "handleDeletePage" | "handleUpdatePageMetadata" | "handleMovePage" | "handleImportCbz"
 >
 
-export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionId, handleUploadPage, handleReplacePage, handleDeletePage, handleUpdatePageMetadata, handleMovePage }: Props) {
+export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionId, handleUploadPage, handleReplacePage, handleDeletePage, handleUpdatePageMetadata, handleMovePage, handleImportCbz }: Props) {
     const uploadInputRef = useRef<HTMLInputElement>(null);
+    const cbzInputRef = useRef<HTMLInputElement>(null);
 
     if (!issue) return null;
 
@@ -91,6 +92,25 @@ export default function PagesGrid({ issue, pageMap, assignPage, selectedSectionI
                 >
                     <span className="text-xl mb-0 group-hover:scale-110 transition-transform">🔗</span>
                     <span className="text-[9px] font-bold uppercase tracking-tighter">Import from URL</span>
+                </button>
+
+                {/* CBZ ZONE */}
+                <button 
+                    onClick={() => cbzInputRef.current?.click()}
+                    className="flex-1 flex flex-col items-center justify-center bg-white/[0.03] hover:bg-purple-500/20 transition-all text-gray-600 hover:text-purple-400 group border-t border-gray-800/50"
+                >
+                    <span className="text-xl mb-0 group-hover:scale-110 transition-transform">📚</span>
+                    <span className="text-[9px] font-bold uppercase tracking-tighter">Import CBZ</span>
+                    <input 
+                        type="file" 
+                        ref={cbzInputRef} 
+                        className="hidden" 
+                        accept=".cbz"
+                        onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) await handleImportCbz(file);
+                        }}
+                    />
                 </button>
             </div>
         </div>
