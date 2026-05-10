@@ -354,6 +354,15 @@ const formatDate = (dateStr?: string) => {
         return `${day}/${month}/${year}`;
     };
 
+    const formatIssueMonth = (dateStr?: string) => {
+        if (!dateStr) return "";
+        const [year, month] = dateStr.split('-');
+        if (!year || !month) return "";
+        const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const monthIdx = parseInt(month) - 1;
+        return `${monthNames[monthIdx]}/${year.slice(2)}`;
+    };
+
     if (loading) return <div className="p-10 text-white">Carregando...</div>;
     if (!person) return notFound();
 
@@ -698,32 +707,37 @@ const formatDate = (dateStr?: string) => {
                                 );
                             }
 
-                            // 1. Group by issue
-                            const issueGroups = credits.reduce((acc, credit) => {
+                            // 1. Group by issue (preserving order from API)
+                            const groups: any[] = [];
+                            const groupsMap = new Map<number, any>();
+
+                            credits.forEach((credit) => {
                                 const key = credit.issue_id;
-                                if (!acc[key]) {
-                                    acc[key] = {
+                                if (!groupsMap.has(key)) {
+                                    const newGroup = {
                                         issue_id: credit.issue_id,
                                         magazine_name: credit.magazine_name,
                                         magazine_slug: credit.magazine_slug,
                                         issue_edition: credit.issue_edition,
+                                        issue_date: credit.issue_date,
                                         issue_cover: credit.issue_cover,
                                         issue_cover_focus_x: credit.issue_cover_focus_x,
                                         issue_cover_focus_y: credit.issue_cover_focus_y,
                                         maxImportance: 3, // Default to lowest
                                         items: [] as any[]
                                     };
+                                    groups.push(newGroup);
+                                    groupsMap.set(key, newGroup);
                                 }
-                                acc[key].items.push(credit);
+                                
+                                const group = groupsMap.get(key);
+                                group.items.push(credit);
                                 // Update max importance (lower number is higher importance)
                                 const importance = credit.importance || 2;
-                                if (importance < acc[key].maxImportance) {
-                                    acc[key].maxImportance = importance;
+                                if (importance < group.maxImportance) {
+                                    group.maxImportance = importance;
                                 }
-                                return acc;
-                            }, {} as Record<number, any>);
-
-                            const groups = Object.values(issueGroups);
+                            });
                             const mainGroups = groups.filter((g: any) => g.maxImportance < 3);
                             const minorGroups = groups.filter((g: any) => g.maxImportance === 3);
 
@@ -777,7 +791,10 @@ const formatDate = (dateStr?: string) => {
                                                             >
                                                                 <span className="text-xs font-bold text-blue-400 uppercase tracking-widest group-hover/title:text-blue-300 transition-colors">{group.magazine_name}</span>
                                                                 <span className="text-xs text-gray-700">/</span>
-                                                                <span className="text-sm text-gray-300 font-medium group-hover/title:text-white transition-colors">Edição {group.issue_edition}</span>
+                                                                <span className="text-sm text-gray-300 font-medium group-hover/title:text-white transition-colors">
+                                                                    {group.issue_date && <span className="mr-2 text-gray-500 font-normal">{formatIssueMonth(group.issue_date)}</span>}
+                                                                    Edição {group.issue_edition}
+                                                                </span>
                                                             </Link>
 
                                                             <div className="space-y-2">
@@ -837,7 +854,7 @@ const formatDate = (dateStr?: string) => {
                                                     <div key={group.issue_id} className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
                                                         <div className="px-3 py-1.5 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
                                                             <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">
-                                                                {group.magazine_name} · Ed. {group.issue_edition}
+                                                                {group.magazine_name} · {group.issue_date && <span className="mr-1">{formatIssueMonth(group.issue_date)}</span>} Ed. {group.issue_edition}
                                                             </span>
                                                             <Link href={`/magazines/${group.magazine_slug}/${group.issue_edition}`} className="text-[10px] text-blue-500/50 hover:text-blue-400 transition-colors">
                                                                 Ver Edição →

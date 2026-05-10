@@ -31,6 +31,7 @@ export interface PersonCredit {
     magazine_name: string;
     magazine_slug: string;
     issue_edition: string;
+    issue_date?: string;
     issue_id: number;
     issue_cover: string | null;
     issue_cover_focus_x?: number;
