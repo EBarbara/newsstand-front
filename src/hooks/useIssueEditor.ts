@@ -43,6 +43,10 @@ export type IssueEditorState = {
     handleUpdatePageMetadata: (renderId: number, data: Partial<Render>) => Promise<void>
     handleMovePage: (renderId: number, direction: 'up' | 'down') => Promise<void>
     handleImportCbz: (file: File) => Promise<void>
+    importStatus: 'idle' | 'loading' | 'success' | 'error'
+    importedPagesCount: number
+    importError: string | null
+    setImportStatus: Dispatch<SetStateAction<'idle' | 'loading' | 'success' | 'error'>>
     handleDeleteIssue: () => Promise<void>
     updateIssueMetadata: (data: Partial<Issue>) => Promise<void>
     error: string | null
@@ -62,6 +66,10 @@ export function useIssueEditor(slug: string, edition: string) {
 
     const [pageMap, setPageMap] = useState<PageMap>({});
     const [error, setError] = useState<string | null>(null);
+
+    const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [importedPagesCount, setImportedPagesCount] = useState<number>(0);
+    const [importError, setImportError] = useState<string | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -308,10 +316,15 @@ export function useIssueEditor(slug: string, edition: string) {
 
     async function handleImportCbz(file: File) {
         if (!issue) return
+        setImportStatus('loading');
+        setImportError(null);
         try {
             const updatedIssue = await importCbzToIssue(issue.id, file)
             setIssue(updatedIssue)
             setSections(updatedIssue.sections)
+            setImportedPagesCount(updatedIssue.pages_count || 0);
+            setImportStatus('success');
+
             // Re-calculate page map
             const map: PageMap = {}
             updatedIssue.sections.forEach(section => {
@@ -322,9 +335,10 @@ export function useIssueEditor(slug: string, edition: string) {
                 })
             })
             setPageMap(map)
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to import CBZ", error)
-            alert("Failed to import CBZ.")
+            setImportError(error.message || "Falha ao importar CBZ.");
+            setImportStatus('error');
         }
     }
 
@@ -477,6 +491,10 @@ export function useIssueEditor(slug: string, edition: string) {
         handleUpdatePageMetadata,
         handleMovePage: onMovePage,
         handleImportCbz,
+        importStatus,
+        importedPagesCount,
+        importError,
+        setImportStatus,
         handleDeleteIssue,
         updateIssueMetadata,
         error,

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { importCbz } from "@/lib/issues";
+import ImportStatusModal from "@/components/ImportStatusModal";
 
 type Props = {
     magazineSlug: string;
@@ -13,18 +14,26 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
     const [file, setFile] = useState<File | null>(null);
     const [edition, setEdition] = useState("");
     const [date, setDate] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [pagesCount, setPagesCount] = useState(0);
     const [error, setError] = useState<string | null>(null);
+    
     const router = useRouter();
 
     const openModal = () => setIsOpen(true);
     
     const closeModal = () => {
+        if (status === 'loading') return;
         setIsOpen(false);
         setFile(null);
         setEdition("");
         setDate("");
         setError(null);
+        if (status === 'success') {
+            router.refresh();
+        }
+        setStatus('idle');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -34,24 +43,23 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
             return;
         }
 
-        setIsLoading(true);
+        setStatus('loading');
         setError(null);
 
         try {
-            await importCbz(
+            const data = await importCbz(
                 file, 
                 magazineSlug, 
                 edition.trim() || undefined, 
                 date.trim() || undefined
             );
             
-            // Reload the page to show the new issue
-            router.refresh();
-            closeModal();
+            setPagesCount(data.pages_count || 0);
+            setStatus('success');
+            setIsOpen(false); // Close the input modal
         } catch (err: any) {
             setError(err.message || "Erro ao fazer upload da edição.");
-        } finally {
-            setIsLoading(false);
+            setStatus('error');
         }
     };
 
@@ -88,9 +96,6 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
                                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-zinc-800 dark:file:text-blue-400"
                                     required
                                 />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Se o nome do arquivo seguir o padrão (ex: "Revista Vol.1938 #01 (June, 1938).cbz"), os campos abaixo serão preenchidos automaticamente.
-                                </p>
                             </div>
 
                             <div>
@@ -118,7 +123,7 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
                                 />
                             </div>
 
-                            {error && (
+                            {error && status !== 'error' && (
                                 <div className="text-red-600 text-sm bg-red-50 dark:bg-red-900/20 p-3 rounded-md">
                                     {error}
                                 </div>
@@ -129,26 +134,28 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
                                     type="button"
                                     onClick={closeModal}
                                     className="px-4 py-2 border rounded-md hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800 transition-colors"
-                                    disabled={isLoading}
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={isLoading || !file}
+                                    disabled={status === 'loading' || !file}
                                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors disabled:opacity-50 flex items-center justify-center min-w-[100px]"
                                 >
-                                    {isLoading ? (
-                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    ) : (
-                                        "Importar"
-                                    )}
+                                    Importar
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
+
+            <ImportStatusModal 
+                status={status}
+                pagesCount={pagesCount}
+                error={error}
+                onClose={closeModal}
+            />
         </>
     );
 }

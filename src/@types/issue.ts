@@ -17,4 +17,5 @@ export type Issue = {
     is_digital_complete?: boolean;
     is_special?: boolean;
     tags?: Tag[];
+    pages_count?: number;
 }

@@ -3,6 +3,7 @@
 import SectionsPanel from "@/components/SectionsPanel";
 import PagesGrid from "@/components/PagesGrid";
 import { useIssueEditor } from "@/hooks/useIssueEditor";
+import ImportStatusModal from "@/components/ImportStatusModal";
 
 type Props = {
     slug: string,
@@ -21,6 +22,13 @@ export default function IssueEditor({ slug, edition }: Props) {
             style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
             <SectionsPanel {...editor} />
             <PagesGrid {...editor} />
+
+            <ImportStatusModal 
+                status={editor.importStatus}
+                pagesCount={editor.importedPagesCount}
+                error={editor.importError}
+                onClose={() => editor.setImportStatus('idle')}
+            />
         </div>
     );
 }
