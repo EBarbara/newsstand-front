@@ -175,3 +175,9 @@ export function reorderPages(issueId: number, renderIds: number[]) {
         body: JSON.stringify({ render_ids: renderIds }),
     });
 }
+
+export function deleteIssue(issueId: number) {
+    return request(`/issues/${issueId}/`, {
+        method: 'DELETE',
+    });
+}

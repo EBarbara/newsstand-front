@@ -3,11 +3,12 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
 import { pagesToSegments } from "@/lib/editor";
-import { createIssueSection, createSectionType, deleteIssuePage, deleteIssueSection, getIssueDetail, getSections, replaceIssuePage, updateIssueSection, uploadIssuePage } from "@/lib/issues";
+import { createIssueSection, createSectionType, deleteIssue, deleteIssuePage, deleteIssueSection, getIssueDetail, getSections, replaceIssuePage, updateIssueSection, uploadIssuePage } from "@/lib/issues";
 import { Issue } from "@/@types/issue";
 import { Render } from "@/@types/render";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
+import { useRouter } from "next/navigation";
 
 
 export type PageMap = Record<number, number | null>;
@@ -41,11 +42,13 @@ export type IssueEditorState = {
     handleDeletePage: (renderId: number) => Promise<void>
     handleUpdatePageMetadata: (renderId: number, data: Partial<Render>) => Promise<void>
     handleMovePage: (renderId: number, direction: 'up' | 'down') => Promise<void>
+    handleDeleteIssue: () => Promise<void>
     updateIssueMetadata: (data: Partial<Issue>) => Promise<void>
     error: string | null
 }
 
 export function useIssueEditor(slug: string, edition: string) {
+    const router = useRouter();
     const [issue, setIssue] = useState<Issue | null>(null);
     const [sections, setSections] = useState<IssueSection[]>([]);
     const [availableSections, setAvailableSections] = useState<Section[]>([]);
@@ -401,6 +404,19 @@ export function useIssueEditor(slug: string, edition: string) {
         }
     }
 
+    async function handleDeleteIssue() {
+        if (!issue) return;
+        if (!confirm(`TEM CERTEZA? Isso excluirá permanentemente a edição #${issue.edition} e TODAS as suas páginas e imagens do disco.`)) return;
+
+        try {
+            await deleteIssue(issue.id);
+            router.push(`/magazines/${slug}`);
+        } catch (error) {
+            console.error("Failed to delete issue", error);
+            alert("Falha ao excluir edição.");
+        }
+    }
+
     return {
         issue,
         sections: sortedSections,
@@ -437,6 +453,7 @@ export function useIssueEditor(slug: string, edition: string) {
         handleDeletePage,
         handleUpdatePageMetadata,
         handleMovePage: onMovePage,
+        handleDeleteIssue,
         updateIssueMetadata,
         error,
     }

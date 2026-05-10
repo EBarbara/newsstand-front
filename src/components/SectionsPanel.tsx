@@ -28,6 +28,7 @@ type Props = Pick<
     | "updateCreditImportance"
     | "updateCreditPage"
     | "updateIssueMetadata"
+    | "handleDeleteIssue"
 >
 
 export default function SectionsPanel({
@@ -52,7 +53,8 @@ export default function SectionsPanel({
     updateCreditRole,
     updateCreditImportance,
     updateCreditPage,
-    updateIssueMetadata
+    updateIssueMetadata,
+    handleDeleteIssue
 }: Props) {
     const [newTypeName, setNewTypeName] = useState("");
     const [isCreatingType, setIsCreatingType] = useState(false);
@@ -441,6 +443,17 @@ export default function SectionsPanel({
                     )}
                 </div>
             ))}
+
+            {/* DANGER ZONE */}
+            <div className="mt-8 pt-6 border-t border-red-900/30">
+                <label className="text-[10px] uppercase font-bold text-red-500 opacity-70 mb-3 block tracking-widest">Zona de Perigo</label>
+                <button
+                    onClick={handleDeleteIssue}
+                    className="w-full p-2.5 bg-red-900/20 text-red-500 border border-red-900/50 rounded-lg text-xs font-bold hover:bg-red-900 hover:text-white transition-all active:scale-95"
+                >
+                    🗑️ Excluir Edição Permanente
+                </button>
+            </div>
         </div>
     );
 }
