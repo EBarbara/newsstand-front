@@ -53,7 +53,7 @@ export function getPageImageUrl(id: number, index: number) {
 }
 
 export function getSections() {
-    return request<PaginatedResponse<Section>>("/sections/")
+    return request<Section[]>("/sections/")
 }
 
 export function updateIssueSection(
