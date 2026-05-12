@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, use, useRef } from "react";
+import React, { useEffect, useState, use, useRef, useMemo } from "react";
 import { getPersonDetail, updatePerson, getPersonCredits } from "@/lib/people";
 import { notFound, useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getMediaUrl } from "@/lib/issues";
 import { Person, PersonLink, PersonCredit, PaginatedResponse, PersonRelationship } from "@/@types/person";
 import { getPeople } from "@/lib/people";
+import Pagination from "@/components/Pagination";
 
 // --- Image Cropper Component ---
 interface CropperProps {
@@ -57,28 +58,28 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
         // Calculate source rectangle
         const containerRatio = width / height;
         const scaleFactor = img.naturalWidth / (img.width * scale);
-        
+
         const dx = (offset.x - (img.width * scale - rect.width) / 2) * scaleFactor;
         const dy = (offset.y - (img.height * scale - rect.height) / 2) * scaleFactor;
 
         // For simplicity, we'll draw what's visible in the container
         ctx.fillStyle = "#000";
         ctx.fillRect(0, 0, width, height);
-        
+
         const drawW = img.naturalWidth;
         const drawH = img.naturalHeight;
-        
+
         // Final implementation of manual crop calculation
         // To keep it robust, we use the container's relative view
         const viewW = rect.width;
         const viewH = rect.height;
         const zoom = scale;
-        
+
         // Source X/Y on natural image
-        const sx = ( (viewW/2 - offset.x) / zoom - viewW/2 ) * (img.naturalWidth / img.width) + (img.naturalWidth/2 - (viewW/2) * (img.naturalWidth / (img.width * zoom)));
+        const sx = ((viewW / 2 - offset.x) / zoom - viewW / 2) * (img.naturalWidth / img.width) + (img.naturalWidth / 2 - (viewW / 2) * (img.naturalWidth / (img.width * zoom)));
         // This is getting complex, let's use a simpler approach: 
         // Render current view to canvas
-        
+
         const outputCanvas = document.createElement('canvas');
         outputCanvas.width = width;
         outputCanvas.height = height;
@@ -92,9 +93,9 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
         // Draw image with current transform
         const ratio = width / viewW;
         oCtx.save();
-        oCtx.translate(width/2 + offset.x * ratio, height/2 + offset.y * ratio);
+        oCtx.translate(width / 2 + offset.x * ratio, height / 2 + offset.y * ratio);
         oCtx.scale(scale * ratio, scale * ratio);
-        oCtx.drawImage(img, -img.width/2, -img.height/2, img.width, img.height);
+        oCtx.drawImage(img, -img.width / 2, -img.height / 2, img.width, img.height);
         oCtx.restore();
 
         outputCanvas.toBlob((blob) => {
@@ -110,7 +111,7 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
                     <p className="text-gray-400 text-sm">Arraste para mover, use o controle para zoom</p>
                 </div>
 
-                <div 
+                <div
                     ref={containerRef}
                     className="relative aspect-[3/4] w-full bg-gray-800 rounded-xl overflow-hidden cursor-move border-2 border-blue-500/50 shadow-2xl"
                     onMouseDown={handleMouseDown}
@@ -118,14 +119,14 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
                 >
-                    <img 
+                    <img
                         ref={imgRef}
-                        src={image} 
+                        src={image}
                         alt="Crop preview"
                         draggable={false}
                         crossOrigin="anonymous"
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-none transition-transform duration-75 ease-out"
-                        style={{ 
+                        style={{
                             transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px)) scale(${scale})`,
                         }}
                     />
@@ -144,22 +145,22 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
                 </div>
 
                 <div className="space-y-4">
-                    <input 
-                        type="range" 
-                        min="0.5" max="3" step="0.01" 
-                        value={scale} 
+                    <input
+                        type="range"
+                        min="0.5" max="3" step="0.01"
+                        value={scale}
                         onChange={(e) => setScale(parseFloat(e.target.value))}
                         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                     />
-                    
+
                     <div className="flex gap-4">
-                        <button 
+                        <button
                             onClick={onCancel}
                             className="flex-1 px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl font-bold transition-colors"
                         >
                             Cancelar
                         </button>
-                        <button 
+                        <button
                             onClick={handleConfirm}
                             className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold transition-colors"
                         >
@@ -187,7 +188,7 @@ function PersonPageContent({ id }: { id: string }) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    
+
     const [person, setPerson] = useState<Person | null>(null);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -204,18 +205,18 @@ function PersonPageContent({ id }: { id: string }) {
     const [editGender, setEditGender] = useState("");
     const [editDeathDate, setEditDeathDate] = useState("");
     const [editRelationships, setEditRelationships] = useState<PersonRelationship[]>([]);
-    
+
     // Relationship search
     const [relSearch, setRelSearch] = useState("");
     const [relSearchResults, setRelSearchResults] = useState<Person[]>([]);
     const [isSearchingRel, setIsSearchingRel] = useState(false);
-    
+
     // Photo management
     const [photoFile, setPhotoFile] = useState<File | Blob | null>(null);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
     const [isCropping, setIsCropping] = useState(false);
     const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
-    
+
     // Credits pagination
     const [creditsResponse, setCreditsResponse] = useState<PaginatedResponse<PersonCredit> | null>(null);
     const [creditsLoading, setCreditsLoading] = useState(true);
@@ -241,7 +242,7 @@ function PersonPageContent({ id }: { id: string }) {
                 setLoading(false);
             });
     }, [id]);
-    
+
     useEffect(() => {
         setCreditsLoading(true);
         getPersonCredits(Number(id), creditsPage)
@@ -254,7 +255,7 @@ function PersonPageContent({ id }: { id: string }) {
                 setCreditsLoading(false);
             });
     }, [id, creditsPage]);
-    
+
     useEffect(() => {
         if (!relSearch.trim()) {
             setRelSearchResults([]);
@@ -299,7 +300,7 @@ function PersonPageContent({ id }: { id: string }) {
 
             if (photoFile) {
                 // If it's a blob from cropper, we give it a name
-                const fileToUpload = photoFile instanceof Blob && !(photoFile instanceof File) 
+                const fileToUpload = photoFile instanceof Blob && !(photoFile instanceof File)
                     ? new File([photoFile], "profile.jpg", { type: "image/jpeg" })
                     : photoFile;
                 formData.append("photo", fileToUpload);
@@ -399,19 +400,19 @@ function PersonPageContent({ id }: { id: string }) {
     };
 
     const calculateAge = (birthDate: string, deathDate?: string) => {
-    const birth = new Date(birthDate);
-    const today = new Date();
-    const end = deathDate ? new Date(deathDate) : today;
-    
-    let age = end.getFullYear() - birth.getFullYear();
-    const m = end.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
-        age--;
-    }
-    return age;
-};
+        const birth = new Date(birthDate);
+        const today = new Date();
+        const end = deathDate ? new Date(deathDate) : today;
 
-const formatDate = (dateStr?: string) => {
+        let age = end.getFullYear() - birth.getFullYear();
+        const m = end.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
+    const formatDate = (dateStr?: string) => {
         if (!dateStr) return "Desconhecido";
         const [year, month, day] = dateStr.split('-');
         if (!year || !month || !day) return dateStr;
@@ -435,9 +436,9 @@ const formatDate = (dateStr?: string) => {
     return (
         <div className="max-w-6xl mx-auto p-6 md:p-10 text-white">
             {isCropping && tempPhotoUrl && (
-                <ImageCropper 
-                    image={tempPhotoUrl} 
-                    onCrop={handleCropComplete} 
+                <ImageCropper
+                    image={tempPhotoUrl}
+                    onCrop={handleCropComplete}
                     onCancel={() => {
                         setIsCropping(false);
                         setTempPhotoUrl(null);
@@ -447,7 +448,7 @@ const formatDate = (dateStr?: string) => {
 
             <div className="flex justify-end mb-6">
                 {!isEditing ? (
-                    <button 
+                    <button
                         onClick={() => setIsEditing(true)}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-colors"
                     >
@@ -455,7 +456,7 @@ const formatDate = (dateStr?: string) => {
                     </button>
                 ) : (
                     <div className="flex gap-2">
-                        <button 
+                        <button
                             onClick={() => {
                                 setIsEditing(false);
                                 setPhotoPreview(null);
@@ -465,7 +466,7 @@ const formatDate = (dateStr?: string) => {
                         >
                             Cancelar
                         </button>
-                        <button 
+                        <button
                             onClick={handleSave}
                             disabled={isSaving}
                             className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
@@ -480,12 +481,12 @@ const formatDate = (dateStr?: string) => {
                 {/* SIDEBAR: Photo & Basic Info */}
                 <div className="w-full md:w-1/3 flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
-                        <div 
+                        <div
                             className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-gray-900 group"
                         >
                             {photoUrl ? (
-                                <img 
-                                    src={photoUrl} 
+                                <img
+                                    src={photoUrl}
                                     alt={person.name}
                                     className="w-full h-full object-cover"
                                 />
@@ -496,7 +497,7 @@ const formatDate = (dateStr?: string) => {
                                     </svg>
                                 </div>
                             )}
-                            
+
                             {isEditing && (
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-6 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
                                     {/* File Upload */}
@@ -509,7 +510,7 @@ const formatDate = (dateStr?: string) => {
                                     </label>
 
                                     {/* URL Import */}
-                                    <button 
+                                    <button
                                         onClick={handlePhotoUrlImport}
                                         className="bg-white/20 p-3 rounded-full border border-white/30 hover:bg-white/40 transition-colors group/btn"
                                         title="Importar por URL"
@@ -534,12 +535,12 @@ const formatDate = (dateStr?: string) => {
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Nome Completo</label>
                             {isEditing ? (
                                 <>
-                                    <input 
+                                    <input
                                         value={editName}
                                         onChange={(e) => setEditName(e.target.value)}
                                         className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
                                     />
-                                    <input 
+                                    <input
                                         value={editDisambiguation}
                                         onChange={(e) => setEditDisambiguation(e.target.value)}
                                         placeholder="Desambiguação (ex: Ator, UK, etc.)"
@@ -563,7 +564,7 @@ const formatDate = (dateStr?: string) => {
                                         {editAliases.map((alias, idx) => (
                                             <span key={idx} className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-md text-xs text-blue-300">
                                                 {alias}
-                                                <button 
+                                                <button
                                                     type="button"
                                                     onClick={() => setEditAliases(editAliases.filter((_, i) => i !== idx))}
                                                     className="hover:text-red-400 font-bold"
@@ -573,7 +574,7 @@ const formatDate = (dateStr?: string) => {
                                             </span>
                                         ))}
                                     </div>
-                                    <input 
+                                    <input
                                         type="text"
                                         placeholder="Novo apelido (aperte Enter)..."
                                         className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
@@ -606,7 +607,7 @@ const formatDate = (dateStr?: string) => {
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Data de Nascimento</label>
                             {isEditing ? (
-                                <input 
+                                <input
                                     type="date"
                                     value={editBirthDate}
                                     onChange={(e) => setEditBirthDate(e.target.value)}
@@ -619,7 +620,7 @@ const formatDate = (dateStr?: string) => {
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Data de Falecimento</label>
                             {isEditing ? (
-                                <input 
+                                <input
                                     type="date"
                                     value={editDeathDate}
                                     onChange={(e) => setEditDeathDate(e.target.value)}
@@ -632,7 +633,7 @@ const formatDate = (dateStr?: string) => {
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">País</label>
                             {isEditing ? (
-                                <input 
+                                <input
                                     value={editCountry}
                                     onChange={(e) => setEditCountry(e.target.value)}
                                     className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
@@ -641,11 +642,11 @@ const formatDate = (dateStr?: string) => {
                                 <p className="text-gray-200">{person.country || "Desconhecido"}</p>
                             )}
                         </div>
-                        
+
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Gênero</label>
                             {isEditing ? (
-                                <select 
+                                <select
                                     value={editGender}
                                     onChange={(e) => setEditGender(e.target.value)}
                                     className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
@@ -672,7 +673,7 @@ const formatDate = (dateStr?: string) => {
                                 </p>
                             </div>
                         )}
-                        
+
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Links</label>
                             <div className="flex flex-col gap-2 mt-2">
@@ -680,14 +681,14 @@ const formatDate = (dateStr?: string) => {
                                     <div key={idx} className="flex gap-2">
                                         {isEditing ? (
                                             <div className="flex flex-col gap-1 flex-1">
-                                                <input 
+                                                <input
                                                     value={link.label}
                                                     onChange={(e) => updateLink(idx, 'label', e.target.value)}
                                                     placeholder="Rótulo"
                                                     className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200 focus:border-blue-500 transition-colors"
                                                 />
                                                 <div className="flex gap-1">
-                                                    <input 
+                                                    <input
                                                         value={link.url}
                                                         onChange={(e) => updateLink(idx, 'url', e.target.value)}
                                                         placeholder="URL"
@@ -697,7 +698,7 @@ const formatDate = (dateStr?: string) => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <a 
+                                            <a
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
@@ -709,7 +710,7 @@ const formatDate = (dateStr?: string) => {
                                     </div>
                                 ))}
                                 {isEditing && (
-                                    <button 
+                                    <button
                                         onClick={addLink}
                                         className="text-xs text-blue-400 hover:text-blue-300 mt-1 font-bold"
                                     >
@@ -733,7 +734,7 @@ const formatDate = (dateStr?: string) => {
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <div className="flex flex-col gap-1">
                                                         <label className="text-[8px] uppercase text-gray-500 font-bold">Vínculo (com {rel.person_name})</label>
-                                                        <input 
+                                                        <input
                                                             value={rel.label}
                                                             onChange={(e) => updateRelationship(idx, 'label', e.target.value)}
                                                             placeholder="ex: Ex-esposa"
@@ -742,7 +743,7 @@ const formatDate = (dateStr?: string) => {
                                                     </div>
                                                     <div className="flex flex-col gap-1">
                                                         <label className="text-[8px] uppercase text-gray-500 font-bold">Volta ({rel.person_name} é...)</label>
-                                                        <input 
+                                                        <input
                                                             value={rel.inverse_label}
                                                             onChange={(e) => updateRelationship(idx, 'inverse_label', e.target.value)}
                                                             placeholder="ex: Ex-marido"
@@ -764,18 +765,18 @@ const formatDate = (dateStr?: string) => {
 
                                 {isEditing && (
                                     <div className="relative mt-2">
-                                        <input 
+                                        <input
                                             value={relSearch}
                                             onChange={(e) => setRelSearch(e.target.value)}
                                             placeholder="Vincular outra pessoa..."
                                             className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-200 focus:border-blue-500 outline-none transition-colors"
                                         />
                                         {isSearchingRel && <div className="absolute right-3 top-2 text-[10px] text-gray-500 animate-pulse">Buscando...</div>}
-                                        
+
                                         {relSearchResults.length > 0 && (
                                             <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto backdrop-blur-xl">
                                                 {relSearchResults.map(p => (
-                                                    <button 
+                                                    <button
                                                         key={p.id}
                                                         onClick={() => addRelationship(p)}
                                                         className="w-full text-left px-4 py-2.5 text-xs hover:bg-blue-600/10 transition-colors border-b border-white/5 last:border-0 flex justify-between items-center group"
@@ -801,7 +802,7 @@ const formatDate = (dateStr?: string) => {
                             Biografia
                         </h2>
                         {isEditing ? (
-                            <textarea 
+                            <textarea
                                 value={editBio}
                                 onChange={(e) => setEditBio(e.target.value)}
                                 className="w-full h-64 bg-gray-900 border border-gray-700 rounded-xl p-4 text-gray-300 leading-relaxed focus:outline-none focus:border-blue-500 transition-colors"
@@ -865,7 +866,7 @@ const formatDate = (dateStr?: string) => {
                                     groups.push(newGroup);
                                     groupsMap.set(key, newGroup);
                                 }
-                                
+
                                 const group = groupsMap.get(key);
                                 group.items.push(credit);
                                 // Update max importance (lower number is higher importance)
@@ -890,23 +891,23 @@ const formatDate = (dateStr?: string) => {
                                             </h2>
                                             <div className="grid grid-cols-1 gap-6">
                                                 {mainGroups.map((group: any) => (
-                                                    <div 
+                                                    <div
                                                         key={group.issue_id}
                                                         className="group bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start transition-all shadow-lg rounded-xl hover:border-white/20 min-h-[160px] overflow-hidden"
                                                     >
                                                         <div className="p-4 shrink-0 self-stretch flex items-center justify-center bg-black/20">
-                                                            <Link 
+                                                            <Link
                                                                 href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
                                                                 className="w-24 sm:w-28 aspect-[3/4] bg-gray-800 shrink-0 block hover:opacity-90 transition-all relative rounded-sm overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-[1.02]"
                                                             >
                                                                 {group.issue_cover ? (
                                                                     <>
-                                                                        <img 
-                                                                            src={getMediaUrl(group.issue_cover)} 
+                                                                        <img
+                                                                            src={getMediaUrl(group.issue_cover)}
                                                                             alt={`Issue ${group.issue_edition}`}
                                                                             className="w-full h-full object-cover"
-                                                                            style={{ 
-                                                                                objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%` 
+                                                                            style={{
+                                                                                objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%`
                                                                             }}
                                                                         />
                                                                         {/* Subtle paper-like gradient overlay */}
@@ -914,14 +915,14 @@ const formatDate = (dateStr?: string) => {
                                                                     </>
                                                                 ) : (
                                                                     <div className="w-full h-full flex items-center justify-center text-gray-700">
-                                                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                                                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" /></svg>
                                                                     </div>
                                                                 )}
                                                             </Link>
                                                         </div>
 
                                                         <div className="flex-1 p-5 flex flex-col justify-center min-w-0 self-stretch">
-                                                            <Link 
+                                                            <Link
                                                                 href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
                                                                 className="flex items-center gap-2 mb-3 group/title"
                                                             >
@@ -935,8 +936,8 @@ const formatDate = (dateStr?: string) => {
 
                                                             <div className="space-y-2">
                                                                 {group.items.sort((a: any, b: any) => (a.importance || 2) - (b.importance || 2)).map((item: any) => (
-                                                                    <Link 
-                                                                        key={item.id} 
+                                                                    <Link
+                                                                        key={item.id}
                                                                         href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`}
                                                                         className="flex flex-wrap items-center gap-x-3 gap-y-1 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all group/item"
                                                                     >
@@ -944,13 +945,12 @@ const formatDate = (dateStr?: string) => {
                                                                             {item.section_title || item.section_type}
                                                                             {item.age_at_issue && <span className="ml-2 text-xs font-normal text-gray-500">{item.age_at_issue}</span>}
                                                                         </h3>
-                                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
-                                                                            item.importance === 1 
-                                                                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+                                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.importance === 1
+                                                                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                                                                 : item.importance === 3
                                                                                     ? "bg-gray-500/5 text-gray-500 border-gray-500/10"
                                                                                     : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                                                                        }`}>
+                                                                            }`}>
                                                                             {item.role || (item.importance === 1 ? "Estrela" : item.importance === 3 ? "Citação" : "Colaborador")}
                                                                         </span>
                                                                         {item.start_page && (
@@ -962,8 +962,8 @@ const formatDate = (dateStr?: string) => {
                                                                 ))}
                                                             </div>
                                                         </div>
-                                                        
-                                                        <Link 
+
+                                                        <Link
                                                             href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
                                                             className="hidden sm:flex items-center px-6 text-gray-700 hover:text-blue-400 transition-colors border-l border-white/5"
                                                             title="Ver detalhes da edição"
@@ -998,8 +998,8 @@ const formatDate = (dateStr?: string) => {
                                                         </div>
                                                         <div className="p-2 space-y-1">
                                                             {group.items.map((item: any) => (
-                                                                <Link 
-                                                                    key={item.id} 
+                                                                <Link
+                                                                    key={item.id}
                                                                     href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`}
                                                                     className="flex items-center justify-between text-sm text-gray-400 px-2 py-1 rounded-lg hover:bg-white/5 hover:text-blue-300 transition-all group/minor"
                                                                 >
@@ -1022,44 +1022,14 @@ const formatDate = (dateStr?: string) => {
                                         </section>
                                     )}
 
-                                    {/* PAGINATION CONTROLS */}
+                                    {/* PAGINATION */}
                                     {totalPages > 1 && (
-                                        <div className="flex justify-center items-center gap-6 mt-12 pt-8 border-t border-white/5">
-                                            {creditsResponse?.previous ? (
-                                                <button 
-                                                    onClick={() => {
-                                                        setCreditsPage(p => p - 1);
-                                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                                    }}
-                                                    className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all"
-                                                >
-                                                    ← Anterior
-                                                </button>
-                                            ) : (
-                                                <span className="px-6 py-2 bg-transparent border border-white/5 text-gray-600 rounded-full text-sm font-medium cursor-not-allowed">
-                                                    ← Anterior
-                                                </span>
-                                            )}
-                                            
-                                            <span className="text-gray-400 text-sm font-mono">
-                                                {creditsPage} <span className="opacity-30">/</span> {totalPages}
-                                            </span>
-
-                                            {creditsResponse?.next ? (
-                                                <button 
-                                                    onClick={() => {
-                                                        setCreditsPage(p => p + 1);
-                                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                                    }}
-                                                    className="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all"
-                                                >
-                                                    Próximo →
-                                                </button>
-                                            ) : (
-                                                <span className="px-6 py-2 bg-transparent border border-white/5 text-gray-600 rounded-full text-sm font-medium cursor-not-allowed">
-                                                    Próximo →
-                                                </span>
-                                            )}
+                                        <div className="mt-12 pt-8 border-t border-white/5">
+                                            <Pagination
+                                                currentPage={creditsPage}
+                                                totalPages={totalPages}
+                                                baseUrl={pathname}
+                                            />
                                         </div>
                                     )}
                                 </div>
