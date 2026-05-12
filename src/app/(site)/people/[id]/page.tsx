@@ -5,7 +5,8 @@ import { getPersonDetail, updatePerson, getPersonCredits } from "@/lib/people";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getMediaUrl } from "@/lib/issues";
-import { Person, PersonLink, PersonCredit, PaginatedResponse } from "@/@types/person";
+import { Person, PersonLink, PersonCredit, PaginatedResponse, PersonRelationship } from "@/@types/person";
+import { getPeople } from "@/lib/people";
 
 // --- Image Cropper Component ---
 interface CropperProps {
@@ -192,6 +193,12 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
     const [editAliases, setEditAliases] = useState<string[]>([]);
     const [editGender, setEditGender] = useState("");
     const [editDeathDate, setEditDeathDate] = useState("");
+    const [editRelationships, setEditRelationships] = useState<PersonRelationship[]>([]);
+    
+    // Relationship search
+    const [relSearch, setRelSearch] = useState("");
+    const [relSearchResults, setRelSearchResults] = useState<Person[]>([]);
+    const [isSearchingRel, setIsSearchingRel] = useState(false);
     
     // Photo management
     const [photoFile, setPhotoFile] = useState<File | Blob | null>(null);
@@ -217,6 +224,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 setEditAliases(data.aliases || []);
                 setEditGender(data.gender || "");
                 setEditDeathDate(data.death_date || "");
+                setEditRelationships(data.relationships || []);
                 setLoading(false);
             })
             .catch(() => {
@@ -236,6 +244,23 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
                 setCreditsLoading(false);
             });
     }, [id, creditsPage]);
+    
+    useEffect(() => {
+        if (!relSearch.trim()) {
+            setRelSearchResults([]);
+            return;
+        }
+        setIsSearchingRel(true);
+        const timer = setTimeout(() => {
+            getPeople(1, 10, { search: relSearch })
+                .then(res => {
+                    // Exclude current person from results
+                    setRelSearchResults(res.results.filter(p => p.id !== Number(id)));
+                })
+                .finally(() => setIsSearchingRel(false));
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [relSearch, id]);
 
     const handleSave = async () => {
         if (!person) return;
@@ -257,6 +282,10 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
 
             // Append aliases
             formData.append("aliases", JSON.stringify(editAliases.filter(a => a.trim())));
+
+            // Append relationships (only those where this person is the source)
+            const relationshipsToSave = editRelationships.filter(r => r.is_from !== false);
+            formData.append("relationships", JSON.stringify(relationshipsToSave));
 
             if (photoFile) {
                 // If it's a blob from cropper, we give it a name
@@ -292,6 +321,31 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
         const newLinks = [...editLinks];
         newLinks[index] = { ...newLinks[index], [field]: value };
         setEditLinks(newLinks);
+    };
+
+    const addRelationship = (toPerson: Person) => {
+        const newRel: PersonRelationship = {
+            id: 0,
+            person_id: toPerson.id,
+            person_name: toPerson.name,
+            label: "",
+            inverse_label: "",
+            is_from: true,
+            order: editRelationships.length
+        };
+        setEditRelationships([...editRelationships, newRel]);
+        setRelSearch("");
+        setRelSearchResults([]);
+    };
+
+    const removeRelationship = (index: number) => {
+        setEditRelationships(editRelationships.filter((_, i) => i !== index));
+    };
+
+    const updateRelationship = (index: number, field: keyof PersonRelationship, value: any) => {
+        const newRels = [...editRelationships];
+        newRels[index] = { ...newRels[index], [field]: value };
+        setEditRelationships(newRels);
     };
 
     const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -651,6 +705,78 @@ const formatDate = (dateStr?: string) => {
                                     >
                                         + Adicionar Link
                                     </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-white/5">
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Relacionamentos</label>
+                            <div className="flex flex-col gap-3 mt-2">
+                                {(isEditing ? editRelationships : person.relationships || []).map((rel, idx) => (
+                                    <div key={idx} className="flex flex-col gap-2 p-3 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                        {isEditing ? (
+                                            <>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">{rel.person_name}</span>
+                                                    <button onClick={() => removeRelationship(idx)} className="text-red-400 hover:text-red-300 text-[10px] font-bold uppercase">Remover</button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div className="flex flex-col gap-1">
+                                                        <label className="text-[8px] uppercase text-gray-500 font-bold">Vínculo ({rel.person_name} é...)</label>
+                                                        <input 
+                                                            value={rel.label}
+                                                            onChange={(e) => updateRelationship(idx, 'label', e.target.value)}
+                                                            placeholder="ex: Pai, Esposa, etc."
+                                                            className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200 focus:border-blue-500 outline-none transition-colors"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col gap-1">
+                                                        <label className="text-[8px] uppercase text-gray-500 font-bold">Volta ({person.name} é...)</label>
+                                                        <input 
+                                                            value={rel.inverse_label}
+                                                            onChange={(e) => updateRelationship(idx, 'inverse_label', e.target.value)}
+                                                            placeholder="ex: Filho, Marido, etc."
+                                                            className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200 focus:border-blue-500 outline-none transition-colors"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-sm">
+                                                <span className="text-gray-400">{rel.label} de </span>
+                                                <Link href={`/people/${rel.person_id}`} className="text-blue-400 hover:text-blue-300 font-bold transition-colors">
+                                                    {rel.person_name}
+                                                </Link>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {isEditing && (
+                                    <div className="relative mt-2">
+                                        <input 
+                                            value={relSearch}
+                                            onChange={(e) => setRelSearch(e.target.value)}
+                                            placeholder="Vincular outra pessoa..."
+                                            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-200 focus:border-blue-500 outline-none transition-colors"
+                                        />
+                                        {isSearchingRel && <div className="absolute right-3 top-2 text-[10px] text-gray-500 animate-pulse">Buscando...</div>}
+                                        
+                                        {relSearchResults.length > 0 && (
+                                            <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl max-h-48 overflow-y-auto backdrop-blur-xl">
+                                                {relSearchResults.map(p => (
+                                                    <button 
+                                                        key={p.id}
+                                                        onClick={() => addRelationship(p)}
+                                                        className="w-full text-left px-4 py-2.5 text-xs hover:bg-blue-600/10 transition-colors border-b border-white/5 last:border-0 flex justify-between items-center group"
+                                                    >
+                                                        <span className="group-hover:text-blue-400 transition-colors">{p.name} {p.disambiguation ? <span className="text-gray-500">[{p.disambiguation}]</span> : ""}</span>
+                                                        <span className="text-blue-500 font-bold opacity-0 group-hover:opacity-100 transition-opacity">+</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         </div>

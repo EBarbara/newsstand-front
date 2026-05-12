@@ -14,6 +14,7 @@ export interface Person {
     disambiguation?: string;
     links?: PersonLink[];
     credits?: PersonCredit[];
+    relationships?: PersonRelationship[];
     gender?: string;
     gender_display?: string;
     tags?: import("./tag").Tag[];
@@ -23,6 +24,16 @@ export interface PersonLink {
     id: number;
     url: string;
     label: string;
+}
+
+export interface PersonRelationship {
+    id: number;
+    person_id: number;
+    person_name: string;
+    label: string;
+    inverse_label?: string;
+    is_from: boolean;
+    order: number;
 }
 
 export interface PersonCredit {
