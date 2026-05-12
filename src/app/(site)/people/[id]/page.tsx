@@ -722,20 +722,20 @@ const formatDate = (dateStr?: string) => {
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-2">
                                                     <div className="flex flex-col gap-1">
-                                                        <label className="text-[8px] uppercase text-gray-500 font-bold">Vínculo ({rel.person_name} é...)</label>
+                                                        <label className="text-[8px] uppercase text-gray-500 font-bold">Vínculo (com {rel.person_name})</label>
                                                         <input 
                                                             value={rel.label}
                                                             onChange={(e) => updateRelationship(idx, 'label', e.target.value)}
-                                                            placeholder="ex: Pai, Esposa, etc."
+                                                            placeholder="ex: Ex-esposa"
                                                             className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200 focus:border-blue-500 outline-none transition-colors"
                                                         />
                                                     </div>
                                                     <div className="flex flex-col gap-1">
-                                                        <label className="text-[8px] uppercase text-gray-500 font-bold">Volta ({person.name} é...)</label>
+                                                        <label className="text-[8px] uppercase text-gray-500 font-bold">Volta ({rel.person_name} é...)</label>
                                                         <input 
                                                             value={rel.inverse_label}
                                                             onChange={(e) => updateRelationship(idx, 'inverse_label', e.target.value)}
-                                                            placeholder="ex: Filho, Marido, etc."
+                                                            placeholder="ex: Ex-marido"
                                                             className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-[10px] text-gray-200 focus:border-blue-500 outline-none transition-colors"
                                                         />
                                                     </div>
