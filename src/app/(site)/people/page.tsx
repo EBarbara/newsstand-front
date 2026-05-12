@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styles from './page.module.css';
 import Link from "next/link";
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { getPeople, createPerson } from '@/lib/people';
 import { Person, PaginatedResponse } from '@/@types/person';
 import PersonCard from '@/components/PersonCard';
@@ -12,15 +13,37 @@ import { Tag } from '@/@types/tag';
 import PeopleFiltersModal from '@/components/PeopleFiltersModal';
 
 export default function PeoplePage() {
+    return (
+        <React.Suspense fallback={<div className={styles.empty}><p>Carregando...</p></div>}>
+            <PeoplePageContent />
+        </React.Suspense>
+    );
+}
+
+function PeoplePageContent() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // Derive current page from URL
+    const currentPage = parseInt(searchParams.get('page') || '1');
+    
+    // Derive active filters from URL (all params except 'page')
+    const activeFilters = useMemo(() => {
+        const filters: Record<string, string> = {};
+        searchParams.forEach((value, key) => {
+            if (key !== 'page') filters[key] = value;
+        });
+        return filters;
+    }, [searchParams]);
+
     const [data, setData] = useState<PaginatedResponse<Person> | null>(null);
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newPersonName, setNewPersonName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const [tags, setTags] = useState<Tag[]>([]);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-    const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
 
     const fetchPeople = useCallback(async (page: number, filters: Record<string, string>) => {
         setLoading(true);
@@ -49,6 +72,15 @@ export default function PeoplePage() {
     useEffect(() => {
         fetchPeople(currentPage, activeFilters);
     }, [currentPage, activeFilters, fetchPeople]);
+
+    const updateUrl = (page: number, filters: Record<string, string>) => {
+        const params = new URLSearchParams();
+        if (page > 1) params.set('page', page.toString());
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value) params.set(key, value);
+        });
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     const handleAddPerson = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -125,7 +157,7 @@ export default function PeoplePage() {
                         <Pagination 
                             currentPage={currentPage}
                             totalPages={Math.ceil((data?.count || 0) / 20)}
-                            onPageChange={(page) => setCurrentPage(page)}
+                            baseUrl={pathname}
                         />
                     )}
                 </>
@@ -136,8 +168,7 @@ export default function PeoplePage() {
                 isOpen={isFilterModalOpen}
                 onClose={() => setIsFilterModalOpen(false)}
                 onApply={(filters) => {
-                    setActiveFilters(filters);
-                    setCurrentPage(1);
+                    updateUrl(1, filters);
                 }}
                 currentFilters={activeFilters}
                 availableTags={tags}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use, useRef } from "react";
 import { getPersonDetail, updatePerson, getPersonCredits } from "@/lib/people";
-import { notFound, useRouter } from "next/navigation";
+import { notFound, useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getMediaUrl } from "@/lib/issues";
 import { Person, PersonLink, PersonCredit, PaginatedResponse, PersonRelationship } from "@/@types/person";
@@ -176,7 +176,17 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
 
 export default function PersonPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
+    return (
+        <React.Suspense fallback={<div className="flex items-center justify-center min-h-[400px] text-gray-500">Carregando...</div>}>
+            <PersonPageContent id={id} />
+        </React.Suspense>
+    );
+}
+
+function PersonPageContent({ id }: { id: string }) {
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     
     const [person, setPerson] = useState<Person | null>(null);
     const [loading, setLoading] = useState(true);
@@ -209,7 +219,7 @@ export default function PersonPage({ params }: { params: Promise<{ id: string }>
     // Credits pagination
     const [creditsResponse, setCreditsResponse] = useState<PaginatedResponse<PersonCredit> | null>(null);
     const [creditsLoading, setCreditsLoading] = useState(true);
-    const [creditsPage, setCreditsPage] = useState(1);
+    const creditsPage = parseInt(searchParams.get('page') || '1');
 
     useEffect(() => {
         getPersonDetail(Number(id))
