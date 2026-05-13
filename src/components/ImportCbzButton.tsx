@@ -58,8 +58,10 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
             setStatus('success');
             setIsOpen(false); // Close the input modal
         } catch (err: any) {
+            console.error("CBZ Import error:", err);
             setError(err.message || "Erro ao fazer upload da edição.");
             setStatus('error');
+            setIsOpen(false); // Close the input modal so user sees the StatusModal error
         }
     };
 

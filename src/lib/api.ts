@@ -79,7 +79,26 @@ export async function request<T>(
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(`API error ${res.status}: ${text}`);
+        let errorMessage = `API error ${res.status}`;
+        
+        try {
+            const json = JSON.parse(text);
+            if (json.error) {
+                errorMessage = json.error;
+            } else if (typeof json === 'object') {
+                // Se for um objeto mas não tiver 'error', stringifica amigavelmente
+                errorMessage = Object.entries(json)
+                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+                    .join(' | ');
+            }
+        } catch (e) {
+            // Se não for JSON, usa o texto puro (mas trunca se for muito grande, ex: HTML)
+            if (text && text.length < 200) {
+                errorMessage = text;
+            }
+        }
+        
+        throw new Error(errorMessage);
     }
 
     // importante: evita quebrar em 204
