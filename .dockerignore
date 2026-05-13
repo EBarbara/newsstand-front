@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+build
+.git
+.gitignore
+.dockerignore
+Dockerfile
+.github
+README.md
+LICENSE
+.env*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea
+.vscode

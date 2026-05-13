@@ -1,33 +1,51 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS base
 
+# Stage 1: Dependencies
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copia os arquivos de dependência
 COPY package.json package-lock.json ./
-
-# Instala as dependências (usando npm ci para ser exato com o lockfile)
 RUN npm ci
 
-# Copia o restante do código fonte
+# Stage 2: Builder
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Faz a build otimizada da aplicação Next.js
+# Desabilita o envio de telemetria do Next.js durante a build
+ENV NEXT_TELEMETRY_DISABLED 1
+
 RUN npm run build
 
-# --- Estágio de Produção ---
-FROM node:20-alpine AS runner
-
+# Stage 3: Runner
+FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
-# Copia do estágio builder apenas o necessário para rodar
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
 COPY --from=builder /app/public ./public
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Aproveita o standalone output do Next.js
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 
 EXPOSE 3000
 
-# Executa a aplicação
-CMD ["npm", "start"]
+ENV PORT 3000
+# set hostname to localhost
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]
+
