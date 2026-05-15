@@ -10,11 +10,11 @@ export function getRecentIssues() {
     return request<Issue[]>('/issues/recent/');
 }
 
-export function getIssuesByMagazine(slug: string, page: number = 1, filters: { tag?: string, exclude_tag?: string, is_special?: string } = {}) {
+export function getIssuesByMagazine(slug: string, page: number = 1, filters: Record<string, string> = {}) {
     let url = `/magazines/${slug}/issues/?page=${page}`;
-    if (filters.tag) url += `&tag=${filters.tag}`;
-    if (filters.exclude_tag) url += `&exclude_tag=${filters.exclude_tag}`;
-    if (filters.is_special) url += `&is_special=${filters.is_special}`;
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value) url += `&${key}=${encodeURIComponent(value)}`;
+    });
     return request<PaginatedResponse<Issue>>(url);
 }
 
