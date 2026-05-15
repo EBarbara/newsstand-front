@@ -3,22 +3,23 @@ const IS_SERVER = typeof window === 'undefined';
 // 1. API URL for Fetching
 // Server-side: uses INTERNAL_API_URL (can be Docker service name or IP)
 // Client-side: uses NEXT_PUBLIC_API_URL (must be accessible by browser)
+const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || 'v3';
 let _api = (IS_SERVER ? process.env.INTERNAL_API_URL : process.env.NEXT_PUBLIC_API_URL) || process.env.NEXT_PUBLIC_API_URL || '';
 
 // 2. Media URL for Images
 // We want just the BASE host (e.g., http://192.168.0.10:8080) because media paths already include /media/
 let _media = process.env.NEXT_PUBLIC_IMAGE_HOSTNAME || process.env.NEXT_PUBLIC_API_URL || '';
 
-if (_media.includes('/api/v2')) {
-    _media = _media.split('/api/v2')[0];
+if (_media.includes(`/api/${API_VERSION}`)) {
+    _media = _media.split(`/api/${API_VERSION}`)[0];
 }
 
 // Browser-only fallback if everything is missing
 if (!IS_SERVER && !_api) {
-    _api = `${window.location.protocol}//${window.location.hostname}:8080/api/v2`;
+    _api = `${window.location.protocol}//${window.location.hostname}:8080/api/${API_VERSION}`;
 }
 if (!IS_SERVER && !_media) {
-    _media = `${window.location.protocol}//${window.location.hostname}:8080/api/v2`;
+    _media = `${window.location.protocol}//${window.location.hostname}:8080/api/${API_VERSION}`;
 }
 
 // Ensure protocols

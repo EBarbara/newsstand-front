@@ -106,7 +106,7 @@ export function useIssueEditor(slug: string, edition: string) {
     useEffect(() => {
         let isMounted = true;
         getSections()
-            .then(res => { if (isMounted) setAvailableSections(res); })
+            .then(res => { if (isMounted) setAvailableSections(res.results); })
             .catch(console.error);
         return () => { isMounted = false };
     }, []);

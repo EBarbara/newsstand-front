@@ -106,10 +106,10 @@ function PeoplePageContent() {
     return (
         <div className={styles.container}>
             {/* HEADER */}
-            <header className={styles.header}>
-                <div className={styles.titleSection}>
-                    <h1 className={styles.title}>Pessoas</h1>
-                    <p className={styles.subtitle}>Diretório de colaboradores e créditos.</p>
+            <header className="page-header !flex-row !justify-between !items-center !gap-4">
+                <div className="flex flex-col">
+                    <h1 className="page-title">Pessoas</h1>
+                    <p className="page-subtitle">Diretório de colaboradores e créditos.</p>
                 </div>
                 <div className={styles.actions}>
                     <button 

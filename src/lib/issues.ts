@@ -1,7 +1,7 @@
 import { request, MEDIA_API_URL } from './api';
 import { Issue } from "@/@types/issue";
 import { Render } from "@/@types/render";
-import { IssueSection } from "@/@types/issueSection";
+import { IssueSection, GlobalIssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
 import { PaginatedResponse } from "@/@types/api";
 
@@ -52,8 +52,18 @@ export function getPageImageUrl(id: number, index: number) {
     return `${MEDIA_API_URL}/issues/${id}/pages/${index}/`;
 }
 
-export function getSections() {
-    return request<Section[]>("/sections/")
+export function getSections(page: number = 1, pageSize?: number) {
+    let url = `/sections/?page=${page}`;
+    if (pageSize) url += `&page_size=${pageSize}`;
+    return request<PaginatedResponse<Section>>(url)
+}
+
+export function getGlobalIssueSections(params: { section?: number, page?: number, issue?: number, pageSize?: number } = {}) {
+    let url = `/issue-sections/?page=${params.page || 1}`;
+    if (params.section) url += `&section=${params.section}`;
+    if (params.issue) url += `&issue=${params.issue}`;
+    if (params.pageSize) url += `&page_size=${params.pageSize}`;
+    return request<PaginatedResponse<GlobalIssueSection>>(url);
 }
 
 export function updateIssueSection(

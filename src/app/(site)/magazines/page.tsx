@@ -9,11 +9,11 @@ export default async function Page() {
         <div className="flex flex-col gap-8">
 
             {/* HEADER */}
-            <header>
-                <h1 className="text-3xl font-bold">
+            <header className="page-header">
+                <h1 className="page-title">
                     Revistas
                 </h1>
-                <p className="text-gray-500">
+                <p className="page-subtitle">
                     Navegue pela sua coleção de revistas.
                 </p>
             </header>

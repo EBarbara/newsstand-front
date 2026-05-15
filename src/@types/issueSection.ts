@@ -21,3 +21,20 @@ export type IssueSection = {
     credits: Credit[];
     order: number;
 }
+
+export type GlobalIssueSection = {
+    id: number;
+    title: string | null;
+    section_name: string;
+    section_id: number;
+    magazine_name: string;
+    magazine_slug: string;
+    issue_edition: string;
+    issue_date: string;
+    issue_id: number;
+    start_page: number;
+    first_page_image: string | null;
+    first_page_type: 'NORMAL' | 'SPREAD' | 'GATEFOLD';
+    credits: Credit[];
+    order: number;
+}
