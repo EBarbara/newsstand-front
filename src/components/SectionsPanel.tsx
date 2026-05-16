@@ -28,8 +28,11 @@ type Props = Pick<
     | "updateCreditImportance"
     | "updateCreditPage"
     | "updateIssueMetadata"
+    | "updateIssueTags"
     | "handleDeleteIssue"
 >
+
+import TagEditor from "./TagEditor";
 
 export default function SectionsPanel({
     issue,
@@ -54,6 +57,7 @@ export default function SectionsPanel({
     updateCreditImportance,
     updateCreditPage,
     updateIssueMetadata,
+    updateIssueTags,
     handleDeleteIssue
 }: Props) {
     const [newTypeName, setNewTypeName] = useState("");
@@ -444,6 +448,14 @@ export default function SectionsPanel({
                 </div>
             ))}
 
+            {/* TAGS */}
+            <div className="mt-6 pt-6 border-t border-white/5">
+                <TagEditor
+                    selectedTags={issue?.tags || []}
+                    onChange={updateIssueTags}
+                />
+            </div>
+            
             {/* DANGER ZONE */}
             <div className="mt-8 pt-6 border-t border-red-900/30">
                 <label className="text-[10px] uppercase font-bold text-red-500 opacity-70 mb-3 block tracking-widest">Zona de Perigo</label>

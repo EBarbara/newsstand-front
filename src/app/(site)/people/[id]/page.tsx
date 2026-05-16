@@ -8,6 +8,8 @@ import { getMediaUrl } from "@/lib/issues";
 import { Person, PersonLink, PersonCredit, PaginatedResponse, PersonRelationship } from "@/@types/person";
 import { getPeople } from "@/lib/people";
 import Pagination from "@/components/Pagination";
+import TagEditor from "@/components/TagEditor";
+import { Tag } from "@/@types/tag";
 
 // --- Image Cropper Component ---
 interface CropperProps {
@@ -205,6 +207,7 @@ function PersonPageContent({ id }: { id: string }) {
     const [editGender, setEditGender] = useState("");
     const [editDeathDate, setEditDeathDate] = useState("");
     const [editRelationships, setEditRelationships] = useState<PersonRelationship[]>([]);
+    const [editTags, setEditTags] = useState<Tag[]>([]);
 
     // Relationship search
     const [relSearch, setRelSearch] = useState("");
@@ -236,6 +239,7 @@ function PersonPageContent({ id }: { id: string }) {
                 setEditGender(data.gender || "");
                 setEditDeathDate(data.death_date || "");
                 setEditRelationships(data.relationships || []);
+                setEditTags(data.tags || []);
                 setLoading(false);
             })
             .catch(() => {
@@ -297,6 +301,9 @@ function PersonPageContent({ id }: { id: string }) {
             // Append relationships (only those where this person is the source)
             const relationshipsToSave = editRelationships.filter(r => r.is_from !== false);
             formData.append("relationships", JSON.stringify(relationshipsToSave));
+
+            // Append tags
+            formData.append("tag_ids", JSON.stringify(editTags.map(t => t.id)));
 
             if (photoFile) {
                 // If it's a blob from cropper, we give it a name
@@ -661,6 +668,30 @@ function PersonPageContent({ id }: { id: string }) {
                                 </select>
                             ) : (
                                 <p className="text-gray-200">{person.gender_display || "Não informado"}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            {isEditing ? (
+                                <TagEditor
+                                    selectedTags={editTags}
+                                    onChange={setEditTags}
+                                />
+                            ) : (
+                                <>
+                                    <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Tags</label>
+                                    <div className="flex flex-wrap gap-1.5 mt-1">
+                                        {person.tags && person.tags.length > 0 ? (
+                                            person.tags.map((tag) => (
+                                                <span key={tag.id} className="px-2 py-0.5 bg-blue-500/10 border border-blue-500/20 rounded-md text-[10px] text-blue-400 font-bold uppercase tracking-wider">
+                                                    {tag.name}
+                                                </span>
+                                            ))
+                                        ) : (
+                                            <p className="text-xs text-gray-600 italic">Nenhuma tag</p>
+                                        )}
+                                    </div>
+                                </>
                             )}
                         </div>
 

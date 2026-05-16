@@ -8,6 +8,7 @@ import { Issue } from "@/@types/issue";
 import { Render } from "@/@types/render";
 import { IssueSection } from "@/@types/issueSection";
 import { Section } from "@/@types/section";
+import { Tag } from "@/@types/tag";
 import { useRouter } from "next/navigation";
 
 
@@ -49,6 +50,7 @@ export type IssueEditorState = {
     setImportStatus: Dispatch<SetStateAction<'idle' | 'loading' | 'success' | 'error'>>
     handleDeleteIssue: () => Promise<void>
     updateIssueMetadata: (data: Partial<Issue>) => Promise<void>
+    updateIssueTags: (tags: Tag[]) => Promise<void>
     error: string | null
 }
 
@@ -408,6 +410,19 @@ export function useIssueEditor(slug: string, edition: string) {
         }
     }
 
+    async function updateIssueTags(tags: Tag[]) {
+        if (!issue) return;
+        try {
+            const { updateIssue } = await import("@/lib/issues");
+            const tag_ids = tags.map(t => t.id);
+            const updated = await updateIssue(issue.id, { tag_ids } as any);
+            setIssue(updated);
+        } catch (error) {
+            console.error("Failed to update issue tags", error);
+            alert("Falha ao atualizar tags da edição.");
+        }
+    }
+
     const sortedSections = useMemo(() => {
         return [...sections].sort((a, b) => {
             const aMin = a.segments.length > 0 ? Math.min(...a.segments.map(s => s.start_page)) : Infinity;
@@ -497,6 +512,7 @@ export function useIssueEditor(slug: string, edition: string) {
         setImportStatus,
         handleDeleteIssue,
         updateIssueMetadata,
+        updateIssueTags,
         error,
     }
 }
