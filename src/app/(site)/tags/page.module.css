@@ -1,0 +1,104 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.titleSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.subtitle {
+    color: var(--foreground-muted);
+    font-size: 1.1rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.tagCard {
+    background: var(--card-background);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.tagCard:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.tagName {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--foreground);
+    z-index: 1;
+}
+
+.tagSlug {
+    font-size: 0.875rem;
+    color: var(--foreground-muted);
+    font-family: monospace;
+    z-index: 1;
+}
+
+.tagDecoration {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 4rem;
+    opacity: 0.05;
+    transform: rotate(15deg);
+    pointer-events: none;
+}
+
+.empty {
+    padding: 4rem;
+    text-align: center;
+    background: var(--card-background);
+    border: 2px dashed var(--border);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.empty p {
+    color: var(--foreground-muted);
+    font-size: 1.1rem;
+}

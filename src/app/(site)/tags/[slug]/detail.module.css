@@ -1,0 +1,77 @@
+.backLink {
+    display: inline-block;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.backLink:hover {
+    transform: translateX(-4px);
+    filter: brightness(1.2);
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.tab {
+    background: transparent;
+    border: none;
+    color: var(--foreground-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tab:hover {
+    color: var(--foreground);
+}
+
+.activeTab {
+    color: var(--primary);
+}
+
+.activeTab::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 3px 3px 0 0;
+}
+
+.count {
+    font-size: 0.75rem;
+    background: var(--card-background);
+    color: var(--foreground-muted);
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+
+.activeTab .count {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.tabContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1rem;
+}

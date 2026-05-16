@@ -10,6 +10,16 @@ export function getRecentIssues() {
     return request<Issue[]>('/issues/recent/');
 }
 
+export function getIssues(page: number = 1, filters: Record<string, string | number | undefined> = {}) {
+    let url = `/issues/?page=${page}`;
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== "") {
+            url += `&${key}=${encodeURIComponent(value.toString())}`;
+        }
+    });
+    return request<PaginatedResponse<Issue>>(url);
+}
+
 export function getIssuesByMagazine(slug: string, page: number = 1, filters: Record<string, string | string[]> = {}) {
     let url = `/magazines/${slug}/issues/?page=${page}`;
     Object.entries(filters).forEach(([key, value]) => {

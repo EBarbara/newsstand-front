@@ -19,11 +19,12 @@ export default function RootLayout({
         <header className={styles.header}>
           <Link href="/" className={styles.logo}>Magazine List</Link>
 
-          <nav className={styles.nav}>
-            <Link href="/magazines" className={styles.navLink}>Revistas</Link>
-            <Link href="/people" className={styles.navLink}>Pessoas</Link>
-            <Link href="/sections" className={styles.navLink}>Seções</Link>
-          </nav>
+            <nav className={styles.nav}>
+              <Link href="/magazines" className={styles.navLink}>Revistas</Link>
+              <Link href="/people" className={styles.navLink}>Pessoas</Link>
+              <Link href="/sections" className={styles.navLink}>Seções</Link>
+              <Link href="/tags" className={styles.navLink}>Tags</Link>
+            </nav>
         </header>
 
         <main className={styles.main}>{children}</main>
