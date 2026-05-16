@@ -10,10 +10,16 @@ export function getRecentIssues() {
     return request<Issue[]>('/issues/recent/');
 }
 
-export function getIssuesByMagazine(slug: string, page: number = 1, filters: Record<string, string> = {}) {
+export function getIssuesByMagazine(slug: string, page: number = 1, filters: Record<string, string | string[]> = {}) {
     let url = `/magazines/${slug}/issues/?page=${page}`;
     Object.entries(filters).forEach(([key, value]) => {
-        if (value) url += `&${key}=${encodeURIComponent(value)}`;
+        if (Array.isArray(value)) {
+            value.forEach(v => {
+                if (v) url += `&${key}=${encodeURIComponent(v)}`;
+            });
+        } else if (value) {
+            url += `&${key}=${encodeURIComponent(value)}`;
+        }
     });
     return request<PaginatedResponse<Issue>>(url);
 }

@@ -32,12 +32,22 @@ function MagazineIssuesContent() {
 
     // Derive current page from URL
     const currentPage = parseInt(searchParams.get('page') || '1');
-    
+
     // Derive active filters from URL (all params except 'page')
     const activeFilters = useMemo(() => {
-        const filters: Record<string, string> = {};
+        const filters: Record<string, string | string[]> = {};
         searchParams.forEach((value, key) => {
-            if (key !== 'page') filters[key] = value;
+            if (key === 'page') return;
+            
+            if (filters[key]) {
+                if (Array.isArray(filters[key])) {
+                    (filters[key] as string[]).push(value);
+                } else {
+                    filters[key] = [filters[key] as string, value];
+                }
+            } else {
+                filters[key] = value;
+            }
         });
         return filters;
     }, [searchParams]);
@@ -47,7 +57,7 @@ function MagazineIssuesContent() {
     const [tags, setTags] = useState<Tag[]>([]);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
-    const fetchIssues = useCallback(async (page: number, filters: Record<string, string>) => {
+    const fetchIssues = useCallback(async (page: number, filters: Record<string, string | string[]>) => {
         setLoading(true);
         try {
             const response = await getIssuesByMagazine(slug, page, filters);
@@ -75,11 +85,17 @@ function MagazineIssuesContent() {
         fetchIssues(currentPage, activeFilters);
     }, [currentPage, activeFilters, fetchIssues]);
 
-    const updateUrl = (page: number, filters: Record<string, string>) => {
+    const updateUrl = (page: number, filters: Record<string, string | string[]>) => {
         const params = new URLSearchParams();
         if (page > 1) params.set('page', page.toString());
         Object.entries(filters).forEach(([key, value]) => {
-            if (value) params.set(key, value);
+            if (Array.isArray(value)) {
+                value.forEach(v => {
+                    if (v) params.append(key, v);
+                });
+            } else if (value) {
+                params.set(key, value);
+            }
         });
         router.push(`${pathname}?${params.toString()}`);
     };
@@ -87,7 +103,7 @@ function MagazineIssuesContent() {
     const magazineName = data?.results.length && data.results.length > 0 ? data.results[0].magazine.name : slug;
     const totalPages = data ? Math.ceil(data.count / 20) : 0;
 
-    const isSpecial = activeFilters.is_special;
+
 
     return (
         <div className="flex flex-col gap-8 pb-12">
@@ -108,7 +124,7 @@ function MagazineIssuesContent() {
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <button 
+                    <button
                         className="flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white px-4 py-2 rounded-xl transition-all font-bold text-sm"
                         onClick={() => setIsFilterModalOpen(true)}
                     >
@@ -118,47 +134,6 @@ function MagazineIssuesContent() {
                     <ImportCbzButton magazineSlug={slug} />
                 </div>
             </header>
-
-            {/* QUICK FILTERS */}
-            <div className="flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/10">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Mostrar:</span>
-                <div className="flex p-1 bg-gray-900/50 rounded-lg border border-white/5">
-                    <button 
-                        onClick={() => {
-                            const newFilters = { ...activeFilters };
-                            delete newFilters.is_special;
-                            updateUrl(1, newFilters);
-                        }}
-                        className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
-                            !isSpecial 
-                            ? "bg-blue-600 text-white shadow-lg" 
-                            : "text-gray-400 hover:text-gray-200"
-                        }`}
-                    >
-                        Todas
-                    </button>
-                    <button 
-                        onClick={() => updateUrl(1, { ...activeFilters, is_special: 'false' })}
-                        className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
-                            isSpecial === 'false' 
-                            ? "bg-blue-600 text-white shadow-lg" 
-                            : "text-gray-400 hover:text-gray-200"
-                        }`}
-                    >
-                        Mensais
-                    </button>
-                    <button 
-                        onClick={() => updateUrl(1, { ...activeFilters, is_special: 'true' })}
-                        className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
-                            isSpecial === 'true' 
-                            ? "bg-amber-600 text-white shadow-lg" 
-                            : "text-gray-400 hover:text-gray-200"
-                        }`}
-                    >
-                        Especiais ⭐
-                    </button>
-                </div>
-            </div>
 
             {/* EMPTY STATE */}
             {loading ? (
@@ -170,7 +145,7 @@ function MagazineIssuesContent() {
                     <p className="text-lg font-medium">Nenhuma edição encontrada.</p>
                     <p className="text-sm mt-1">Tente ajustar seus filtros para encontrar o que procura.</p>
                     {Object.keys(activeFilters).length > 0 && (
-                        <button 
+                        <button
                             onClick={() => updateUrl(1, {})}
                             className="mt-4 text-blue-400 hover:text-blue-300 font-bold text-sm"
                         >
@@ -188,7 +163,7 @@ function MagazineIssuesContent() {
 
                     {/* PAGINATION */}
                     {totalPages > 1 && (
-                        <Pagination 
+                        <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             baseUrl={pathname}
@@ -198,7 +173,7 @@ function MagazineIssuesContent() {
             )}
 
             {/* FILTER MODAL */}
-            <IssueFiltersModal 
+            <IssueFiltersModal
                 isOpen={isFilterModalOpen}
                 onClose={() => setIsFilterModalOpen(false)}
                 onApply={(filters) => {
