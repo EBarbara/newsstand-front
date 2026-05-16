@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IssueEditorState } from "@/hooks/useIssueEditor";
 import { getPeople } from "@/lib/people";
 import { Person } from "@/@types/person";
+import TagEditor from "./TagEditor";
 
 type Props = Pick<
     IssueEditorState,
@@ -31,8 +32,6 @@ type Props = Pick<
     | "updateIssueTags"
     | "handleDeleteIssue"
 >
-
-import TagEditor from "./TagEditor";
 
 export default function SectionsPanel({
     issue,
@@ -68,8 +67,8 @@ export default function SectionsPanel({
     const [newCreditRole, setNewCreditRole] = useState("");
     const [peopleSearch, setPeopleSearch] = useState("");
     const [isLoadingPeople, setIsLoadingPeople] = useState(false);
-    
-    const sortedAvailableSections = [...availableSections].sort((a, b) => 
+
+    const sortedAvailableSections = [...availableSections].sort((a, b) =>
         a.name.localeCompare(b.name)
     );
 
@@ -217,8 +216,8 @@ export default function SectionsPanel({
                 onClick={createSection}
                 disabled={!selectedTemplate}
                 className={`w-full mb-4 p-2 text-white font-bold rounded transition-all ${!selectedTemplate
-                        ? "bg-gray-800 text-gray-500 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-95"
+                    ? "bg-gray-800 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-500 shadow-lg active:scale-95"
                     }`}
             >
                 + Adicionar Seção
@@ -233,8 +232,8 @@ export default function SectionsPanel({
                         setSelectedSectionId(prev => (prev === s.id ? null : s.id))
                     }}
                     className={`p-2 mb-1.5 rounded-md cursor-pointer transition-all border ${selectedSectionId === s.id
-                            ? "bg-blue-600 text-white border-blue-500 shadow-md"
-                            : "bg-[#161a20] text-gray-300 border-gray-800 hover:bg-[#1e232b] hover:border-gray-700"
+                        ? "bg-blue-600 text-white border-blue-500 shadow-md"
+                        : "bg-[#161a20] text-gray-300 border-gray-800 hover:bg-[#1e232b] hover:border-gray-700"
                         }`}
                 >
                     <div className="flex items-center justify-between gap-2">
@@ -327,8 +326,8 @@ export default function SectionsPanel({
                                                                         updateCreditPage(s.id, idx, next);
                                                                     }}
                                                                     className={`text-[9px] px-1.5 py-0.5 rounded transition-all ${isSelected
-                                                                            ? "bg-blue-600 text-white font-bold"
-                                                                            : "bg-[#252a33] text-gray-500 hover:bg-[#2c323c]"
+                                                                        ? "bg-blue-600 text-white font-bold"
+                                                                        : "bg-[#252a33] text-gray-500 hover:bg-[#2c323c]"
                                                                         }`}
                                                                 >
                                                                     {r.order}
@@ -344,8 +343,8 @@ export default function SectionsPanel({
                                                     value={credit.importance || 1}
                                                     onChange={(e) => updateCreditImportance(s.id, idx, Number(e.target.value))}
                                                     className={`text-[9px] font-bold uppercase rounded px-1 py-0.5 border-none focus:ring-0 cursor-pointer ${credit.importance === 1 ? "bg-amber-500/20 text-amber-400" :
-                                                            credit.importance === 2 ? "bg-blue-500/20 text-blue-400" :
-                                                                "bg-gray-500/20 text-gray-400"
+                                                        credit.importance === 2 ? "bg-blue-500/20 text-blue-400" :
+                                                            "bg-gray-500/20 text-gray-400"
                                                         }`}
                                                 >
                                                     <option value={1} className="bg-[#1a1d23]">Major</option>
@@ -427,10 +426,10 @@ export default function SectionsPanel({
                                     onClick={() => saveSection(s.id)}
                                     disabled={savingSections[s.id]}
                                     className={`flex-1 py-1.5 font-bold rounded text-sm transition-all shadow-sm ${savingSections[s.id]
-                                            ? "bg-blue-400 text-white"
-                                            : savedSections[s.id]
-                                                ? "bg-green-500 text-white"
-                                                : "bg-white text-blue-700 hover:bg-gray-100"
+                                        ? "bg-blue-400 text-white"
+                                        : savedSections[s.id]
+                                            ? "bg-green-500 text-white"
+                                            : "bg-white text-blue-700 hover:bg-gray-100"
                                         }`}
                                 >
                                     {savingSections[s.id] ? "Salvando..." : savedSections[s.id] ? "Salvo ✓" : "Salvar"}
@@ -455,7 +454,7 @@ export default function SectionsPanel({
                     onChange={updateIssueTags}
                 />
             </div>
-            
+
             {/* DANGER ZONE */}
             <div className="mt-8 pt-6 border-t border-red-900/30">
                 <label className="text-[10px] uppercase font-bold text-red-500 opacity-70 mb-3 block tracking-widest">Zona de Perigo</label>

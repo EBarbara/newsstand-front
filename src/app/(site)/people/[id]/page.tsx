@@ -303,7 +303,7 @@ function PersonPageContent({ id }: { id: string }) {
             formData.append("relationships", JSON.stringify(relationshipsToSave));
 
             // Append tags
-            formData.append("tag_ids", JSON.stringify(editTags.map(t => t.id)));
+            editTags.forEach(tag => formData.append("tag_ids", tag.id.toString()));
 
             if (photoFile) {
                 // If it's a blob from cropper, we give it a name
