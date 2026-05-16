@@ -40,6 +40,18 @@ const FIELDS = [
     ], operations: [
         { id: 'exact', label: 'Igual a', apiKey: 'is_special' }
     ] },
+    { id: 'has_physical_copy', label: 'Possuo física', type: 'select', options: [
+        { id: 'true', label: 'Sim' },
+        { id: 'false', label: 'Não' },
+    ], operations: [
+        { id: 'exact', label: 'Igual a', apiKey: 'has_physical_copy' }
+    ] },
+    { id: 'is_digital_complete', label: 'Digital completa', type: 'select', options: [
+        { id: 'true', label: 'Sim' },
+        { id: 'false', label: 'Não' },
+    ], operations: [
+        { id: 'exact', label: 'Igual a', apiKey: 'is_digital_complete' }
+    ] },
     { id: 'person_age', label: 'Idade da Pessoa (na data)', type: 'number', operations: [
         { id: 'exact', label: 'Igual a', apiKey: 'person_age_eq' },
         { id: 'gt', label: 'Maior que (>)', apiKey: 'person_age_gt' },
