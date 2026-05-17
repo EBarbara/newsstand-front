@@ -106,7 +106,7 @@ function TagDetailContent({ slug }: { slug: string }) {
                     peopleData?.results.length === 0 ? (
                         <div className={styles.empty}><p>Nenhuma pessoa encontrada com esta tag.</p></div>
                     ) : (
-                        <div className={styles.grid}>
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6">
                             {peopleData?.results.map(p => (
                                 <PersonCard key={p.id} person={p} />
                             ))}
@@ -116,7 +116,7 @@ function TagDetailContent({ slug }: { slug: string }) {
                     issuesData?.results.length === 0 ? (
                         <div className={styles.empty}><p>Nenhuma edição encontrada com esta tag.</p></div>
                     ) : (
-                        <div className={styles.grid}>
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-8">
                             {issuesData?.results.map(i => (
                                 <IssueCard key={i.id} issue={i} />
                             ))}
