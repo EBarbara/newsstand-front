@@ -74,11 +74,12 @@ export function getSections(page: number = 1, pageSize?: number) {
     return request<PaginatedResponse<Section>>(url)
 }
 
-export function getGlobalIssueSections(params: { section?: number, page?: number, issue?: number, pageSize?: number } = {}) {
+export function getGlobalIssueSections(params: { section?: number, page?: number, issue?: number, pageSize?: number, ordering?: string } = {}) {
     let url = `/issue-sections/?page=${params.page || 1}`;
     if (params.section) url += `&section=${params.section}`;
     if (params.issue) url += `&issue=${params.issue}`;
     if (params.pageSize) url += `&page_size=${params.pageSize}`;
+    if (params.ordering) url += `&ordering=${params.ordering}`;
     return request<PaginatedResponse<GlobalIssueSection>>(url);
 }
 
