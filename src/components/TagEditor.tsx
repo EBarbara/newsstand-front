@@ -20,7 +20,7 @@ export default function TagEditor({ selectedTags, onChange, label = "Tags" }: Ta
     useEffect(() => {
         const loadTags = async () => {
             try {
-                const res = await getTags();
+                const res = await getTags(1, 1000);
                 setAllTags(res.results);
             } catch (err) {
                 console.error("Failed to load tags", err);

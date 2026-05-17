@@ -60,7 +60,7 @@ function PeoplePageContent() {
     useEffect(() => {
         const loadTags = async () => {
             try {
-                const res = await getTags();
+                const res = await getTags(1, 1000);
                 setTags(res.results);
             } catch (e) {
                 console.error("Error loading tags", e);

@@ -25,7 +25,7 @@ export default async function SectionTypePage({ params, searchParams }: {
         } else {
             // If empty, maybe it doesn't exist or just has no items
             // We can try to get the type name from the sections list
-            const allTypes = await getSections(1, 100);
+            const allTypes = await getSections(1, 1000);
             const type = allTypes.results.find(t => t.id === sectionId);
             if (type) typeName = type.name;
             else return notFound();

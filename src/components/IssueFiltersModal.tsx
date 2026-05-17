@@ -66,6 +66,7 @@ export default function IssueFiltersModal({ isOpen, onClose, onApply, currentFil
     const [selectedFieldId, setSelectedFieldId] = useState(FIELDS[0].id);
     const [selectedOpId, setSelectedOpId] = useState(FIELDS[0].operations[0].id);
     const [filterValue, setFilterValue] = useState('');
+    const [tagSearch, setTagSearch] = useState('');
     
     const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
@@ -103,7 +104,9 @@ export default function IssueFiltersModal({ isOpen, onClose, onApply, currentFil
 
     const selectedField = FIELDS.find(f => f.id === selectedFieldId) || FIELDS[0];
     const fieldOptions = (selectedFieldId === 'tag' || selectedFieldId === 'person_tag')
-        ? availableTags.map(t => ({ id: t.slug, label: t.name }))
+        ? availableTags
+            .filter(t => t.name.toLowerCase().includes(tagSearch.toLowerCase()))
+            .map(t => ({ id: t.slug, label: t.name }))
         : selectedField.options || [];
 
     const handleAddFilter = () => {
@@ -199,8 +202,17 @@ export default function IssueFiltersModal({ isOpen, onClose, onApply, currentFil
                                     {selectedField.operations.map(op => <option key={op.id} value={op.id}>{op.label}</option>)}
                                 </select>
                             </div>
-                            <div className="space-y-1.5">
+                            <div className="space-y-1.5 flex flex-col">
                                 <label className="text-[10px] uppercase font-bold text-gray-500 tracking-wider text-gray-400">Valor</label>
+                                {(selectedFieldId === 'tag' || selectedFieldId === 'person_tag') && (
+                                    <input
+                                        type="text"
+                                        value={tagSearch}
+                                        onChange={(e) => setTagSearch(e.target.value)}
+                                        placeholder="Buscar tag..."
+                                        className="w-full bg-[#161a20] border border-white/10 rounded-lg p-2 mb-1 text-sm text-blue-300 focus:border-blue-500 outline-none"
+                                    />
+                                )}
                                 {selectedField.type === 'select' || selectedFieldId === 'tag' || selectedFieldId === 'person_tag' ? (
                                     <select 
                                         value={filterValue}
@@ -208,6 +220,9 @@ export default function IssueFiltersModal({ isOpen, onClose, onApply, currentFil
                                         className="w-full bg-[#0b0e14] border border-white/10 rounded-lg p-2 text-sm text-white focus:border-blue-500 outline-none"
                                     >
                                         <option value="">Selecionar...</option>
+                                        {fieldOptions.length === 0 && tagSearch && (
+                                            <option disabled>Nenhum resultado encontrado</option>
+                                        )}
                                         {fieldOptions.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
                                     </select>
                                 ) : (

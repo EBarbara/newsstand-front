@@ -1,12 +1,16 @@
 import { getMagazines } from "@/lib/magazines";
 import MagazineCard from "@/components/MagazineCard";
+import Pagination from "@/components/Pagination";
 
-export default async function Page() {
-    const response = await getMagazines();
+export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+    const resolvedSearchParams = await searchParams;
+    const currentPage = parseInt(resolvedSearchParams.page || '1', 10) || 1;
+    const response = await getMagazines(currentPage, 20);
     const magazines = response.results;
+    const totalPages = Math.ceil(response.count / 20);
 
     return (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 pb-12">
 
             {/* HEADER */}
             <header className="page-header">
@@ -24,11 +28,22 @@ export default async function Page() {
                     Nenhuma revista encontrada.
                 </div>
             ) : (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
-                    {magazines.map((mag) => (
-                        <MagazineCard key={mag.slug} mag={mag} />
-                    ))}
-                </div>
+                <>
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-6">
+                        {magazines.map((mag) => (
+                            <MagazineCard key={mag.slug} mag={mag} />
+                        ))}
+                    </div>
+
+                    {/* PAGINATION */}
+                    {totalPages > 1 && (
+                        <Pagination 
+                            currentPage={currentPage} 
+                            totalPages={totalPages} 
+                            baseUrl="/magazines" 
+                        />
+                    )}
+                </>
             )}
         </div>
     );

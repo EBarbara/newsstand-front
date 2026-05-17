@@ -61,6 +61,7 @@ export default function SectionsPanel({
 }: Props) {
     const [newTypeName, setNewTypeName] = useState("");
     const [isCreatingType, setIsCreatingType] = useState(false);
+    const [sectionSearch, setSectionSearch] = useState("");
 
     const [people, setPeople] = useState<Person[]>([]);
     const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
@@ -68,9 +69,9 @@ export default function SectionsPanel({
     const [peopleSearch, setPeopleSearch] = useState("");
     const [isLoadingPeople, setIsLoadingPeople] = useState(false);
 
-    const sortedAvailableSections = [...availableSections].sort((a, b) =>
-        a.name.localeCompare(b.name)
-    );
+    const sortedAvailableSections = [...availableSections]
+        .filter(s => s.name.toLowerCase().includes(sectionSearch.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     useEffect(() => {
         console.log("Searching people for:", peopleSearch);
@@ -184,29 +185,41 @@ export default function SectionsPanel({
                         </button>
                     </div>
                 ) : (
-                    <div className="flex gap-2">
-                        <select
-                            value={selectedTemplate ?? ""}
-                            onChange={(e) => {
-                                e.stopPropagation()
-                                setSelectedTemplate(Number(e.target.value))
-                            }}
-                            className="flex-1 p-1.5 bg-[#1a1d23] border border-gray-700 rounded text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        >
-                            <option value="">Selecionar tipo de seção</option>
-                            {sortedAvailableSections.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                    {s.name}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            onClick={() => setIsCreatingType(true)}
-                            title="Criar novo tipo de seção"
-                            className="px-3 bg-gray-800 text-gray-300 rounded border border-gray-700 hover:bg-gray-700 hover:text-white"
-                        >
-                            +
-                        </button>
+                    <div className="flex flex-col gap-1.5 w-full">
+                        <input
+                            type="text"
+                            value={sectionSearch}
+                            onChange={(e) => setSectionSearch(e.target.value)}
+                            placeholder="Buscar tipo de seção..."
+                            className="w-full p-1 bg-[#161a20] border border-gray-800 rounded text-[10px] text-blue-300 focus:border-blue-500 focus:outline-none"
+                        />
+                        <div className="flex gap-2 w-full">
+                            <select
+                                value={selectedTemplate ?? ""}
+                                onChange={(e) => {
+                                    e.stopPropagation()
+                                    setSelectedTemplate(Number(e.target.value))
+                                }}
+                                className="flex-1 p-1.5 bg-[#1a1d23] border border-gray-700 rounded text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-0"
+                            >
+                                <option value="">Selecionar tipo de seção</option>
+                                {sortedAvailableSections.length === 0 && sectionSearch && (
+                                    <option disabled>Nenhum resultado encontrado</option>
+                                )}
+                                {sortedAvailableSections.map((s) => (
+                                    <option key={s.id} value={s.id}>
+                                        {s.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                onClick={() => setIsCreatingType(true)}
+                                title="Criar novo tipo de seção"
+                                className="px-3 bg-gray-800 text-gray-300 rounded border border-gray-700 hover:bg-gray-700 hover:text-white shrink-0"
+                            >
+                                +
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

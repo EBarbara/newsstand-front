@@ -2,6 +2,8 @@ import { request } from "./api";
 import { Magazine } from "@/@types/magazine";
 import { PaginatedResponse } from "@/@types/api";
 
-export function getMagazines() {
-    return request<PaginatedResponse<Magazine>>("/magazines/");
+export function getMagazines(page: number = 1, pageSize?: number) {
+    let url = `/magazines/?page=${page}`;
+    if (pageSize) url += `&page_size=${pageSize}`;
+    return request<PaginatedResponse<Magazine>>(url);
 }
