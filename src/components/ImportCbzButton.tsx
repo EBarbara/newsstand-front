@@ -14,6 +14,9 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
     const [file, setFile] = useState<File | null>(null);
     const [edition, setEdition] = useState("");
     const [date, setDate] = useState("");
+    const [hasPhysicalCopy, setHasPhysicalCopy] = useState(false);
+    const [isDigitalComplete, setIsDigitalComplete] = useState(false);
+    const [isSpecial, setIsSpecial] = useState(false);
     
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [pagesCount, setPagesCount] = useState(0);
@@ -29,6 +32,9 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
         setFile(null);
         setEdition("");
         setDate("");
+        setHasPhysicalCopy(false);
+        setIsDigitalComplete(false);
+        setIsSpecial(false);
         setError(null);
         if (status === 'success') {
             router.refresh();
@@ -51,7 +57,12 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
                 file, 
                 magazineSlug, 
                 edition.trim() || undefined, 
-                date.trim() || undefined
+                date.trim() || undefined,
+                {
+                    hasPhysicalCopy,
+                    isDigitalComplete,
+                    isSpecial
+                }
             );
             
             setPagesCount(data.pages_count || 0);
@@ -123,6 +134,36 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
                                     onChange={(e) => setDate(e.target.value)}
                                     className="w-full border rounded-md px-3 py-2 bg-transparent dark:border-zinc-700 dark:text-white"
                                 />
+                            </div>
+
+                            <div className="flex flex-col gap-2 mt-2">
+                                <label className="flex items-center gap-2 text-sm dark:text-gray-300">
+                                    <input
+                                        type="checkbox"
+                                        checked={hasPhysicalCopy}
+                                        onChange={(e) => setHasPhysicalCopy(e.target.checked)}
+                                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Tenho cópia física
+                                </label>
+                                <label className="flex items-center gap-2 text-sm dark:text-gray-300">
+                                    <input
+                                        type="checkbox"
+                                        checked={isDigitalComplete}
+                                        onChange={(e) => setIsDigitalComplete(e.target.checked)}
+                                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Digital completa
+                                </label>
+                                <label className="flex items-center gap-2 text-sm dark:text-gray-300">
+                                    <input
+                                        type="checkbox"
+                                        checked={isSpecial}
+                                        onChange={(e) => setIsSpecial(e.target.checked)}
+                                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Edição especial
+                                </label>
                             </div>
 
                             {error && status !== 'error' && (

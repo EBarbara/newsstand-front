@@ -131,12 +131,24 @@ export function createSectionType(name: string) {
     })
 }
 
-export function importCbz(file: File, magazineSlug?: string, edition?: string, date?: string) {
+export function importCbz(
+    file: File, 
+    magazineSlug?: string, 
+    edition?: string, 
+    date?: string,
+    flags?: { hasPhysicalCopy: boolean, isDigitalComplete: boolean, isSpecial: boolean }
+) {
     const formData = new FormData();
     formData.append('file', file);
     if (magazineSlug) formData.append('magazine', magazineSlug);
     if (edition) formData.append('edition', edition);
     if (date) formData.append('date', date);
+    
+    if (flags) {
+        formData.append('has_physical_copy', flags.hasPhysicalCopy.toString());
+        formData.append('is_digital_complete', flags.isDigitalComplete.toString());
+        formData.append('is_special', flags.isSpecial.toString());
+    }
 
     return request<Issue>('/issues/import_cbz/', {
         method: 'POST',
@@ -154,13 +166,21 @@ export function importCbzToIssue(issueId: number, file: File) {
     });
 }
 
-export function createEmptyIssue(magazineSlug: string, edition: string, date: string) {
+export function createEmptyIssue(
+    magazineSlug: string, 
+    edition: string, 
+    date: string,
+    flags?: { hasPhysicalCopy: boolean, isDigitalComplete: boolean, isSpecial: boolean }
+) {
     return request<Issue>('/issues/create_empty/', {
         method: 'POST',
         body: JSON.stringify({
             magazine: magazineSlug,
             edition: edition,
-            date: date
+            date: date,
+            has_physical_copy: flags?.hasPhysicalCopy || false,
+            is_digital_complete: flags?.isDigitalComplete || false,
+            is_special: flags?.isSpecial || false,
         }),
     });
 }

@@ -12,6 +12,10 @@ export default function CreateEmptyIssueButton({ magazineSlug }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [edition, setEdition] = useState("");
     const [date, setDate] = useState("");
+    const [hasPhysicalCopy, setHasPhysicalCopy] = useState(false);
+    const [isDigitalComplete, setIsDigitalComplete] = useState(false);
+    const [isSpecial, setIsSpecial] = useState(false);
+    
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
@@ -22,6 +26,9 @@ export default function CreateEmptyIssueButton({ magazineSlug }: Props) {
         setIsOpen(false);
         setEdition("");
         setDate("");
+        setHasPhysicalCopy(false);
+        setIsDigitalComplete(false);
+        setIsSpecial(false);
         setError(null);
     };
 
@@ -40,7 +47,12 @@ export default function CreateEmptyIssueButton({ magazineSlug }: Props) {
             await createEmptyIssue(
                 magazineSlug, 
                 edition.trim(), 
-                date.trim()
+                date.trim(),
+                {
+                    hasPhysicalCopy,
+                    isDigitalComplete,
+                    isSpecial
+                }
             );
             
             // Reload the page to show the new issue
@@ -100,6 +112,36 @@ export default function CreateEmptyIssueButton({ magazineSlug }: Props) {
                                     className="w-full border rounded-md px-3 py-2 bg-transparent dark:border-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                     required
                                 />
+                            </div>
+
+                            <div className="flex flex-col gap-2 mt-2">
+                                <label className="flex items-center gap-2 text-sm dark:text-gray-300">
+                                    <input
+                                        type="checkbox"
+                                        checked={hasPhysicalCopy}
+                                        onChange={(e) => setHasPhysicalCopy(e.target.checked)}
+                                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Tenho cópia física
+                                </label>
+                                <label className="flex items-center gap-2 text-sm dark:text-gray-300">
+                                    <input
+                                        type="checkbox"
+                                        checked={isDigitalComplete}
+                                        onChange={(e) => setIsDigitalComplete(e.target.checked)}
+                                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Digital completa
+                                </label>
+                                <label className="flex items-center gap-2 text-sm dark:text-gray-300">
+                                    <input
+                                        type="checkbox"
+                                        checked={isSpecial}
+                                        onChange={(e) => setIsSpecial(e.target.checked)}
+                                        className="rounded border-zinc-300 dark:border-zinc-700 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    Edição especial
+                                </label>
                             </div>
 
                             {error && (
