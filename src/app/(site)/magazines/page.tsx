@@ -1,6 +1,7 @@
 import { getMagazines } from "@/lib/magazines";
 import MagazineCard from "@/components/MagazineCard";
 import Pagination from "@/components/Pagination";
+import CreateMagazineButton from "@/components/CreateMagazineButton";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
     const resolvedSearchParams = await searchParams;
@@ -13,13 +14,18 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
         <div className="flex flex-col gap-8 pb-12">
 
             {/* HEADER */}
-            <header className="page-header">
-                <h1 className="page-title">
-                    Revistas
-                </h1>
-                <p className="page-subtitle">
-                    Navegue pela sua coleção de revistas.
-                </p>
+            <header className="page-header flex justify-between items-end">
+                <div>
+                    <h1 className="page-title">
+                        Revistas
+                    </h1>
+                    <p className="page-subtitle">
+                        Navegue pela sua coleção de revistas.
+                    </p>
+                </div>
+                <div>
+                    <CreateMagazineButton />
+                </div>
             </header>
 
             {/* EMPTY */}
