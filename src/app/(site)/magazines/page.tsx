@@ -14,8 +14,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
         <div className="flex flex-col gap-8 pb-12">
 
             {/* HEADER */}
-            <header className="page-header flex justify-between items-end">
-                <div>
+            <header className="page-header !flex-row !justify-between !items-center !gap-4">
+                <div className="flex flex-col">
                     <h1 className="page-title">
                         Revistas
                     </h1>
