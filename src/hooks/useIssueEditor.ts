@@ -67,7 +67,7 @@ export type IssueEditorState = {
     error: string | null
 }
 
-export function useIssueEditor(slug: string, edition: string) {
+export function useIssueEditor(slug: string, edition: string, volume?: string) {
     const router = useRouter();
     const [issue, setIssue] = useState<Issue | null>(null);
     const [sections, setSections] = useState<IssueSection[]>([]);
@@ -91,7 +91,7 @@ export function useIssueEditor(slug: string, edition: string) {
         
         async function load() {
             try {
-                const data = await getIssueDetail(slug, edition);
+                const data = await getIssueDetail(slug, edition, volume);
                 if (!isMounted) return;
 
                 setIssue(data);
@@ -116,7 +116,7 @@ export function useIssueEditor(slug: string, edition: string) {
 
         void load();
         return () => { isMounted = false };
-    }, [slug, edition]);
+    }, [slug, edition, volume]);
 
     useEffect(() => {
         let isMounted = true;

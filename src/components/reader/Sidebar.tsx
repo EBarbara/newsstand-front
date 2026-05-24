@@ -1,5 +1,6 @@
 import { IssueSection } from "@/@types/issueSection";
 import { Issue } from "@/@types/issue";
+import { getIssueUrl } from "@/lib/issues";
 import styles from './Reader.module.css'
 
 interface SidebarProps {
@@ -97,7 +98,7 @@ export default function Sidebar({ issue, section, currentPageId, onReadText }: S
 
             <hr />
 
-            <a href={`/magazines/${issue.magazine.slug}/${issue.edition}`}>
+            <a href={getIssueUrl(issue)}>
                 Back to issue
             </a>
         </div>

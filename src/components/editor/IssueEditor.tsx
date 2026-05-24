@@ -8,10 +8,11 @@ import ImportStatusModal from "@/components/ImportStatusModal";
 type Props = {
     slug: string,
     edition: string,
+    volume?: string,
 }
 
-export default function IssueEditor({ slug, edition }: Props) {
-    const editor = useIssueEditor(slug, edition);
+export default function IssueEditor({ slug, edition, volume }: Props) {
+    const editor = useIssueEditor(slug, edition, volume);
 
     if (editor.error) return <div className="p-10 text-red-500 font-bold">{editor.error}</div>
     if (!editor.issue) return <div>Loading...</div>

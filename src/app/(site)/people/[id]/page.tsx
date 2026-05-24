@@ -887,6 +887,7 @@ function PersonPageContent({ id }: { id: string }) {
                                         magazine_name: credit.magazine_name,
                                         magazine_slug: credit.magazine_slug,
                                         issue_edition: credit.issue_edition,
+                                        issue_volume: credit.issue_volume,
                                         issue_date: credit.issue_date,
                                         issue_cover: credit.issue_cover,
                                         issue_cover_focus_x: credit.issue_cover_focus_x,
@@ -928,7 +929,7 @@ function PersonPageContent({ id }: { id: string }) {
                                                     >
                                                         <div className="p-4 shrink-0 self-stretch flex items-center justify-center bg-black/20">
                                                             <Link
-                                                                href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                                href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`}
                                                                 className="w-24 sm:w-28 aspect-[3/4] bg-gray-800 shrink-0 block hover:opacity-90 transition-all relative rounded-sm overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-[1.02]"
                                                             >
                                                                 {group.issue_cover ? (
@@ -954,7 +955,7 @@ function PersonPageContent({ id }: { id: string }) {
 
                                                         <div className="flex-1 p-5 flex flex-col justify-center min-w-0 self-stretch">
                                                             <Link
-                                                                href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                                href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`}
                                                                 className="flex items-center gap-2 mb-3 group/title"
                                                             >
                                                                 <span className="text-xs font-bold text-blue-400 uppercase tracking-widest group-hover/title:text-blue-300 transition-colors">{group.magazine_name}</span>
@@ -969,7 +970,7 @@ function PersonPageContent({ id }: { id: string }) {
                                                                 {group.items.sort((a: any, b: any) => (a.importance || 2) - (b.importance || 2)).map((item: any) => (
                                                                     <Link
                                                                         key={item.id}
-                                                                        href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`}
+                                                                        href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
                                                                         className="flex flex-wrap items-center gap-x-3 gap-y-1 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all group/item"
                                                                     >
                                                                         <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
@@ -1023,7 +1024,7 @@ function PersonPageContent({ id }: { id: string }) {
                                                             <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">
                                                                 {group.magazine_name} · {group.issue_date && <span className="mr-1">{formatIssueMonth(group.issue_date)}</span>} Ed. {group.issue_edition}
                                                             </span>
-                                                            <Link href={`/magazines/${group.magazine_slug}/${group.issue_edition}`} className="text-[10px] text-blue-500/50 hover:text-blue-400 transition-colors">
+                                                            <Link href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`} className="text-[10px] text-blue-500/50 hover:text-blue-400 transition-colors">
                                                                 Ver Edição →
                                                             </Link>
                                                         </div>
@@ -1031,7 +1032,7 @@ function PersonPageContent({ id }: { id: string }) {
                                                             {group.items.map((item: any) => (
                                                                 <Link
                                                                     key={item.id}
-                                                                    href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`}
+                                                                    href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
                                                                     className="flex items-center justify-between text-sm text-gray-400 px-2 py-1 rounded-lg hover:bg-white/5 hover:text-blue-300 transition-all group/minor"
                                                                 >
                                                                     <div className="flex items-center gap-2">

@@ -3,19 +3,43 @@ import Link from "next/link";
 import SectionCard from "@/components/SectionCard";
 import CoverGallery from "@/components/CoverGallery";
 import { getIssueDetail, getMediaUrl } from "@/lib/issues";
+import IssueEditor from "@/components/editor/IssueEditor";
 
 type Props = {
     params: Promise<{
         slug: string;
-        edition: string;
+        edition: string | string[];
     }>;
 };
 
 export default async function Page({ params }: Props) {
-    const { slug, edition } = await params;
+    const { slug, edition: rawEdition } = await params;
+    
+    let isEditMode = false;
+    let edition = "";
+    
+    if (Array.isArray(rawEdition)) {
+        if (rawEdition[rawEdition.length - 1] === "edit") {
+            isEditMode = true;
+            edition = rawEdition.slice(0, -1).join("/");
+        } else {
+            edition = rawEdition.join("/");
+        }
+    } else {
+        if (rawEdition === "edit") {
+            isEditMode = true;
+            edition = "";
+        } else {
+            edition = rawEdition;
+        }
+    }
 
     if (!slug || !edition) {
         throw new Error("Invalid params");
+    }
+
+    if (isEditMode) {
+        return <IssueEditor slug={slug} edition={edition} />;
     }
 
     const issueData = await getIssueDetail(slug, edition);

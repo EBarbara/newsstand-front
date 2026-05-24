@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IssueEditorState } from "@/hooks/useIssueEditor";
 import { getPeople } from "@/lib/people";
 import { Person } from "@/@types/person";
+import { getIssueUrl } from "@/lib/issues";
 import TagEditor from "./TagEditor";
 
 type Props = Pick<
@@ -101,7 +102,7 @@ export default function SectionsPanel({
             {issue && (
                 <>
                     <Link
-                        href={`/magazines/${issue.magazine.slug}/${issue.edition}`}
+                        href={getIssueUrl(issue)}
                         className="flex items-center gap-2 mb-4 p-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded transition-colors"
                     >
                         ← Voltar para Edição

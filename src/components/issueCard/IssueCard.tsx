@@ -6,7 +6,7 @@ import styles from "./IssueCard.module.css";
 import IssueCover from "@/components/issueCover/IssueCover";
 import { formatIssueDate } from "@/lib/date";
 import { Issue } from "@/@types/issue";
-import { getMediaUrl, updateIssue, deleteIssue } from "@/lib/issues";
+import { getMediaUrl, updateIssue, deleteIssue, getIssueUrl } from "@/lib/issues";
 
 interface IssueCardProps {
     issue: Issue;
@@ -92,7 +92,7 @@ export default function IssueCard({ issue: initialIssue, onUpdate, onDelete }: I
             {/* COVER */}
             <div className={styles.coverContainer}>
                 <Link
-                    href={`/magazines/${issue.magazine.slug}/${issue.edition}`}
+                    href={getIssueUrl(issue)}
                     className={styles.coverWrapper}
                 >
                     <IssueCover

@@ -34,8 +34,19 @@ export function getIssuesByMagazine(slug: string, page: number = 1, filters: Rec
     return request<PaginatedResponse<Issue>>(url);
 }
 
-export function getIssueDetail(slug: string, edition: string) {
-    return request<Issue>(`/magazines/${encodeURIComponent(slug)}/issues/${encodeURIComponent(edition)}/`);
+export function getIssueDetail(slug: string, edition: string, volume?: string) {
+    let url = `/magazines/${encodeURIComponent(slug)}/issues/${encodeURIComponent(edition)}/`;
+    if (volume) {
+        url += `?volume=${encodeURIComponent(volume)}`;
+    }
+    return request<Issue>(url);
+}
+
+export function getIssueUrl(issue: { magazine: { slug: string }, volume?: string | null, edition?: string | null }) {
+    if (issue.volume) {
+        return `/magazines/${issue.magazine.slug}/${issue.volume}/${issue.edition}`;
+    }
+    return `/magazines/${issue.magazine.slug}/${issue.edition}`;
 }
 
 export function getMediaUrl(path: string | null, cacheBust: boolean = false) {
