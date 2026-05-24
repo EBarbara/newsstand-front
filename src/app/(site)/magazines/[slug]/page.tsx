@@ -86,6 +86,11 @@ function MagazineIssuesContent() {
         }
     }, [slug]);
 
+    const handleIssueChange = useCallback(() => {
+        fetchIssues(currentPage, activeFilters);
+        fetchMagazineDetail();
+    }, [currentPage, activeFilters, fetchIssues, fetchMagazineDetail]);
+
     useEffect(() => {
         const loadTags = async () => {
             try {
@@ -102,6 +107,27 @@ function MagazineIssuesContent() {
     useEffect(() => {
         fetchIssues(currentPage, activeFilters);
     }, [currentPage, activeFilters, fetchIssues]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('BroadcastChannel' in window)) return;
+
+        const channel = new BroadcastChannel('newsstand-issue-updates');
+        
+        const handleMessage = (event: MessageEvent) => {
+            const { type, id } = event.data;
+            if (type === 'ISSUE_UPDATED' || type === 'ISSUE_DELETED') {
+                console.log(`Received tab update broadcast: ${type} for issue ${id}. Refreshing...`);
+                handleIssueChange();
+            }
+        };
+
+        channel.addEventListener('message', handleMessage);
+
+        return () => {
+            channel.removeEventListener('message', handleMessage);
+            channel.close();
+        };
+    }, [handleIssueChange]);
 
     const updateUrl = (page: number, filters: Record<string, string | string[]>) => {
         const params = new URLSearchParams();
@@ -284,8 +310,8 @@ function MagazineIssuesContent() {
                         </button>
                     )}
 
-                    <CreateEmptyIssueButton magazineSlug={slug} />
-                    <ImportCbzButton magazineSlug={slug} />
+                    <CreateEmptyIssueButton magazineSlug={slug} onSuccess={handleIssueChange} />
+                    <ImportCbzButton magazineSlug={slug} onSuccess={handleIssueChange} />
                 </div>
             </div>
 
@@ -311,7 +337,12 @@ function MagazineIssuesContent() {
                 <>
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-8">
                         {data.results.map(issue => (
-                            <IssueCard key={issue.id} issue={issue} />
+                            <IssueCard 
+                                key={issue.id} 
+                                issue={issue} 
+                                onUpdate={handleIssueChange}
+                                onDelete={handleIssueChange}
+                            />
                         ))}
                     </div>
 

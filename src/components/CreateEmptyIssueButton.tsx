@@ -6,9 +6,10 @@ import { createEmptyIssue } from "@/lib/issues";
 
 type Props = {
     magazineSlug: string;
+    onSuccess?: () => void;
 };
 
-export default function CreateEmptyIssueButton({ magazineSlug }: Props) {
+export default function CreateEmptyIssueButton({ magazineSlug, onSuccess }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [edition, setEdition] = useState("");
     const [date, setDate] = useState("");
@@ -55,8 +56,12 @@ export default function CreateEmptyIssueButton({ magazineSlug }: Props) {
                 }
             );
             
-            // Reload the page to show the new issue
-            router.refresh();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                // Fallback
+                router.refresh();
+            }
             closeModal();
         } catch (err: any) {
             setError(err.message || "Erro ao criar edição.");

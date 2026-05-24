@@ -7,9 +7,10 @@ import ImportStatusModal from "@/components/ImportStatusModal";
 
 type Props = {
     magazineSlug: string;
+    onSuccess?: () => void;
 };
 
-export default function ImportCbzButton({ magazineSlug }: Props) {
+export default function ImportCbzButton({ magazineSlug, onSuccess }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [edition, setEdition] = useState("");
@@ -37,7 +38,11 @@ export default function ImportCbzButton({ magazineSlug }: Props) {
         setIsSpecial(false);
         setError(null);
         if (status === 'success') {
-            router.refresh();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                router.refresh();
+            }
         }
         setStatus('idle');
     };

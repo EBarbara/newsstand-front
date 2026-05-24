@@ -11,6 +11,19 @@ import { Section } from "@/@types/section";
 import { Tag } from "@/@types/tag";
 import { useRouter } from "next/navigation";
 
+// Broadcast helper for tab synchronization (e.g. refreshes lists when adding pages in another tab)
+const broadcastUpdate = (issueId: number, type: 'ISSUE_UPDATED' | 'ISSUE_DELETED' = 'ISSUE_UPDATED') => {
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        try {
+            const channel = new BroadcastChannel('newsstand-issue-updates');
+            channel.postMessage({ type, id: issueId });
+            channel.close();
+        } catch (e) {
+            console.error("Failed to broadcast issue change", e);
+        }
+    }
+};
+
 
 export type PageMap = Record<number, number | null>;
 
@@ -300,6 +313,7 @@ export function useIssueEditor(slug: string, edition: string) {
             const updatedIssue = await uploadIssuePage(issue.id, file, order)
             setIssue(updatedIssue)
             setSections(updatedIssue.sections)
+            broadcastUpdate(issue.id);
             // Re-calculate page map
             const map: PageMap = {}
             updatedIssue.sections.forEach(section => {
@@ -326,6 +340,7 @@ export function useIssueEditor(slug: string, edition: string) {
             setSections(updatedIssue.sections)
             setImportedPagesCount(updatedIssue.pages_count || 0);
             setImportStatus('success');
+            broadcastUpdate(issue.id);
 
             // Re-calculate page map
             const map: PageMap = {}
@@ -349,6 +364,7 @@ export function useIssueEditor(slug: string, edition: string) {
         try {
             const updatedIssue = await replaceIssuePage(issue.id, renderId, file)
             setIssue(updatedIssue)
+            broadcastUpdate(issue.id);
             // Note: Replace doesn't change segments, but it might change dimensions
         } catch (error) {
             console.error("Failed to replace page", error)
@@ -364,6 +380,7 @@ export function useIssueEditor(slug: string, edition: string) {
             const updatedIssue = await deleteIssuePage(issue.id, renderId)
             setIssue(updatedIssue)
             setSections(updatedIssue.sections)
+            broadcastUpdate(issue.id);
             // Re-calculate page map
             const map: PageMap = {}
             updatedIssue.sections.forEach(section => {
@@ -404,6 +421,7 @@ export function useIssueEditor(slug: string, edition: string) {
             const { updateIssue } = await import("@/lib/issues");
             const updated = await updateIssue(issue.id, data);
             setIssue(updated);
+            broadcastUpdate(issue.id);
         } catch (error) {
             console.error("Failed to update issue metadata", error);
             alert("Failed to update issue status.");
@@ -417,6 +435,7 @@ export function useIssueEditor(slug: string, edition: string) {
             const tag_ids = tags.map(t => t.id);
             const updated = await updateIssue(issue.id, { tag_ids } as any);
             setIssue(updated);
+            broadcastUpdate(issue.id);
         } catch (error) {
             console.error("Failed to update issue tags", error);
             alert("Falha ao atualizar tags da edição.");
@@ -443,12 +462,14 @@ export function useIssueEditor(slug: string, edition: string) {
                 const { reorderPages } = await import("@/lib/issues");
                 const updatedIssue = await reorderPages(issue.id, newRenders.map(r => r.id));
                 setIssue(updatedIssue);
+                broadcastUpdate(issue.id);
             } else if (direction === 'down' && currentIndex < renders.length - 1) {
                 const newRenders = [...renders];
                 [newRenders[currentIndex], newRenders[currentIndex + 1]] = [newRenders[currentIndex + 1], newRenders[currentIndex]];
                 const { reorderPages } = await import("@/lib/issues");
                 const updatedIssue = await reorderPages(issue.id, newRenders.map(r => r.id));
                 setIssue(updatedIssue);
+                broadcastUpdate(issue.id);
             }
         } catch (error) {
             console.error("Failed to reorder pages", error);
@@ -462,6 +483,7 @@ export function useIssueEditor(slug: string, edition: string) {
 
         try {
             await deleteIssue(issue.id);
+            broadcastUpdate(issue.id, 'ISSUE_DELETED');
             router.push(`/magazines/${slug}`);
         } catch (error) {
             console.error("Failed to delete issue", error);

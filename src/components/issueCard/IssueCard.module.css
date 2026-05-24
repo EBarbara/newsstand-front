@@ -167,3 +167,22 @@
     background: rgba(15, 23, 42, 0.8);
     border-color: var(--primary);
 }
+
+.deleteBadge {
+    opacity: 0;
+    transform: scale(0.8);
+    background: rgba(220, 38, 38, 0.6) !important;
+    border-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+.card:hover .deleteBadge {
+    opacity: 0.2;
+    transform: scale(0.9);
+}
+
+.card:hover .deleteBadge:hover {
+    opacity: 1 !important;
+    transform: scale(1.15) !important;
+    background: rgba(220, 38, 38, 0.9) !important;
+    border-color: #ef4444 !important;
+}
