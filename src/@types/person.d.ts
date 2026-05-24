@@ -6,6 +6,7 @@ export interface Person {
     birth_date?: string;
     death_date?: string;
     country?: string;
+    country_code?: string;
     biography?: string;
     photo?: string;
     photo_focus_x?: number;

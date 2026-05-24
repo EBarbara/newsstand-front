@@ -20,46 +20,7 @@ import { getMagazineBySlug } from "@/lib/magazines";
 import { Magazine } from "@/@types/magazine";
 import EditMagazineModal from "@/components/EditMagazineModal";
 
-const getCountryCode = (country: string) => {
-    const map: Record<string, string> = {
-        'brasil': 'br',
-        'brazil': 'br',
-        'eua': 'us',
-        'usa': 'us',
-        'united states': 'us',
-        'frança': 'fr',
-        'france': 'fr',
-        'itália': 'it',
-        'italy': 'it',
-        'espanha': 'es',
-        'spain': 'es',
-        'alemanha': 'de',
-        'germany': 'de',
-        'reino unido': 'gb',
-        'united kingdom': 'gb',
-        'uk': 'gb',
-        'japão': 'jp',
-        'japan': 'jp',
-        'portugal': 'pt',
-        'argentina': 'ar',
-        'canadá': 'ca',
-        'canada': 'ca',
-        'coreia do sul': 'kr',
-        'south korea': 'kr',
-        'korea': 'kr',
-        'burkina faso': 'bf',
-        'burkina fasso': 'bf',
-        'bélgica': 'be',
-        'belgium': 'be',
-        'méxico': 'mx',
-        'mexico': 'mx',
-        'china': 'cn',
-    };
-    
-    const normalized = country.toLowerCase().trim();
-    if (normalized.length === 2) return normalized;
-    return map[normalized] || null;
-};
+
 
 export default function MagazineIssuesPage() {
     return (
@@ -204,8 +165,7 @@ function MagazineIssuesContent() {
     const gradient = getGradientClass(slug);
     const initials = magazineName.substring(0, 2).toUpperCase();
 
-    const countryCode = magazine?.country ? getCountryCode(magazine.country) : null;
-    const flagUrl = countryCode ? `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png` : null;
+    const flagUrl = magazine?.country_code ? `https://flagcdn.com/w40/${magazine.country_code.toLowerCase()}.png` : null;
 
     // Standardize language tag to uppercase for cleaner badge representation (e.g. PT-BR, EN-US)
     const formatLanguage = (lang?: string) => {

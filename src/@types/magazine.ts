@@ -7,6 +7,7 @@ export type Magazine = {
     publisher?: string;
     language?: string;
     country?: string;
+    country_code?: string;
     description?: string;
     tags?: Tag[];
     logo?: string;

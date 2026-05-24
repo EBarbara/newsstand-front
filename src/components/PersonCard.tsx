@@ -23,54 +23,10 @@ const calculateAge = (birthDate: string, deathDate?: string) => {
     return age;
 };
 
-const getCountryCode = (country: string) => {
-    const map: Record<string, string> = {
-        'brasil': 'br',
-        'brazil': 'br',
-        'eua': 'us',
-        'usa': 'us',
-        'united states': 'us',
-        'frança': 'fr',
-        'france': 'fr',
-        'itália': 'it',
-        'italy': 'it',
-        'espanha': 'es',
-        'spain': 'es',
-        'alemanha': 'de',
-        'germany': 'de',
-        'reino unido': 'gb',
-        'united kingdom': 'gb',
-        'uk': 'gb',
-        'japão': 'jp',
-        'japan': 'jp',
-        'portugal': 'pt',
-        'argentina': 'ar',
-        'canadá': 'ca',
-        'canada': 'ca',
-        'coreia do sul': 'kr',
-        'south korea': 'kr',
-        'korea': 'kr',
-        'burkina faso': 'bf',
-        'burkina fasso': 'bf',
-        'bélgica': 'be',
-        'belgium': 'be',
-        'méxico': 'mx',
-        'mexico': 'mx',
-        'china': 'cn',
-    };
-    
-    const normalized = country.toLowerCase().trim();
-    // Se já for um código de 2 letras, retorna ele mesmo
-    if (normalized.length === 2) return normalized;
-    // Tenta encontrar no mapa, senão retorna o próprio nome (pode falhar no flagcdn se não for código)
-    return map[normalized] || null;
-};
-
 export default function PersonCard({ person }: PersonCardProps) {
     const age = person.birth_date ? calculateAge(person.birth_date, person.death_date) : null;
     
-    const countryCode = person.country ? getCountryCode(person.country) : null;
-    const flagUrl = countryCode ? `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png` : null;
+    const flagUrl = person.country_code ? `https://flagcdn.com/w40/${person.country_code.toLowerCase()}.png` : null;
 
     return (
         <Link href={`/people/${person.id}`} className={styles.card}>
