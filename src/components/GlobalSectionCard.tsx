@@ -49,7 +49,7 @@ export default function GlobalSectionCard({ section }: Props) {
                         {section.magazine_name}
                     </div>
                     <div className="text-[10px] text-gray-500 flex justify-between items-center font-medium">
-                        <span>Edição {section.issue_edition}</span>
+                        <span>Edição {section.issue_edition?.replace("-", "/")}</span>
                         <span className="capitalize">{new Date(section.issue_date + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })}</span>
                     </div>
                 </div>

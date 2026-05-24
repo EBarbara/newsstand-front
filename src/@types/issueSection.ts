@@ -30,6 +30,7 @@ export type GlobalIssueSection = {
     magazine_name: string;
     magazine_slug: string;
     issue_edition: string;
+    issue_volume?: string | null;
     issue_date: string;
     issue_id: number;
     start_page: number;

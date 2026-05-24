@@ -16,22 +16,31 @@ export default async function Page({ params }: Props) {
     const { slug, edition: rawEdition } = await params;
     
     let isEditMode = false;
-    let edition = "";
+    let editionParts: string[] = [];
     
     if (Array.isArray(rawEdition)) {
-        if (rawEdition[rawEdition.length - 1] === "edit") {
-            isEditMode = true;
-            edition = rawEdition.slice(0, -1).join("/");
-        } else {
-            edition = rawEdition.join("/");
-        }
+        editionParts = [...rawEdition];
     } else {
-        if (rawEdition === "edit") {
-            isEditMode = true;
-            edition = "";
-        } else {
-            edition = rawEdition;
-        }
+        editionParts = [rawEdition];
+    }
+    
+    // 1. Detect edit mode
+    if (editionParts.length > 0 && editionParts[editionParts.length - 1] === "edit") {
+        isEditMode = true;
+        editionParts.pop();
+    }
+    
+    let volume: string | undefined = undefined;
+    let edition = "";
+
+    // 2. Parse volume vs edition
+    if (editionParts.length >= 2) {
+        // e.g. ["2017", "3-4"] -> volume = "2017", edition = "3-4"
+        volume = editionParts[0];
+        edition = editionParts[1];
+    } else {
+        // editionParts.length === 1
+        edition = editionParts[0];
     }
 
     if (!slug || !edition) {
@@ -39,10 +48,10 @@ export default async function Page({ params }: Props) {
     }
 
     if (isEditMode) {
-        return <IssueEditor slug={slug} edition={edition} />;
+        return <IssueEditor slug={slug} edition={edition} volume={volume} />;
     }
 
-    const issueData = await getIssueDetail(slug, edition);
+    const issueData = await getIssueDetail(slug, edition, volume);
 
     // Sort sections by their earliest page assignment
     const sortedSections = [...issueData.sections].sort((a, b) => {
@@ -63,7 +72,7 @@ export default async function Page({ params }: Props) {
                 </Link> /{" "}
                 <span>
                     {issueData.volume && `Vol. ${issueData.volume} - `}
-                    Issue #{issueData.edition ?? issueData.id}
+                    Issue #{issueData.edition ? issueData.edition.replace("-", "/") : issueData.id}
                 </span>
             </nav>
 
@@ -91,7 +100,7 @@ export default async function Page({ params }: Props) {
                         )}
                         {issueData.edition && (
                             <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md text-xs font-extrabold border border-blue-100/30 dark:border-blue-900/30">
-                                #{issueData.edition}
+                                #{issueData.edition.replace("-", "/")}
                             </span>
                         )}
                     </div>
@@ -108,7 +117,7 @@ export default async function Page({ params }: Props) {
                 </Link>
 
                 <Link
-                    href={`/magazines/${slug}/${edition}/edit`}
+                    href={volume ? `/magazines/${slug}/${volume}/${edition}/edit` : `/magazines/${slug}/${edition}/edit`}
                     className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
                     Edit Issue

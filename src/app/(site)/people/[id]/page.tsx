@@ -936,7 +936,7 @@ function PersonPageContent({ id }: { id: string }) {
                                                                     <>
                                                                         <img
                                                                             src={getMediaUrl(group.issue_cover)}
-                                                                            alt={`Issue ${group.issue_edition}`}
+                                                                            alt={`Issue ${group.issue_edition?.replace("-", "/")}`}
                                                                             className="w-full h-full object-cover"
                                                                             style={{
                                                                                 objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%`
@@ -962,7 +962,7 @@ function PersonPageContent({ id }: { id: string }) {
                                                                 <span className="text-xs text-gray-700">/</span>
                                                                 <span className="text-sm text-gray-300 font-medium group-hover/title:text-white transition-colors">
                                                                     {group.issue_date && <span className="mr-2 text-gray-500 font-normal">{formatIssueMonth(group.issue_date)}</span>}
-                                                                    Edição {group.issue_edition}
+                                                                    Edição {group.issue_edition?.replace("-", "/")}
                                                                 </span>
                                                             </Link>
 
@@ -1022,7 +1022,7 @@ function PersonPageContent({ id }: { id: string }) {
                                                     <div key={group.issue_id} className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
                                                         <div className="px-3 py-1.5 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
                                                             <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">
-                                                                {group.magazine_name} · {group.issue_date && <span className="mr-1">{formatIssueMonth(group.issue_date)}</span>} Ed. {group.issue_edition}
+                                                                {group.magazine_name} · {group.issue_date && <span className="mr-1">{formatIssueMonth(group.issue_date)}</span>} Ed. {group.issue_edition?.replace("-", "/")}
                                                             </span>
                                                             <Link href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`} className="text-[10px] text-blue-500/50 hover:text-blue-400 transition-colors">
                                                                 Ver Edição →

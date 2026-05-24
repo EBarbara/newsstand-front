@@ -15,7 +15,7 @@ export default function Sidebar({ issue, section, currentPageId, onReadText }: S
         <div className={styles.sidebar}>
             <div>
                 <strong>{issue.magazine.name}</strong>
-                <div>Edition {issue.edition}</div>
+                <div>Edition {issue.edition?.replace("-", "/")}</div>
             </div>
 
             <hr />
