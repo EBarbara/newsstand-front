@@ -15,6 +15,7 @@ interface EditMagazineModalProps {
 
 export default function EditMagazineModal({ isOpen, onClose, magazine, onSave }: EditMagazineModalProps) {
     const [name, setName] = useState("");
+    const [volume, setVolume] = useState("");
     const [publisher, setPublisher] = useState("");
     const [language, setLanguage] = useState("");
     const [country, setCountry] = useState("");
@@ -33,6 +34,7 @@ export default function EditMagazineModal({ isOpen, onClose, magazine, onSave }:
     useEffect(() => {
         if (isOpen && magazine) {
             setName(magazine.name || "");
+            setVolume(magazine.volume || "");
             setPublisher(magazine.publisher || "");
             setLanguage(magazine.language || "");
             setCountry(magazine.country || "");
@@ -74,6 +76,7 @@ export default function EditMagazineModal({ isOpen, onClose, magazine, onSave }:
         try {
             const formData = new FormData();
             formData.append("name", name.trim());
+            formData.append("volume", volume.trim());
             formData.append("publisher", publisher.trim());
             
             // i18n standardized lowercased or trimmed tag
@@ -122,19 +125,35 @@ export default function EditMagazineModal({ isOpen, onClose, magazine, onSave }:
                 </h2>
                 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-h-[80vh] overflow-y-auto pr-1">
-                    {/* Name */}
-                    <div>
-                        <label className="block text-xs uppercase font-extrabold tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
-                            Nome*
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Ex: Pato Donald"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                            required
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Name */}
+                        <div>
+                            <label className="block text-xs uppercase font-extrabold tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
+                                Nome*
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Ex: Pato Donald"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                required
+                            />
+                        </div>
+
+                        {/* Volume */}
+                        <div>
+                            <label className="block text-xs uppercase font-extrabold tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
+                                Volume / Ano da Série
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Ex: 1983, 2012, 1"
+                                value={volume}
+                                onChange={(e) => setVolume(e.target.value)}
+                                className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                            />
+                        </div>
                     </div>
 
                     {/* Logo Image Upload with Preview */}

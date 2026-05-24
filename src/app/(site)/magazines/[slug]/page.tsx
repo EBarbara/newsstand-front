@@ -179,7 +179,10 @@ function MagazineIssuesContent() {
             <nav className="text-sm text-gray-500">
                 <Link href="/">Home</Link> /{" "}
                 <Link href="/magazines" className="hover:text-blue-500 transition-colors">Revistas</Link> /{" "}
-                <span className="capitalize text-zinc-800 dark:text-zinc-300 font-medium">{magazineName}</span>
+                <span className="capitalize text-zinc-800 dark:text-zinc-300 font-medium">
+                    {magazineName}
+                    {magazine?.volume && ` (Vol. ${magazine.volume})`}
+                </span>
             </nav>
 
             {/* PREMIUM MAGAZINE PROFILE HERO HEADER */}
@@ -208,8 +211,13 @@ function MagazineIssuesContent() {
                         {/* Title, details and description */}
                         <div className="flex-1 min-w-0 flex flex-col gap-3">
                             <div className="flex flex-col gap-1.5">
-                                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-                                    {magazine.name}
+                                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-white flex items-baseline flex-wrap gap-2">
+                                    <span>{magazine.name}</span>
+                                    {magazine.volume && (
+                                        <span className="text-lg md:text-xl font-medium text-zinc-500 dark:text-zinc-400">
+                                            (Vol. {magazine.volume})
+                                        </span>
+                                    )}
                                 </h1>
                                 {magazine.publisher && (
                                     <span className="text-sm font-bold text-zinc-500 dark:text-zinc-400">

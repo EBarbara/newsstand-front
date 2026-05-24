@@ -12,6 +12,7 @@ type Props = {
 export default function CreateEmptyIssueButton({ magazineSlug, onSuccess }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [edition, setEdition] = useState("");
+    const [volume, setVolume] = useState("");
     const [date, setDate] = useState("");
     const [hasPhysicalCopy, setHasPhysicalCopy] = useState(false);
     const [isDigitalComplete, setIsDigitalComplete] = useState(false);
@@ -26,6 +27,7 @@ export default function CreateEmptyIssueButton({ magazineSlug, onSuccess }: Prop
     const closeModal = () => {
         setIsOpen(false);
         setEdition("");
+        setVolume("");
         setDate("");
         setHasPhysicalCopy(false);
         setIsDigitalComplete(false);
@@ -53,7 +55,8 @@ export default function CreateEmptyIssueButton({ magazineSlug, onSuccess }: Prop
                     hasPhysicalCopy,
                     isDigitalComplete,
                     isSpecial
-                }
+                },
+                volume.trim() || undefined
             );
             
             if (onSuccess) {
@@ -103,6 +106,19 @@ export default function CreateEmptyIssueButton({ magazineSlug, onSuccess }: Prop
                                     onChange={(e) => setEdition(e.target.value)}
                                     className="w-full border rounded-md px-3 py-2 bg-transparent dark:border-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                     required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-1 dark:text-gray-300">
+                                    Volume (Opcional)
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Ex: 1, 2"
+                                    value={volume}
+                                    onChange={(e) => setVolume(e.target.value)}
+                                    className="w-full border rounded-md px-3 py-2 bg-transparent dark:border-zinc-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
 

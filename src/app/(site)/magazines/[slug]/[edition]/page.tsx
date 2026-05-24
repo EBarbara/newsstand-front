@@ -37,7 +37,10 @@ export default async function Page({ params }: Props) {
                 <Link href={`/magazines/${slug}`}>
                     {issueData.magazine.name}
                 </Link> /{" "}
-                <span>Issue #{issueData.edition ?? issueData.id}</span>
+                <span>
+                    {issueData.volume && `Vol. ${issueData.volume} - `}
+                    Issue #{issueData.edition ?? issueData.id}
+                </span>
             </nav>
 
             {/* HEADER */}
@@ -55,10 +58,19 @@ export default async function Page({ params }: Props) {
                         {issueData.magazine.name}
                     </h1>
 
-                    <p className="text-gray-500">
-                        {issueData.publishing_date}
-                        {issueData.edition && ` • Issue #${issueData.edition}`}
-                    </p>
+                    <div className="text-gray-500 text-sm flex flex-wrap gap-2 items-center mt-1">
+                        <span>{issueData.publishing_date}</span>
+                        {issueData.volume && (
+                            <span className="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-2.5 py-0.5 rounded-md text-xs font-extrabold uppercase tracking-wide border border-zinc-200/40 dark:border-zinc-700/40">
+                                Vol. {issueData.volume}
+                            </span>
+                        )}
+                        {issueData.edition && (
+                            <span className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2.5 py-0.5 rounded-md text-xs font-extrabold border border-blue-100/30 dark:border-blue-900/30">
+                                #{issueData.edition}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </header>
 

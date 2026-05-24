@@ -6,6 +6,7 @@ import { Tag } from "@/@types/tag";
 export type Issue = {
     id: number;
     edition: string;
+    volume?: string;
     publishing_date: string;
     magazine: Magazine;
     renders: Render[];

@@ -9,6 +9,7 @@ export type Magazine = {
     country?: string;
     country_code?: string;
     description?: string;
+    volume?: string;
     tags?: Tag[];
     logo?: string;
     issues_count?: number;

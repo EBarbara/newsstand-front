@@ -154,6 +154,7 @@ export default function IssueCard({ issue: initialIssue, onUpdate, onDelete }: I
 
                 <p className={styles.subtitle}>
                     {formatIssueDate(issue.publishing_date)}
+                    {issue.volume && ` - Vol. ${issue.volume}`}
                     {issue.edition && ` - #${issue.edition}`}
                 </p>
             </div>
