@@ -17,6 +17,7 @@ export default function MagazineCard({ mag }: { mag: Magazine }) {
 
     const gradient = getGradientClass(mag.slug);
     const initials = mag.name.substring(0, 2).toUpperCase();
+    const flagUrl = mag.country_code ? `https://flagcdn.com/w40/${mag.country_code.toLowerCase()}.png` : null;
 
     // Standardize language tag to uppercase for cleaner badge representation (e.g. PT-BR, EN-US)
     const formatLanguage = (lang?: string) => {
@@ -79,14 +80,19 @@ export default function MagazineCard({ mag }: { mag: Magazine }) {
 
                 {/* Country/Language and Tags */}
                 <div className="flex flex-wrap gap-1.5 mt-1">
-                    {mag.language && (
-                        <span className="inline-flex items-center rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50 uppercase">
-                            🌐 {formatLanguage(mag.language)}
-                        </span>
-                    )}
-                    {mag.country && (
-                        <span className="inline-flex items-center rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50">
-                            📍 {mag.country}
+                    {(flagUrl || mag.language || mag.country) && (
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-700 dark:text-zinc-400 border border-zinc-200/50 dark:border-zinc-700/50 uppercase">
+                            {flagUrl ? (
+                                <img 
+                                    src={flagUrl} 
+                                    alt={mag.country || "Bandeira"} 
+                                    className="w-3.5 h-auto rounded-[1px] shadow-sm border border-white/10"
+                                    title={mag.country}
+                                />
+                            ) : (
+                                <span>{mag.language ? "🌐" : "📍"}</span>
+                            )}
+                            {formatLanguage(mag.language) || mag.country}
                         </span>
                     )}
                     {mag.tags?.slice(0, 2).map(tag => (

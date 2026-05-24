@@ -230,24 +230,19 @@ function MagazineIssuesContent() {
 
                             {/* Badges */}
                             <div className="flex flex-wrap gap-2 items-center mt-1">
-                                {magazine.language && (
-                                    <span className="inline-flex items-center rounded-lg bg-zinc-150 dark:bg-zinc-800 px-3 py-1 text-xs font-bold text-zinc-700 dark:text-zinc-350 border border-zinc-200/50 dark:border-zinc-700/50 uppercase">
-                                        🌐 {formatLanguage(magazine.language)}
-                                    </span>
-                                )}
-                                {magazine.country && (
-                                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-150 dark:bg-zinc-800 px-3 py-1 text-xs font-bold text-zinc-700 dark:text-zinc-350 border border-zinc-200/50 dark:border-zinc-700/50">
+                                {(flagUrl || magazine.language || magazine.country) && (
+                                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-150 dark:bg-zinc-800 px-3 py-1 text-xs font-bold text-zinc-700 dark:text-zinc-350 border border-zinc-200/50 dark:border-zinc-700/50 uppercase">
                                         {flagUrl ? (
                                             <img 
                                                 src={flagUrl} 
-                                                alt={magazine.country} 
+                                                alt={magazine.country || "Bandeira"} 
                                                 className="w-4 h-auto rounded-[2px] shadow-sm border border-white/10"
                                                 title={magazine.country}
                                             />
                                         ) : (
-                                            <span>📍</span>
+                                            <span>{magazine.language ? "🌐" : "📍"}</span>
                                         )}
-                                        {magazine.country}
+                                        {formatLanguage(magazine.language) || magazine.country}
                                     </span>
                                 )}
                                 {magazine.tags?.map(tag => (
