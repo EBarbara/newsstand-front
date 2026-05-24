@@ -14,3 +14,15 @@ export function createMagazine(data: { name: string, slug: string, description?:
         body: JSON.stringify(data)
     });
 }
+
+export function getMagazineBySlug(slug: string) {
+    return request<Magazine>(`/magazines/${slug}/`);
+}
+
+export function updateMagazine(slug: string, data: FormData | Record<string, any>) {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return request<Magazine>(`/magazines/${slug}/`, {
+        method: 'PATCH',
+        body: isFormData ? data : JSON.stringify(data)
+    });
+}
