@@ -47,6 +47,16 @@ const getCountryCode = (country: string) => {
         'argentina': 'ar',
         'canadá': 'ca',
         'canada': 'ca',
+        'coreia do sul': 'kr',
+        'south korea': 'kr',
+        'korea': 'kr',
+        'burkina faso': 'bf',
+        'burkina fasso': 'bf',
+        'bélgica': 'be',
+        'belgium': 'be',
+        'méxico': 'mx',
+        'mexico': 'mx',
+        'china': 'cn',
     };
     
     const normalized = country.toLowerCase().trim();

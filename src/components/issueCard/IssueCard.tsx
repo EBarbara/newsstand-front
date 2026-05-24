@@ -24,7 +24,7 @@ export default function IssueCard({ issue: initialIssue, onUpdate, onDelete }: I
         setIssue(initialIssue);
     }, [initialIssue]);
 
-    const handleToggle = async (e: React.MouseEvent, field: 'has_physical_copy' | 'is_digital_complete') => {
+    const handleToggle = async (e: React.MouseEvent, field: 'has_physical_copy' | 'is_digital_complete' | 'is_special') => {
         e.preventDefault();
         e.stopPropagation();
         
@@ -121,6 +121,14 @@ export default function IssueCard({ issue: initialIssue, onUpdate, onDelete }: I
                         disabled={isUpdating}
                     >
                         ✅
+                    </button>
+                    <button 
+                        onClick={(e) => handleToggle(e, 'is_special')}
+                        className={`${styles.statusBadge} ${issue.is_special ? styles.active : styles.inactive}`}
+                        title="Edição Especial"
+                        disabled={isUpdating}
+                    >
+                        ⭐
                     </button>
                     
                     {/* Delete button (hover only trash badge) */}

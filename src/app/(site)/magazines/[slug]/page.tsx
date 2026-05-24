@@ -20,6 +20,47 @@ import { getMagazineBySlug } from "@/lib/magazines";
 import { Magazine } from "@/@types/magazine";
 import EditMagazineModal from "@/components/EditMagazineModal";
 
+const getCountryCode = (country: string) => {
+    const map: Record<string, string> = {
+        'brasil': 'br',
+        'brazil': 'br',
+        'eua': 'us',
+        'usa': 'us',
+        'united states': 'us',
+        'frança': 'fr',
+        'france': 'fr',
+        'itália': 'it',
+        'italy': 'it',
+        'espanha': 'es',
+        'spain': 'es',
+        'alemanha': 'de',
+        'germany': 'de',
+        'reino unido': 'gb',
+        'united kingdom': 'gb',
+        'uk': 'gb',
+        'japão': 'jp',
+        'japan': 'jp',
+        'portugal': 'pt',
+        'argentina': 'ar',
+        'canadá': 'ca',
+        'canada': 'ca',
+        'coreia do sul': 'kr',
+        'south korea': 'kr',
+        'korea': 'kr',
+        'burkina faso': 'bf',
+        'burkina fasso': 'bf',
+        'bélgica': 'be',
+        'belgium': 'be',
+        'méxico': 'mx',
+        'mexico': 'mx',
+        'china': 'cn',
+    };
+    
+    const normalized = country.toLowerCase().trim();
+    if (normalized.length === 2) return normalized;
+    return map[normalized] || null;
+};
+
 export default function MagazineIssuesPage() {
     return (
         <React.Suspense fallback={<div className="flex items-center justify-center min-h-[400px] text-gray-500"><p>Carregando...</p></div>}>
@@ -163,6 +204,9 @@ function MagazineIssuesContent() {
     const gradient = getGradientClass(slug);
     const initials = magazineName.substring(0, 2).toUpperCase();
 
+    const countryCode = magazine?.country ? getCountryCode(magazine.country) : null;
+    const flagUrl = countryCode ? `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png` : null;
+
     // Standardize language tag to uppercase for cleaner badge representation (e.g. PT-BR, EN-US)
     const formatLanguage = (lang?: string) => {
         if (!lang) return "";
@@ -232,8 +276,18 @@ function MagazineIssuesContent() {
                                     </span>
                                 )}
                                 {magazine.country && (
-                                    <span className="inline-flex items-center rounded-lg bg-zinc-150 dark:bg-zinc-800 px-3 py-1 text-xs font-bold text-zinc-700 dark:text-zinc-350 border border-zinc-200/50 dark:border-zinc-700/50">
-                                        📍 {magazine.country}
+                                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-150 dark:bg-zinc-800 px-3 py-1 text-xs font-bold text-zinc-700 dark:text-zinc-350 border border-zinc-200/50 dark:border-zinc-700/50">
+                                        {flagUrl ? (
+                                            <img 
+                                                src={flagUrl} 
+                                                alt={magazine.country} 
+                                                className="w-4 h-auto rounded-[2px] shadow-sm border border-white/10"
+                                                title={magazine.country}
+                                            />
+                                        ) : (
+                                            <span>📍</span>
+                                        )}
+                                        {magazine.country}
                                     </span>
                                 )}
                                 {magazine.tags?.map(tag => (
