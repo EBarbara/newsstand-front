@@ -2,11 +2,13 @@ import { getMagazines } from "@/lib/magazines";
 import MagazineCard from "@/components/MagazineCard";
 import Pagination from "@/components/Pagination";
 import CreateMagazineButton from "@/components/CreateMagazineButton";
+import PageSearch from "@/components/PageSearch";
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+export default async function Page({ searchParams }: { searchParams: Promise<{ page?: string; search?: string }> }) {
     const resolvedSearchParams = await searchParams;
     const currentPage = parseInt(resolvedSearchParams.page || '1', 10) || 1;
-    const response = await getMagazines(currentPage, 20);
+    const searchQuery = resolvedSearchParams.search || "";
+    const response = await getMagazines(currentPage, 20, searchQuery);
     const magazines = response.results;
     const totalPages = Math.ceil(response.count / 20);
 
@@ -23,7 +25,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
                         Navegue pela sua coleção de revistas.
                     </p>
                 </div>
-                <div>
+                <div className="flex items-center gap-3">
+                    <PageSearch placeholder="Buscar revistas..." className="w-64" />
                     <CreateMagazineButton />
                 </div>
             </header>

@@ -2,13 +2,15 @@ import { getSections, getGlobalIssueSections } from "@/lib/issues";
 import GlobalSectionCard from "@/components/GlobalSectionCard";
 import Link from "next/link";
 import Pagination from "@/components/Pagination";
+import PageSearch from "@/components/PageSearch";
 
-export default async function SectionsPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-    const { page } = await searchParams;
-    const currentPage = parseInt(page || "1");
+export default async function SectionsPage({ searchParams }: { searchParams: Promise<{ page?: string; search?: string }> }) {
+    const resolvedSearchParams = await searchParams;
+    const currentPage = parseInt(resolvedSearchParams.page || "1");
+    const searchQuery = resolvedSearchParams.search || "";
     
     // Fetch section types paginated
-    const sectionTypesResponse = await getSections(currentPage, 10);
+    const sectionTypesResponse = await getSections(currentPage, 10, searchQuery);
     const sectionTypes = sectionTypesResponse.results;
     const totalPages = Math.ceil(sectionTypesResponse.count / 10);
 
@@ -25,17 +27,22 @@ export default async function SectionsPage({ searchParams }: { searchParams: Pro
     return (
         <div className="flex flex-col gap-12 pb-20">
             {/* HEADER */}
-            <header className="page-header">
-                <h1 className="page-title">Seções</h1>
-                <p className="page-subtitle">Navegue pelo conteúdo das revistas categorizado por tipo.</p>
+            <header className="page-header !flex-row !justify-between !items-center !gap-4">
+                <div className="flex flex-col">
+                    <h1 className="page-title">Seções</h1>
+                    <p className="page-subtitle">Navegue pelo conteúdo das revistas categorizado por tipo.</p>
+                </div>
+                <div>
+                    <PageSearch placeholder="Buscar seções..." className="w-64" />
+                </div>
             </header>
 
             {activeSections.length === 0 ? (
                 <div className="text-center py-20 bg-white/5 rounded-3xl border-2 border-dashed border-white/10">
-                    <p className="text-gray-500 text-lg">Nenhuma seção encontrada nesta página.</p>
-                    {currentPage > 1 && (
+                    <p className="text-gray-500 text-lg">Nenhuma seção encontrada.</p>
+                    {(currentPage > 1 || searchQuery) && (
                         <Link href="/sections" className="text-blue-400 hover:underline mt-4 inline-block font-bold">
-                            Voltar para a primeira página
+                            Limpar filtros e voltar para a primeira página
                         </Link>
                     )}
                 </div>

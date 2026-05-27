@@ -11,6 +11,7 @@ import Pagination from '@/components/Pagination';
 import { getTags } from '@/lib/tags';
 import { Tag } from '@/@types/tag';
 import PeopleFiltersModal from '@/components/PeopleFiltersModal';
+import PageSearch from '@/components/PageSearch';
 
 export default function PeoplePage() {
     return (
@@ -36,6 +37,10 @@ function PeoplePageContent() {
         });
         return filters;
     }, [searchParams]);
+
+    const advancedFiltersCount = useMemo(() => {
+        return Object.keys(activeFilters).filter(k => k !== 'search').length;
+    }, [activeFilters]);
 
     const [data, setData] = useState<PaginatedResponse<Person> | null>(null);
     const [loading, setLoading] = useState(true);
@@ -112,11 +117,12 @@ function PeoplePageContent() {
                     <p className="page-subtitle">Diretório de colaboradores e créditos.</p>
                 </div>
                 <div className={styles.actions}>
+                    <PageSearch placeholder="Buscar pessoas..." className="w-64" />
                     <button 
                         className="flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 text-white px-4 py-2 rounded-xl transition-all font-bold text-sm"
                         onClick={() => setIsFilterModalOpen(true)}
                     >
-                        <span>🔍</span> Filtros {Object.keys(activeFilters).length > 0 && `(${Object.keys(activeFilters).length})`}
+                        <span>⚙️</span> Filtros {advancedFiltersCount > 0 && `(${advancedFiltersCount})`}
                     </button>
                     <button 
                         className={styles.addButton}

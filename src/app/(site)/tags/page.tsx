@@ -8,6 +8,7 @@ import { getTags } from '@/lib/tags';
 import { Tag } from '@/@types/tag';
 import { PaginatedResponse } from '@/@types/api';
 import Pagination from '@/components/Pagination';
+import PageSearch from '@/components/PageSearch';
 
 export default function TagsPage() {
     return (
@@ -21,16 +22,17 @@ function TagsPageContent() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    // Derive current page from URL
+    // Derive current page and search query from URL
     const currentPage = parseInt(searchParams.get('page') || '1');
+    const searchQuery = searchParams.get('search') || '';
     
     const [data, setData] = useState<PaginatedResponse<Tag> | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const fetchTags = useCallback(async (page: number) => {
+    const fetchTags = useCallback(async (page: number, search?: string) => {
         setLoading(true);
         try {
-            const response = await getTags(page);
+            const response = await getTags(page, 20, search);
             setData(response);
         } catch (error) {
             console.error("Error fetching tags:", error);
@@ -40,17 +42,20 @@ function TagsPageContent() {
     }, []);
 
     useEffect(() => {
-        fetchTags(currentPage);
-    }, [currentPage, fetchTags]);
+        fetchTags(currentPage, searchQuery);
+    }, [currentPage, searchQuery, fetchTags]);
 
     const totalPages = data ? Math.ceil(data.count / 20) : 0;
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
+            <header className="page-header !flex-row !justify-between !items-center !gap-4">
                 <div className={styles.titleSection}>
-                    <h1 className={styles.title}>Tags</h1>
-                    <p className={styles.subtitle}>Categorias e marcações para organizar o acervo.</p>
+                    <h1 className="page-title !mb-1">Tags</h1>
+                    <p className="page-subtitle">Categorias e marcações para organizar o acervo.</p>
+                </div>
+                <div>
+                    <PageSearch placeholder="Buscar tags..." className="w-64" />
                 </div>
             </header>
 

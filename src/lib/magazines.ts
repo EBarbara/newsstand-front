@@ -2,9 +2,10 @@ import { request } from "./api";
 import { Magazine } from "@/@types/magazine";
 import { PaginatedResponse } from "@/@types/api";
 
-export function getMagazines(page: number = 1, pageSize?: number) {
+export function getMagazines(page: number = 1, pageSize?: number, search?: string) {
     let url = `/magazines/?page=${page}`;
     if (pageSize) url += `&page_size=${pageSize}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
     return request<PaginatedResponse<Magazine>>(url);
 }
 

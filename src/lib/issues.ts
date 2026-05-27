@@ -79,9 +79,10 @@ export function getPageImageUrl(id: number, index: number) {
     return `${MEDIA_API_URL}/issues/${id}/pages/${index}/`;
 }
 
-export function getSections(page: number = 1, pageSize?: number) {
+export function getSections(page: number = 1, pageSize?: number, search?: string) {
     let url = `/sections/?page=${page}`;
     if (pageSize) url += `&page_size=${pageSize}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
     return request<PaginatedResponse<Section>>(url)
 }
 
