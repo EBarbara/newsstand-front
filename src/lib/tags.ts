@@ -19,3 +19,10 @@ export function createTag(name: string) {
         body: JSON.stringify({ name }),
     });
 }
+
+export function updateTag(slug: string, formData: FormData) {
+    return request<Tag>(`/tags/${slug}/`, {
+        method: 'PATCH',
+        body: formData,
+    });
+}

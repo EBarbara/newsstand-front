@@ -75,3 +75,343 @@
     gap: 2rem;
     margin-top: 1rem;
 }
+
+/* --- Hierarchical Tags & Metadata Styling --- */
+
+/* Breadcrumbs Path */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.breadcrumbLink {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.breadcrumbLink:hover {
+    color: var(--primary);
+}
+
+.breadcrumbSeparator {
+    color: rgba(255, 255, 255, 0.25);
+    font-weight: normal;
+}
+
+.breadcrumbActive {
+    color: #93c5fd;
+}
+
+/* Premium Image/Cover Banner */
+.bannerContainer {
+    position: relative;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #111827;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
+
+.bannerBg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-size: cover;
+    background-position: center;
+    filter: blur(16px) brightness(0.35);
+    transform: scale(1.12);
+}
+
+.bannerOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+        to top,
+        rgba(15, 23, 42, 0.95) 0%,
+        rgba(15, 23, 42, 0.6) 60%,
+        rgba(15, 23, 42, 0.3) 100%
+    );
+}
+
+.bannerContent {
+    position: relative;
+    z-index: 3;
+    padding: 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.tagTitleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.tagImageThumbnail {
+    width: 72px;
+    height: 72px;
+    border-radius: 1rem;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tagTitleInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.tagTitle {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.tagDescription {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 850px;
+    margin: 0;
+}
+
+/* Edit Mode Layouts */
+.editContainer {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    backdrop-filter: blur(8px);
+}
+
+.editFormGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .editFormGrid {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+.formField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formLabel {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.05em;
+}
+
+.inputField {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #ffffff;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.inputField:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.textareaField {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.imageUploadWrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 0.75rem;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.previewThumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.uploadActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.uploadBtn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.uploadBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.clearImageBtn {
+    color: #f87171;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    padding: 0.2rem;
+    text-align: left;
+    width: fit-content;
+}
+
+.clearImageBtn:hover {
+    text-decoration: underline;
+}
+
+/* Recursive Descendant Tags Tree Styling */
+.hierarchyTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #93c5fd;
+    margin-top: 2rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.hierarchyTitle::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.treeContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.treeNode {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    border-left: 2px dashed rgba(255, 255, 255, 0.08);
+    padding-left: 1.5rem;
+    margin-left: 0.25rem;
+}
+
+.treeNode::before {
+    content: '';
+    position: absolute;
+    top: 1.25rem;
+    left: 0;
+    width: 1.25rem;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.treeNodeHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.treeTagLink {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #60a5fa;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.treeTagLink:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.treeBreadcrumb {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.treeItemsSection {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.treeChildren {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    margin-top: 0.5rem;
+}
