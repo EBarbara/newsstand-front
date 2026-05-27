@@ -86,12 +86,24 @@ export function getSections(page: number = 1, pageSize?: number, search?: string
     return request<PaginatedResponse<Section>>(url)
 }
 
-export function getGlobalIssueSections(params: { section?: number, page?: number, issue?: number, pageSize?: number, ordering?: string } = {}) {
+export function getGlobalIssueSections(params: { 
+    section?: number; 
+    page?: number; 
+    issue?: number; 
+    pageSize?: number; 
+    ordering?: string;
+    search?: string;
+    magazine?: string;
+    year?: number;
+} = {}) {
     let url = `/issue-sections/?page=${params.page || 1}`;
     if (params.section) url += `&section=${params.section}`;
     if (params.issue) url += `&issue=${params.issue}`;
     if (params.pageSize) url += `&page_size=${params.pageSize}`;
     if (params.ordering) url += `&ordering=${params.ordering}`;
+    if (params.search) url += `&search=${encodeURIComponent(params.search)}`;
+    if (params.magazine) url += `&magazine=${encodeURIComponent(params.magazine)}`;
+    if (params.year) url += `&year=${params.year}`;
     return request<PaginatedResponse<GlobalIssueSection>>(url);
 }
 
