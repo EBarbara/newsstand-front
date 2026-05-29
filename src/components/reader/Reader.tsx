@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Issue } from "@/@types/issue";
+import { IssueSection } from "@/@types/issueSection";
 import Canvas from "./Canvas";
 import Controls from "./Controls";
 import Sidebar from "./Sidebar";
@@ -17,13 +18,14 @@ export default function Reader({ issue, initialIndex = 0 }: Props) {
     const [index, setIndex] = useState(initialIndex);
     const [mode, setMode] = useState<"image" | "text">("image");
     const [showControls, setShowControls] = useState(true);
+    const [activeTextSection, setActiveTextSection] = useState<IssueSection | null>(null);
 
     const total = issue.renders.length;
     const current = issue.renders[index];
     const pageNumber = index + 1;
 
-    const section = useMemo(() => {
-        return issue.sections.find((s) =>
+    const sections = useMemo(() => {
+        return issue.sections.filter((s) =>
             s.segments.some(
                 (seg) =>
                     pageNumber >= seg.start_page &&
@@ -82,11 +84,14 @@ export default function Reader({ issue, initialIndex = 0 }: Props) {
         return <div style={{ color: "white" }}>No pages</div>;
     }
 
-    if (mode === "text" && section) {
+    if (mode === "text" && activeTextSection) {
         return (
             <TextView
-                section={section}
-                onBack={() => setMode("image")}
+                section={activeTextSection}
+                onBack={() => {
+                    setMode("image");
+                    setActiveTextSection(null);
+                }}
             />
         );
     }
@@ -108,14 +113,20 @@ export default function Reader({ issue, initialIndex = 0 }: Props) {
 
             <Sidebar
                 issue={issue}
-                section={section}
+                sections={sections}
                 currentPageId={current.id}
-                onReadText={() => setMode("text")}
+                onReadText={(sec) => {
+                    setActiveTextSection(sec);
+                    setMode("text");
+                }}
             />
 
-            {section?.text_content && (
+            {sections[0]?.text_content && (
                 <button
-                    onClick={() => setMode("text")}
+                    onClick={() => {
+                        setActiveTextSection(sections[0]);
+                        setMode("text");
+                    }}
                     className={styles.textToggle}
                 >
                     Read text

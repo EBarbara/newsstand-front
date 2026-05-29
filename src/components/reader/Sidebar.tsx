@@ -1,51 +1,54 @@
 import { IssueSection } from "@/@types/issueSection";
 import { Issue } from "@/@types/issue";
 import { getIssueUrl } from "@/lib/issues";
+import { formatIssueDate } from "@/lib/date";
 import styles from './Reader.module.css'
 
 interface SidebarProps {
     issue: Issue,
-    section: IssueSection | undefined,
+    sections: IssueSection[],
     currentPageId: number | undefined,
-    onReadText: () => void
+    onReadText: (section: IssueSection) => void
 }
 
-export default function Sidebar({ issue, section, currentPageId, onReadText }: SidebarProps) {
+export default function Sidebar({ issue, sections, currentPageId, onReadText }: SidebarProps) {
+    const formattedDate = formatIssueDate(issue.publishing_date);
+
     return (
         <div className={styles.sidebar}>
             <div>
                 <strong>{issue.magazine.name}</strong>
-                <div>Edition {issue.edition?.replace("-", "/")}</div>
+                <div>
+                    Edition {issue.edition?.replace("-", "/")}
+                    {formattedDate && ` (${formattedDate})`}
+                </div>
             </div>
 
-            <hr />
+            {sections.map((section, idx) => {
+                const filteredCredits = section.credits?.filter(c => {
+                    if (c.render_ids && c.render_ids.length > 0) {
+                        return currentPageId && c.render_ids.includes(currentPageId);
+                    }
+                    return true;
+                }) || [];
 
-            {section && (
-                <div>
-                    <strong>Section</strong>
-                    <div>
-                        {!section.title || section.title === section.section.name 
-                            ? section.section.name 
-                            : `${section.title} (${section.section.name})`}
-                    </div>
-                </div>
-            )}
+                return (
+                    <div key={section.id}>
+                        {/* Section Divider (show before every section except first) */}
+                        <hr className={idx === 0 ? styles.firstDivider : styles.sectionDivider} />
 
-            {section && (
-                <>
-                    {(() => {
-                        const filteredCredits = section.credits?.filter(c => {
-                            if (c.render_ids && c.render_ids.length > 0) {
-                                return currentPageId && c.render_ids.includes(currentPageId);
-                            }
-                            return true;
-                        }) || [];
+                        <div>
+                            <strong>Section</strong>
+                            <div>
+                                {!section.title || section.title === section.section.name 
+                                    ? section.section.name 
+                                    : `${section.title} (${section.section.name})`}
+                            </div>
+                        </div>
 
-                        if (filteredCredits.length === 0) return null;
-
-                        return (
+                        {filteredCredits.length > 0 && (
                             <>
-                                <hr />
+                                <hr className={styles.innerDivider} />
                                 <div className={styles.credits}>
                                     <strong>Credits</strong>
                                     <ul className={styles.creditsList}>
@@ -83,22 +86,23 @@ export default function Sidebar({ issue, section, currentPageId, onReadText }: S
                                     </ul>
                                 </div>
                             </>
-                        );
-                    })()}
-                </>
-            )}
+                        )}
 
-            <hr />
+                        {section.text_content && (
+                            <button 
+                                onClick={() => onReadText(section)}
+                                className={styles.readTextButton}
+                            >
+                                Read text
+                            </button>
+                        )}
+                    </div>
+                );
+            })}
 
-            {section?.text_content && (
-                <button onClick={onReadText}>
-                    Read text
-                </button>
-            )}
+            <hr className={styles.sectionDivider} />
 
-            <hr />
-
-            <a href={getIssueUrl(issue)}>
+            <a href={getIssueUrl(issue)} className={styles.backLink}>
                 Back to issue
             </a>
         </div>
