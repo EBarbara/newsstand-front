@@ -44,6 +44,13 @@ export function getPersonDetail(id: number) {
     return request<Person>(`/people/${id}/`);
 }
 
-export function getPersonCredits(id: number, page: number = 1) {
-    return request<PaginatedResponse<PersonCredit>>(`/people/${id}/credits/?page=${page}`);
+export function getPersonCredits(id: number, page: number = 1, importance?: string, pageSize?: number) {
+    let url = `/people/${id}/credits/?page=${page}`;
+    if (importance) {
+        url += `&importance=${encodeURIComponent(importance)}`;
+    }
+    if (pageSize) {
+        url += `&page_size=${pageSize}`;
+    }
+    return request<PaginatedResponse<PersonCredit>>(url);
 }

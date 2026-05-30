@@ -221,9 +221,13 @@ function PersonPageContent({ id }: { id: string }) {
     const [tempPhotoUrl, setTempPhotoUrl] = useState<string | null>(null);
 
     // Credits pagination
-    const [creditsResponse, setCreditsResponse] = useState<PaginatedResponse<PersonCredit> | null>(null);
-    const [creditsLoading, setCreditsLoading] = useState(true);
-    const creditsPage = parseInt(searchParams.get('page') || '1');
+    const [mainCreditsResponse, setMainCreditsResponse] = useState<PaginatedResponse<PersonCredit> | null>(null);
+    const [minorCreditsResponse, setMinorCreditsResponse] = useState<PaginatedResponse<PersonCredit> | null>(null);
+    const [mainCreditsLoading, setMainCreditsLoading] = useState(true);
+    const [minorCreditsLoading, setMinorCreditsLoading] = useState(true);
+    
+    const mainPage = parseInt(searchParams.get('main_page') || '1');
+    const minorPage = parseInt(searchParams.get('minor_page') || '1');
 
     useEffect(() => {
         getPersonDetail(Number(id))
@@ -248,17 +252,30 @@ function PersonPageContent({ id }: { id: string }) {
     }, [id]);
 
     useEffect(() => {
-        setCreditsLoading(true);
-        getPersonCredits(Number(id), creditsPage)
+        setMainCreditsLoading(true);
+        getPersonCredits(Number(id), mainPage, "1,2", 10)
             .then(data => {
-                setCreditsResponse(data);
-                setCreditsLoading(false);
+                setMainCreditsResponse(data);
+                setMainCreditsLoading(false);
             })
             .catch(err => {
-                console.error("Failed to load credits", err);
-                setCreditsLoading(false);
+                console.error("Failed to load main credits", err);
+                setMainCreditsLoading(false);
             });
-    }, [id, creditsPage]);
+    }, [id, mainPage]);
+
+    useEffect(() => {
+        setMinorCreditsLoading(true);
+        getPersonCredits(Number(id), minorPage, "3", 30)
+            .then(data => {
+                setMinorCreditsResponse(data);
+                setMinorCreditsLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to load minor credits", err);
+                setMinorCreditsLoading(false);
+            });
+    }, [id, minorPage]);
 
     useEffect(() => {
         if (!relSearch.trim()) {
@@ -848,7 +865,8 @@ function PersonPageContent({ id }: { id: string }) {
 
                     <section>
                         {(() => {
-                            if (creditsLoading && !creditsResponse) {
+                            const isInitialLoading = (mainCreditsLoading && !mainCreditsResponse) || (minorCreditsLoading && !minorCreditsResponse);
+                            if (isInitialLoading) {
                                 return (
                                     <div className="space-y-12 animate-pulse">
                                         <section>
@@ -862,8 +880,11 @@ function PersonPageContent({ id }: { id: string }) {
                                 );
                             }
 
-                            const credits = creditsResponse?.results || [];
-                            if (!creditsLoading && credits.length === 0) {
+                            const hasNoCredits = !mainCreditsLoading && !minorCreditsLoading && 
+                                (!mainCreditsResponse || mainCreditsResponse.count === 0) &&
+                                (!minorCreditsResponse || minorCreditsResponse.count === 0);
+
+                            if (hasNoCredits) {
                                 return (
                                     <>
                                         <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">
@@ -875,13 +896,14 @@ function PersonPageContent({ id }: { id: string }) {
                                 );
                             }
 
-                            // 1. Group by issue (preserving order from API)
-                            const groups: any[] = [];
-                            const groupsMap = new Map<number, any>();
+                            // 1. Group main credits by issue
+                            const mainCredits = mainCreditsResponse?.results || [];
+                            const mainGroups: any[] = [];
+                            const mainGroupsMap = new Map<number, any>();
 
-                            credits.forEach((credit) => {
+                            mainCredits.forEach((credit) => {
                                 const key = credit.issue_id;
-                                if (!groupsMap.has(key)) {
+                                if (!mainGroupsMap.has(key)) {
                                     const newGroup = {
                                         issue_id: credit.issue_id,
                                         magazine_name: credit.magazine_name,
@@ -892,177 +914,216 @@ function PersonPageContent({ id }: { id: string }) {
                                         issue_cover: credit.issue_cover,
                                         issue_cover_focus_x: credit.issue_cover_focus_x,
                                         issue_cover_focus_y: credit.issue_cover_focus_y,
-                                        maxImportance: 3, // Default to lowest
                                         items: [] as any[]
                                     };
-                                    groups.push(newGroup);
-                                    groupsMap.set(key, newGroup);
+                                    mainGroups.push(newGroup);
+                                    mainGroupsMap.set(key, newGroup);
                                 }
 
-                                const group = groupsMap.get(key);
+                                const group = mainGroupsMap.get(key);
                                 group.items.push(credit);
-                                // Update max importance (lower number is higher importance)
-                                const importance = credit.importance || 2;
-                                if (importance < group.maxImportance) {
-                                    group.maxImportance = importance;
-                                }
                             });
-                            const mainGroups = groups.filter((g: any) => g.maxImportance < 3);
-                            const minorGroups = groups.filter((g: any) => g.maxImportance === 3);
 
-                            const totalPages = creditsResponse ? Math.ceil(creditsResponse.count / 20) : 0;
+                            // 2. Group minor credits by issue
+                            const minorCredits = minorCreditsResponse?.results || [];
+                            const minorGroups: any[] = [];
+                            const minorGroupsMap = new Map<number, any>();
+
+                            minorCredits.forEach((credit) => {
+                                const key = credit.issue_id;
+                                if (!minorGroupsMap.has(key)) {
+                                    const newGroup = {
+                                        issue_id: credit.issue_id,
+                                        magazine_name: credit.magazine_name,
+                                        magazine_slug: credit.magazine_slug,
+                                        issue_edition: credit.issue_edition,
+                                        issue_volume: credit.issue_volume,
+                                        issue_date: credit.issue_date,
+                                        items: [] as any[]
+                                    };
+                                    minorGroups.push(newGroup);
+                                    minorGroupsMap.set(key, newGroup);
+                                }
+
+                                const group = minorGroupsMap.get(key);
+                                group.items.push(credit);
+                            });
+
+                            const mainTotalPages = mainCreditsResponse ? Math.ceil(mainCreditsResponse.count / 10) : 0;
+                            const minorTotalPages = minorCreditsResponse ? Math.ceil(minorCreditsResponse.count / 30) : 0;
 
                             return (
-                                <div className={`space-y-12 transition-opacity duration-300 ${creditsLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+                                <div className="space-y-12">
                                     {/* MAIN APPEARANCES SECTION */}
-                                    {mainGroups.length > 0 && (
-                                        <section>
+                                    {((mainCreditsResponse && mainCreditsResponse.count > 0) || mainCreditsLoading) && (
+                                        <section className={`transition-opacity duration-300 ${mainCreditsLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
                                             <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-blue-400">
                                                 <span className="w-8 h-[1px] bg-blue-500"></span>
                                                 Aparições Principais
                                             </h2>
-                                            <div className="grid grid-cols-1 gap-6">
-                                                {mainGroups.map((group: any) => (
-                                                    <div
-                                                        key={group.issue_id}
-                                                        className="group bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start transition-all shadow-lg rounded-xl hover:border-white/20 min-h-[160px] overflow-hidden"
-                                                    >
-                                                        <div className="p-4 shrink-0 self-stretch flex items-center justify-center bg-black/20">
+                                            {mainGroups.length > 0 ? (
+                                                <div className="grid grid-cols-1 gap-6">
+                                                    {mainGroups.map((group: any) => (
+                                                        <div
+                                                            key={group.issue_id}
+                                                            className="group bg-white/5 border border-white/10 flex flex-col sm:flex-row items-start transition-all shadow-lg rounded-xl hover:border-white/20 min-h-[160px] overflow-hidden"
+                                                        >
+                                                            <div className="p-4 shrink-0 self-stretch flex items-center justify-center bg-black/20">
+                                                                <Link
+                                                                    href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                                    className="w-24 sm:w-28 aspect-[3/4] bg-gray-800 shrink-0 block hover:opacity-90 transition-all relative rounded-sm overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-[1.02]"
+                                                                >
+                                                                    {group.issue_cover ? (
+                                                                        <>
+                                                                            <img
+                                                                                src={getMediaUrl(group.issue_cover)}
+                                                                                alt={`Issue ${group.issue_edition?.replace("-", "/")}`}
+                                                                                className="w-full h-full object-cover"
+                                                                                style={{
+                                                                                    objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%`
+                                                                                }}
+                                                                            />
+                                                                            {/* Subtle paper-like gradient overlay */}
+                                                                            <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent pointer-events-none" />
+                                                                        </>
+                                                                    ) : (
+                                                                        <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" /></svg>
+                                                                        </div>
+                                                                    )}
+                                                                </Link>
+                                                            </div>
+
+                                                            <div className="flex-1 p-5 flex flex-col justify-center min-w-0 self-stretch">
+                                                                <Link
+                                                                    href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                                    className="flex items-center gap-2 mb-3 group/title"
+                                                                >
+                                                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-widest group-hover/title:text-blue-300 transition-colors">{group.magazine_name}</span>
+                                                                    <span className="text-xs text-gray-700">/</span>
+                                                                    <span className="text-sm text-gray-300 font-medium group-hover/title:text-white transition-colors">
+                                                                        {group.issue_date && <span className="mr-2 text-gray-500 font-normal">{formatIssueMonth(group.issue_date)}</span>}
+                                                                        Edição {group.issue_edition?.replace("-", "/")}
+                                                                    </span>
+                                                                </Link>
+
+                                                                <div className="space-y-2">
+                                                                    {group.items.sort((a: any, b: any) => (a.importance || 2) - (b.importance || 2)).map((item: any) => (
+                                                                        <Link
+                                                                            key={item.id}
+                                                                            href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
+                                                                            className="flex flex-wrap items-center gap-x-3 gap-y-1 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all group/item"
+                                                                        >
+                                                                            <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
+                                                                                {item.section_title || item.section_type}
+                                                                                {item.age_at_issue && <span className="ml-2 text-xs font-normal text-gray-500">{item.age_at_issue}</span>}
+                                                                            </h3>
+                                                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.importance === 1
+                                                                                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                                                                    : item.importance === 3
+                                                                                        ? "bg-gray-500/5 text-gray-500 border-gray-500/10"
+                                                                                        : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                                                                                }`}>
+                                                                                {item.role || (item.importance === 1 ? "Estrela" : item.importance === 3 ? "Citação" : "Colaborador")}
+                                                                            </span>
+                                                                            {item.start_page && (
+                                                                                <span className="ml-auto opacity-0 group-hover/item:opacity-100 text-[10px] font-bold text-blue-500 uppercase tracking-tighter transition-all translate-x-2 group-hover/item:translate-x-0">
+                                                                                    Ler Seção →
+                                                                                </span>
+                                                                            )}
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+
                                                             <Link
-                                                                href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`}
-                                                                className="w-24 sm:w-28 aspect-[3/4] bg-gray-800 shrink-0 block hover:opacity-90 transition-all relative rounded-sm overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)] group-hover:scale-[1.02]"
+                                                                href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
+                                                                className="hidden sm:flex items-center px-6 text-gray-700 hover:text-blue-400 transition-colors border-l border-white/5"
+                                                                title="Ver detalhes da edição"
                                                             >
-                                                                {group.issue_cover ? (
-                                                                    <>
-                                                                        <img
-                                                                            src={getMediaUrl(group.issue_cover)}
-                                                                            alt={`Issue ${group.issue_edition?.replace("-", "/")}`}
-                                                                            className="w-full h-full object-cover"
-                                                                            style={{
-                                                                                objectPosition: `${group.issue_cover_focus_x ?? 0}% ${group.issue_cover_focus_y ?? 50}%`
-                                                                            }}
-                                                                        />
-                                                                        {/* Subtle paper-like gradient overlay */}
-                                                                        <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent pointer-events-none" />
-                                                                    </>
-                                                                ) : (
-                                                                    <div className="w-full h-full flex items-center justify-center text-gray-700">
-                                                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" /></svg>
-                                                                    </div>
-                                                                )}
+                                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
                                                             </Link>
                                                         </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-gray-500 italic">Nenhuma aparição principal nesta página.</p>
+                                            )}
 
-                                                        <div className="flex-1 p-5 flex flex-col justify-center min-w-0 self-stretch">
-                                                            <Link
-                                                                href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`}
-                                                                className="flex items-center gap-2 mb-3 group/title"
-                                                            >
-                                                                <span className="text-xs font-bold text-blue-400 uppercase tracking-widest group-hover/title:text-blue-300 transition-colors">{group.magazine_name}</span>
-                                                                <span className="text-xs text-gray-700">/</span>
-                                                                <span className="text-sm text-gray-300 font-medium group-hover/title:text-white transition-colors">
-                                                                    {group.issue_date && <span className="mr-2 text-gray-500 font-normal">{formatIssueMonth(group.issue_date)}</span>}
-                                                                    Edição {group.issue_edition?.replace("-", "/")}
+                                            {/* MAIN PAGINATION */}
+                                            {mainTotalPages > 1 && (
+                                                <div className="mt-12 pt-8 border-t border-white/5">
+                                                    <Pagination
+                                                        currentPage={mainPage}
+                                                        totalPages={mainTotalPages}
+                                                        baseUrl={pathname}
+                                                        paramName="main_page"
+                                                    />
+                                                </div>
+                                            )}
+                                        </section>
+                                    )}
+
+                                    {/* MINOR CREDITS (MENTIONS) SECTION */}
+                                    {((minorCreditsResponse && minorCreditsResponse.count > 0) || minorCreditsLoading) && (
+                                        <section className="pt-6 border-t border-white/5">
+                                            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-gray-400">
+                                                <span className="w-6 h-[1px] bg-gray-600"></span>
+                                                Menções e Notas
+                                            </h2>
+                                            {minorGroups.length > 0 ? (
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    {minorGroups.map((group: any) => (
+                                                        <div key={group.issue_id} className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
+                                                            <div className="px-3 py-1.5 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
+                                                                <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">
+                                                                    {group.magazine_name} · {group.issue_date && <span className="mr-1">{formatIssueMonth(group.issue_date)}</span>} Ed. {group.issue_edition?.replace("-", "/")}
                                                                 </span>
-                                                            </Link>
-
-                                                            <div className="space-y-2">
-                                                                {group.items.sort((a: any, b: any) => (a.importance || 2) - (b.importance || 2)).map((item: any) => (
+                                                                <Link href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`} className="text-[10px] text-blue-500/50 hover:text-blue-400 transition-colors">
+                                                                    Ver Edição →
+                                                                </Link>
+                                                            </div>
+                                                            <div className="p-2 space-y-1">
+                                                                {group.items.map((item: any) => (
                                                                     <Link
                                                                         key={item.id}
                                                                         href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
-                                                                        className="flex flex-wrap items-center gap-x-3 gap-y-1 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all group/item"
+                                                                        className="flex items-center justify-between text-sm text-gray-400 px-2 py-1 rounded-lg hover:bg-white/5 hover:text-blue-300 transition-all group/minor"
                                                                     >
-                                                                        <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
-                                                                            {item.section_title || item.section_type}
-                                                                            {item.age_at_issue && <span className="ml-2 text-xs font-normal text-gray-500">{item.age_at_issue}</span>}
-                                                                        </h3>
-                                                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.importance === 1
-                                                                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                                                                : item.importance === 3
-                                                                                    ? "bg-gray-500/5 text-gray-500 border-gray-500/10"
-                                                                                    : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                                                                            }`}>
-                                                                            {item.role || (item.importance === 1 ? "Estrela" : item.importance === 3 ? "Citação" : "Colaborador")}
-                                                                        </span>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span>{item.section_title || item.section_type}</span>
+                                                                            {item.age_at_issue && <span className="text-[10px] text-gray-600">{item.age_at_issue}</span>}
+                                                                            <span className="text-[9px] text-gray-600 uppercase tracking-tighter">({item.role || "Citação"})</span>
+                                                                        </div>
                                                                         {item.start_page && (
-                                                                            <span className="ml-auto opacity-0 group-hover/item:opacity-100 text-[10px] font-bold text-blue-500 uppercase tracking-tighter transition-all translate-x-2 group-hover/item:translate-x-0">
-                                                                                Ler Seção →
+                                                                            <span className="text-[9px] font-bold text-blue-500/50 group-hover/minor:text-blue-400 opacity-0 group-hover/minor:opacity-100 transition-opacity">
+                                                                                P.{item.start_page} ↗
                                                                             </span>
                                                                         )}
                                                                     </Link>
                                                                 ))}
                                                             </div>
                                                         </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-gray-500 italic">Nenhuma menção nesta página.</p>
+                                            )}
 
-                                                        <Link
-                                                            href={`/magazines/${group.magazine_slug}/${group.issue_edition}`}
-                                                            className="hidden sm:flex items-center px-6 text-gray-700 hover:text-blue-400 transition-colors border-l border-white/5"
-                                                            title="Ver detalhes da edição"
-                                                        >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
-                                                        </Link>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                            {/* MINOR PAGINATION */}
+                                            {minorTotalPages > 1 && (
+                                                <div className="mt-12 pt-8 border-t border-white/5">
+                                                    <Pagination
+                                                        currentPage={minorPage}
+                                                        totalPages={minorTotalPages}
+                                                        baseUrl={pathname}
+                                                        paramName="minor_page"
+                                                    />
+                                                </div>
+                                            )}
                                         </section>
-                                    )}
-
-                                    {/* MINOR CREDITS (MENTIONS) SECTION */}
-                                    {minorGroups.length > 0 && (
-                                        <section className="pt-6 border-t border-white/5">
-                                            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-gray-400">
-                                                <span className="w-6 h-[1px] bg-gray-600"></span>
-                                                Menções e Notas
-                                            </h2>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                {minorGroups.map((group: any) => (
-                                                    <div key={group.issue_id} className="bg-white/[0.02] border border-white/5 rounded-xl overflow-hidden">
-                                                        <div className="px-3 py-1.5 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
-                                                            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-tighter">
-                                                                {group.magazine_name} · {group.issue_date && <span className="mr-1">{formatIssueMonth(group.issue_date)}</span>} Ed. {group.issue_edition?.replace("-", "/")}
-                                                            </span>
-                                                            <Link href={group.issue_volume ? `/magazines/${group.magazine_slug}/${group.issue_volume}/${group.issue_edition}` : `/magazines/${group.magazine_slug}/${group.issue_edition}`} className="text-[10px] text-blue-500/50 hover:text-blue-400 transition-colors">
-                                                                Ver Edição →
-                                                            </Link>
-                                                        </div>
-                                                        <div className="p-2 space-y-1">
-                                                            {group.items.map((item: any) => (
-                                                                <Link
-                                                                    key={item.id}
-                                                                    href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
-                                                                    className="flex items-center justify-between text-sm text-gray-400 px-2 py-1 rounded-lg hover:bg-white/5 hover:text-blue-300 transition-all group/minor"
-                                                                >
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span>{item.section_title || item.section_type}</span>
-                                                                        {item.age_at_issue && <span className="text-[10px] text-gray-600">{item.age_at_issue}</span>}
-                                                                        <span className="text-[9px] text-gray-600 uppercase tracking-tighter">({item.role || "Citação"})</span>
-                                                                    </div>
-                                                                    {item.start_page && (
-                                                                        <span className="text-[9px] font-bold text-blue-500/50 group-hover/minor:text-blue-400 opacity-0 group-hover/minor:opacity-100 transition-opacity">
-                                                                            P.{item.start_page} ↗
-                                                                        </span>
-                                                                    )}
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </section>
-                                    )}
-
-                                    {/* PAGINATION */}
-                                    {totalPages > 1 && (
-                                        <div className="mt-12 pt-8 border-t border-white/5">
-                                            <Pagination
-                                                currentPage={creditsPage}
-                                                totalPages={totalPages}
-                                                baseUrl={pathname}
-                                            />
-                                        </div>
                                     )}
                                 </div>
                             );

@@ -10,9 +10,10 @@ interface Props {
     totalPages: number;
     onPageChange?: (page: number) => void;
     baseUrl?: string; // e.g., "/magazines/slug"
+    paramName?: string; // query param name, defaults to 'page'
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange, baseUrl }: Props) {
+export default function Pagination({ currentPage, totalPages, onPageChange, baseUrl, paramName = 'page' }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [inputValue, setInputValue] = useState(currentPage.toString());
@@ -28,7 +29,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange, base
             onPageChange(page);
         } else if (baseUrl) {
             const params = new URLSearchParams(searchParams.toString());
-            params.set('page', page.toString());
+            params.set(paramName, page.toString());
             router.push(`${baseUrl}?${params.toString()}`);
         }
     };
@@ -69,7 +70,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange, base
 
         if (baseUrl) {
             const params = new URLSearchParams(searchParams.toString());
-            params.set('page', page.toString());
+            params.set(paramName, page.toString());
             return (
                 <Link href={`${baseUrl}?${params.toString()}`} className={styles.button}>
                     {content}
