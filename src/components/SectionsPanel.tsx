@@ -67,6 +67,7 @@ export default function SectionsPanel({
     const [people, setPeople] = useState<Person[]>([]);
     const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
     const [newCreditRole, setNewCreditRole] = useState("");
+    const [newCreditImportance, setNewCreditImportance] = useState<number>(2);
     const [peopleSearch, setPeopleSearch] = useState("");
     const [isLoadingPeople, setIsLoadingPeople] = useState(false);
 
@@ -411,6 +412,42 @@ export default function SectionsPanel({
                                             })}
                                         </select>
                                     </div>
+                                    <div className="flex flex-wrap gap-1 items-center py-0.5">
+                                        <span className="text-[9px] text-gray-500 uppercase font-bold mr-1">Importância:</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setNewCreditImportance(1)}
+                                            className={`text-[9px] font-bold uppercase rounded px-1.5 py-0.5 border transition-all ${
+                                                newCreditImportance === 1
+                                                    ? "bg-amber-500 text-gray-950 border-amber-400 font-extrabold shadow-[0_0_8px_rgba(245,158,11,0.3)]"
+                                                    : "bg-amber-500/10 text-amber-500/60 border-amber-500/20 hover:bg-amber-500/20 hover:text-amber-400"
+                                            }`}
+                                        >
+                                            Major
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setNewCreditImportance(2)}
+                                            className={`text-[9px] font-bold uppercase rounded px-1.5 py-0.5 border transition-all ${
+                                                newCreditImportance === 2
+                                                    ? "bg-blue-500 text-gray-950 border-blue-400 font-extrabold shadow-[0_0_8px_rgba(59,130,246,0.3)]"
+                                                    : "bg-blue-500/10 text-blue-500/60 border-blue-500/20 hover:bg-blue-500/20 hover:text-blue-400"
+                                            }`}
+                                        >
+                                            Regular
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setNewCreditImportance(3)}
+                                            className={`text-[9px] font-bold uppercase rounded px-1.5 py-0.5 border transition-all ${
+                                                newCreditImportance === 3
+                                                    ? "bg-gray-400 text-gray-950 border-gray-300 font-extrabold shadow-[0_0_8px_rgba(156,163,175,0.3)]"
+                                                    : "bg-gray-500/10 text-gray-500/60 border-gray-500/20 hover:bg-gray-500/20 hover:text-gray-400"
+                                            }`}
+                                        >
+                                            Minor
+                                        </button>
+                                    </div>
                                     <div className="flex gap-1.5">
                                         <input
                                             value={newCreditRole}
@@ -421,9 +458,10 @@ export default function SectionsPanel({
                                         <button
                                             onClick={() => {
                                                 if (selectedPersonId) {
-                                                    addCreditToSection(s.id, selectedPersonId, newCreditRole);
+                                                    addCreditToSection(s.id, selectedPersonId, newCreditRole, newCreditImportance);
                                                     setSelectedPersonId(null);
                                                     setNewCreditRole("");
+                                                    setNewCreditImportance(2);
                                                 }
                                             }}
                                             disabled={!selectedPersonId}

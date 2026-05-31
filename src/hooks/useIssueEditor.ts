@@ -43,7 +43,7 @@ export type IssueEditorState = {
     updateSectionText: (sectionId: number, text: string) => void
     updateSectionType: (sectionId: number, typeId: number) => void
     createNewSectionType: (name: string) => Promise<void>
-    addCreditToSection: (sectionId: number, personId: number, role: string | null) => void
+    addCreditToSection: (sectionId: number, personId: number, role: string | null, importance?: number) => void
     removeCreditFromSection: (sectionId: number, creditIndex: number) => void
     updateCreditRole: (sectionId: number, creditIndex: number, role: string) => void
     updateCreditImportance: (sectionId: number, creditIndex: number, importance: number) => void
@@ -213,12 +213,12 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
         )
     }
 
-    function addCreditToSection(sectionId: number, personId: number, role: string | null) {
+    function addCreditToSection(sectionId: number, personId: number, role: string | null, importance?: number) {
         setSections(prev => prev.map(s => {
             if (s.id !== sectionId) return s;
             return {
                 ...s,
-                credits: [...(s.credits || []), { person_id: personId, role, importance: 2 }]
+                credits: [...(s.credits || []), { person_id: personId, role, importance: importance ?? 2 }]
             }
         }));
     }
