@@ -229,3 +229,42 @@
     color: #555;
     font-weight: normal;
 }
+
+.relationships {
+    font-size: 0.9rem;
+}
+
+.relationshipsList {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.relationshipsList li {
+    color: #ccc;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.relationshipLabel {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #888;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.relationshipLink {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.relationshipLink:hover {
+    text-decoration: underline;
+    color: #357abd;
+}

@@ -12,6 +12,23 @@ export interface Credit {
     age_at_issue?: string | null;
 }
 
+export interface IssueSectionRelationship {
+    id?: number;
+    issue_section_id: number;
+    issue_section_title: string | null;
+    section_name: string;
+    magazine_name: string;
+    magazine_slug: string;
+    issue_edition: string;
+    issue_volume?: string | null;
+    issue_id: number;
+    start_page: number;
+    label: string;
+    inverse_label?: string | null;
+    is_from?: boolean;
+    order?: number;
+}
+
 export type IssueSection = {
     id: number;
     section: Section;
@@ -19,6 +36,7 @@ export type IssueSection = {
     segments: Segment[];
     text_content?: string;
     credits: Credit[];
+    relationships?: IssueSectionRelationship[];
     order: number;
 }
 
@@ -37,5 +55,6 @@ export type GlobalIssueSection = {
     first_page_image: string | null;
     first_page_type: 'NORMAL' | 'SPREAD' | 'GATEFOLD';
     credits: Credit[];
+    relationships?: IssueSectionRelationship[];
     order: number;
 }

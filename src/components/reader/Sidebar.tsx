@@ -88,6 +88,28 @@ export default function Sidebar({ issue, sections, currentPageId, onReadText }: 
                             </>
                         )}
 
+                        {section.relationships && section.relationships.length > 0 && (
+                            <>
+                                <hr className={styles.innerDivider} />
+                                <div className={styles.relationships}>
+                                    <strong>Vínculos</strong>
+                                    <ul className={styles.relationshipsList}>
+                                        {section.relationships.map((rel, i) => (
+                                            <li key={i}>
+                                                <span className={styles.relationshipLabel}>{rel.label}: </span>
+                                                <a 
+                                                    href={`/reader/${rel.issue_id}?page=${rel.start_page || 1}`}
+                                                    className={styles.relationshipLink}
+                                                >
+                                                    {rel.issue_section_title || rel.section_name} ({rel.magazine_name} Ed. {rel.issue_edition?.replace("-", "/")})
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+
                         {section.text_content && (
                             <button 
                                 onClick={() => onReadText(section)}

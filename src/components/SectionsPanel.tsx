@@ -3,7 +3,7 @@ import Link from "next/link";
 import { IssueEditorState } from "@/hooks/useIssueEditor";
 import { getPeople } from "@/lib/people";
 import { Person } from "@/@types/person";
-import { getIssueUrl } from "@/lib/issues";
+import { getIssueUrl, getGlobalIssueSections } from "@/lib/issues";
 import TagEditor from "./TagEditor";
 
 type Props = Pick<
@@ -29,6 +29,10 @@ type Props = Pick<
     | "updateCreditRole"
     | "updateCreditImportance"
     | "updateCreditPage"
+    | "addRelationshipToSection"
+    | "removeRelationshipFromSection"
+    | "updateRelationshipLabel"
+    | "updateRelationshipInverseLabel"
     | "updateIssueMetadata"
     | "updateIssueTags"
     | "handleDeleteIssue"
@@ -56,6 +60,10 @@ export default function SectionsPanel({
     updateCreditRole,
     updateCreditImportance,
     updateCreditPage,
+    addRelationshipToSection,
+    removeRelationshipFromSection,
+    updateRelationshipLabel,
+    updateRelationshipInverseLabel,
     updateIssueMetadata,
     updateIssueTags,
     handleDeleteIssue
@@ -70,6 +78,32 @@ export default function SectionsPanel({
     const [newCreditImportance, setNewCreditImportance] = useState<number>(2);
     const [peopleSearch, setPeopleSearch] = useState("");
     const [isLoadingPeople, setIsLoadingPeople] = useState(false);
+
+    const [relatedSections, setRelatedSections] = useState<any[]>([]);
+    const [selectedRelatedId, setSelectedRelatedId] = useState<number | null>(null);
+    const [relSearch, setRelSearch] = useState("");
+    const [isLoadingRelated, setIsLoadingRelated] = useState(false);
+    const [newRelLabel, setNewRelLabel] = useState("Tradução de");
+    const [newRelInverseLabel, setNewRelInverseLabel] = useState("Traduzido como");
+
+    useEffect(() => {
+        if (!relSearch.trim()) {
+            setRelatedSections([]);
+            return;
+        }
+        setIsLoadingRelated(true);
+        const timer = setTimeout(() => {
+            getGlobalIssueSections({ search: relSearch, pageSize: 50 })
+                .then(res => {
+                    // Filter out the currently selected section to prevent self-linking
+                    const filtered = res.results.filter(item => item.id !== selectedSectionId);
+                    setRelatedSections(filtered);
+                })
+                .catch(console.error)
+                .finally(() => setIsLoadingRelated(false));
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [relSearch, selectedSectionId]);
 
     const sortedAvailableSections = [...availableSections]
         .filter(s => s.name.toLowerCase().includes(sectionSearch.toLowerCase()))
@@ -473,7 +507,104 @@ export default function SectionsPanel({
                                 </div>
                             </div>
 
-                            <div className="flex gap-2 mt-1">
+                            {/* RELATIONSHIPS */}
+                            <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-gray-800">
+                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Vínculos (Traduções / Republicações)</label>
+
+                                <div className="flex flex-col gap-1.5">
+                                    {(s.relationships || []).map((rel, idx) => (
+                                        <div key={idx} className="flex gap-2 items-center bg-[#1a1d23] p-1.5 rounded border border-gray-800">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-[10px] font-bold text-gray-300 truncate">
+                                                    {rel.issue_section_title || rel.section_name || "Sem título"}
+                                                </div>
+                                                <div className="text-[9px] text-gray-500 truncate">
+                                                    {rel.magazine_name} {rel.issue_volume ? `Vol. ${rel.issue_volume} ` : ""}{rel.issue_edition ? `Ed. ${rel.issue_edition}` : ""}
+                                                </div>
+                                                <div className="flex gap-1 mt-1">
+                                                    <input
+                                                        value={rel.label || ""}
+                                                        onChange={(e) => updateRelationshipLabel(s.id, idx, e.target.value)}
+                                                        placeholder="Rótulo (ex: Tradução de)"
+                                                        className="flex-1 bg-transparent text-[10px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
+                                                    />
+                                                    <input
+                                                        value={rel.inverse_label || ""}
+                                                        onChange={(e) => updateRelationshipInverseLabel(s.id, idx, e.target.value)}
+                                                        placeholder="Inverso (ex: Traduzido como)"
+                                                        className="flex-1 bg-transparent text-[10px] text-gray-400 focus:outline-none border-b border-transparent focus:border-gray-500"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => removeRelationshipFromSection(s.id, idx)}
+                                                className="text-gray-500 hover:text-red-400 p-0.5"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* ADD RELATIONSHIP */}
+                                <div className="flex flex-col gap-1.5 mt-1 p-2 bg-[#1a1d23]/50 rounded border border-dashed border-gray-700">
+                                    <div className="flex flex-col gap-1">
+                                        <input
+                                            type="text"
+                                            value={relSearch}
+                                            onChange={(e) => setRelSearch(e.target.value)}
+                                            placeholder="Buscar matéria..."
+                                            className="w-full p-1 bg-[#161a20] border border-gray-800 rounded text-[10px] text-blue-300 focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <select
+                                            value={selectedRelatedId ?? ""}
+                                            onChange={(e) => setSelectedRelatedId(Number(e.target.value))}
+                                            className="w-full p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
+                                        >
+                                            <option value="">{isLoadingRelated ? "Buscando..." : "Selecionar matéria..."}</option>
+                                            {relatedSections.length === 0 && !isLoadingRelated && relSearch && (
+                                                <option disabled>Nenhuma matéria encontrada</option>
+                                            )}
+                                            {relatedSections.map(item => (
+                                                <option key={item.id} value={item.id}>
+                                                    {item.magazine_name} (Ed. {item.issue_edition?.replace("-", "/")}) - {item.title || item.section_name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex gap-1.5">
+                                        <input
+                                            value={newRelLabel}
+                                            onChange={(e) => setNewRelLabel(e.target.value)}
+                                            placeholder="Rótulo (ex: Tradução de)"
+                                            className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[9px] text-white"
+                                        />
+                                        <input
+                                            value={newRelInverseLabel}
+                                            onChange={(e) => setNewRelInverseLabel(e.target.value)}
+                                            placeholder="Inverso (ex: Traduzido como)"
+                                            className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[9px] text-white"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                if (selectedRelatedId) {
+                                                    addRelationshipToSection(s.id, selectedRelatedId, newRelLabel, newRelInverseLabel || null);
+                                                    setSelectedRelatedId(null);
+                                                    setRelSearch("");
+                                                    setNewRelLabel("Tradução de");
+                                                    setNewRelInverseLabel("Traduzido como");
+                                                }
+                                            }}
+                                            disabled={!selectedRelatedId}
+                                            className="px-2 bg-blue-600 text-white rounded text-[10px] hover:bg-blue-500 disabled:opacity-50"
+                                        >
+                                            Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-2 mt-3">
                                 <button
                                     onClick={() => saveSection(s.id)}
                                     disabled={savingSections[s.id]}

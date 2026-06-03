@@ -116,6 +116,12 @@ export function updateIssueSection(
         text_content?: string,
         section_id?: number,
         credits?: { person_id: number; role: string | null }[],
+        relationships?: {
+            issue_section_id: number;
+            label: string;
+            inverse_label: string | null;
+            order?: number;
+        }[],
     }
 ) {
     return request<IssueSection>(

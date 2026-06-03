@@ -48,6 +48,10 @@ export type IssueEditorState = {
     updateCreditRole: (sectionId: number, creditIndex: number, role: string) => void
     updateCreditImportance: (sectionId: number, creditIndex: number, importance: number) => void
     updateCreditPage: (sectionId: number, creditIndex: number, renderIds: number[]) => void
+    addRelationshipToSection: (sectionId: number, targetSectionId: number, label: string, inverseLabel: string | null) => void
+    removeRelationshipFromSection: (sectionId: number, relIndex: number) => void
+    updateRelationshipLabel: (sectionId: number, relIndex: number, label: string) => void
+    updateRelationshipInverseLabel: (sectionId: number, relIndex: number, inverseLabel: string) => void
     saveSection: (sectionId: number) => void
     savingSections: Record<number, boolean>
     savedSections: Record<number, boolean>
@@ -259,6 +263,48 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
         }));
     }
 
+    function addRelationshipToSection(sectionId: number, targetSectionId: number, label: string, inverseLabel: string | null) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            return {
+                ...s,
+                relationships: [...(s.relationships || []), {
+                    issue_section_id: targetSectionId,
+                    label,
+                    inverse_label: inverseLabel,
+                    order: (s.relationships || []).length
+                } as any]
+            }
+        }));
+    }
+
+    function removeRelationshipFromSection(sectionId: number, relIndex: number) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            const newRels = [...(s.relationships || [])];
+            newRels.splice(relIndex, 1);
+            return { ...s, relationships: newRels };
+        }));
+    }
+
+    function updateRelationshipLabel(sectionId: number, relIndex: number, label: string) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            const newRels = [...(s.relationships || [])];
+            newRels[relIndex] = { ...newRels[relIndex], label };
+            return { ...s, relationships: newRels };
+        }));
+    }
+
+    function updateRelationshipInverseLabel(sectionId: number, relIndex: number, inverseLabel: string) {
+        setSections(prev => prev.map(s => {
+            if (s.id !== sectionId) return s;
+            const newRels = [...(s.relationships || [])];
+            newRels[relIndex] = { ...newRels[relIndex], inverse_label: inverseLabel };
+            return { ...s, relationships: newRels };
+        }));
+    }
+
     async function saveSection(sectionId: number) {
         if (!issue) return
 
@@ -287,6 +333,13 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
                         importance: c.importance || 1,
                         render_ids: c.render_ids || []
                     })),
+                relationships: (section.relationships || [])
+                    .map(r => ({
+                        issue_section_id: r.issue_section_id,
+                        label: r.label,
+                        inverse_label: r.inverse_label || null,
+                        order: r.order ?? 0
+                    }))
             });
 
             // Update local state with the actual data from the server
@@ -517,6 +570,11 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
         updateCreditRole,
         updateCreditImportance,
         updateCreditPage,
+
+        addRelationshipToSection,
+        removeRelationshipFromSection,
+        updateRelationshipLabel,
+        updateRelationshipInverseLabel,
 
         saveSection,
         savingSections,
