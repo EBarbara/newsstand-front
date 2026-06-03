@@ -59,6 +59,15 @@ function buildUrl(path: string, params?: RequestOptions['params']) {
     }
 }
 
+export class ApiError extends Error {
+    status: number;
+    constructor(message: string, status: number) {
+        super(message);
+        this.status = status;
+        this.name = 'ApiError';
+    }
+}
+
 export async function request<T>(
     path: string,
     options: RequestOptions = {}
@@ -99,7 +108,7 @@ export async function request<T>(
             }
         }
         
-        throw new Error(errorMessage);
+        throw new ApiError(errorMessage, res.status);
     }
 
     // importante: evita quebrar em 204
