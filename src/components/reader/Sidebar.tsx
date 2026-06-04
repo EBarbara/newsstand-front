@@ -8,10 +8,12 @@ interface SidebarProps {
     issue: Issue,
     sections: IssueSection[],
     currentPageId: number | undefined,
-    onReadText: (section: IssueSection) => void
+    currentPageNumber: number,
+    onReadText: (section: IssueSection) => void,
+    onGoToPage: (page: number) => void
 }
 
-export default function Sidebar({ issue, sections, currentPageId, onReadText }: SidebarProps) {
+export default function Sidebar({ issue, sections, currentPageId, currentPageNumber, onReadText, onGoToPage }: SidebarProps) {
     const formattedDate = formatIssueDate(issue.publishing_date);
 
     return (
@@ -32,6 +34,24 @@ export default function Sidebar({ issue, sections, currentPageId, onReadText }: 
                     return true;
                 }) || [];
 
+                const sortedSegments = [...section.segments].sort((a, b) => a.start_page - b.start_page);
+                const currentSegmentIdx = sortedSegments.findIndex(
+                    (seg) => currentPageNumber >= seg.start_page && currentPageNumber <= seg.end_page
+                );
+
+                let prevPage: number | null = null;
+                let nextPage: number | null = null;
+
+                if (currentSegmentIdx !== -1) {
+                    const currentSegment = sortedSegments[currentSegmentIdx];
+                    if (currentPageNumber === currentSegment.start_page && currentSegmentIdx > 0) {
+                        prevPage = sortedSegments[currentSegmentIdx - 1].end_page;
+                    }
+                    if (currentPageNumber === currentSegment.end_page && currentSegmentIdx < sortedSegments.length - 1) {
+                        nextPage = sortedSegments[currentSegmentIdx + 1].start_page;
+                    }
+                }
+
                 return (
                     <div key={section.id}>
                         {/* Section Divider (show before every section except first) */}
@@ -44,6 +64,27 @@ export default function Sidebar({ issue, sections, currentPageId, onReadText }: 
                                     ? section.section.name 
                                     : `${section.title} (${section.section.name})`}
                             </div>
+                            
+                            {(prevPage !== null || nextPage !== null) && (
+                                <div className={styles.continuationContainer}>
+                                    {prevPage !== null && (
+                                        <button
+                                            onClick={() => onGoToPage(prevPage!)}
+                                            className={styles.continuationLink}
+                                        >
+                                            ← Continuação da pág. {prevPage}
+                                        </button>
+                                    )}
+                                    {nextPage !== null && (
+                                        <button
+                                            onClick={() => onGoToPage(nextPage!)}
+                                            className={styles.continuationLink}
+                                        >
+                                            Continua na pág. {nextPage} →
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {filteredCredits.length > 0 && (

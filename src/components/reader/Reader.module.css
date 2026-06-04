@@ -268,3 +268,31 @@
     text-decoration: underline;
     color: #357abd;
 }
+
+.continuationContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.continuationLink {
+    background: none;
+    border: none;
+    color: #4a90e2;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: left;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+}
+
+.continuationLink:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+

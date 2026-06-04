@@ -115,10 +115,12 @@ export default function Reader({ issue, initialIndex = 0 }: Props) {
                 issue={issue}
                 sections={sections}
                 currentPageId={current.id}
+                currentPageNumber={pageNumber}
                 onReadText={(sec) => {
                     setActiveTextSection(sec);
                     setMode("text");
                 }}
+                onGoToPage={(pageNum) => setIndex(pageNum - 1)}
             />
 
             {sections[0]?.text_content && (
