@@ -521,19 +521,25 @@ export default function SectionsPanel({
                                                 <div className="text-[9px] text-gray-500 truncate">
                                                     {rel.magazine_name} {rel.issue_volume ? `Vol. ${rel.issue_volume} ` : ""}{rel.issue_edition ? `Ed. ${rel.issue_edition}` : ""}
                                                 </div>
-                                                <div className="flex gap-1 mt-1">
-                                                    <input
-                                                        value={rel.label || ""}
-                                                        onChange={(e) => updateRelationshipLabel(s.id, idx, e.target.value)}
-                                                        placeholder="Rótulo (ex: Tradução de)"
-                                                        className="flex-1 bg-transparent text-[10px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500"
-                                                    />
-                                                    <input
-                                                        value={rel.inverse_label || ""}
-                                                        onChange={(e) => updateRelationshipInverseLabel(s.id, idx, e.target.value)}
-                                                        placeholder="Inverso (ex: Traduzido como)"
-                                                        className="flex-1 bg-transparent text-[10px] text-gray-400 focus:outline-none border-b border-transparent focus:border-gray-500"
-                                                    />
+                                                <div className="flex flex-col gap-1 mt-1">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[8px] text-gray-500 w-10 shrink-0 font-bold uppercase">Ida:</span>
+                                                        <input
+                                                            value={rel.label || ""}
+                                                            onChange={(e) => updateRelationshipLabel(s.id, idx, e.target.value)}
+                                                            placeholder="Rótulo (ex: Tradução de)"
+                                                            className="flex-1 bg-transparent text-[10px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500 min-w-0"
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[8px] text-gray-500 w-10 shrink-0 font-bold uppercase">Volta:</span>
+                                                        <input
+                                                            value={rel.inverse_label || ""}
+                                                            onChange={(e) => updateRelationshipInverseLabel(s.id, idx, e.target.value)}
+                                                            placeholder="Inverso (ex: Traduzido como)"
+                                                            className="flex-1 bg-transparent text-[10px] text-gray-400 focus:outline-none border-b border-transparent focus:border-gray-500 min-w-0"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
                                             <button
@@ -572,19 +578,21 @@ export default function SectionsPanel({
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="flex gap-1.5">
-                                        <input
-                                            value={newRelLabel}
-                                            onChange={(e) => setNewRelLabel(e.target.value)}
-                                            placeholder="Rótulo (ex: Tradução de)"
-                                            className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[9px] text-white"
-                                        />
-                                        <input
-                                            value={newRelInverseLabel}
-                                            onChange={(e) => setNewRelInverseLabel(e.target.value)}
-                                            placeholder="Inverso (ex: Traduzido como)"
-                                            className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[9px] text-white"
-                                        />
+                                    <div className="flex flex-col gap-1.5">
+                                        <div className="flex gap-1.5">
+                                            <input
+                                                value={newRelLabel}
+                                                onChange={(e) => setNewRelLabel(e.target.value)}
+                                                placeholder="Rótulo (ex: Tradução de)"
+                                                className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[9px] text-white min-w-0"
+                                            />
+                                            <input
+                                                value={newRelInverseLabel}
+                                                onChange={(e) => setNewRelInverseLabel(e.target.value)}
+                                                placeholder="Inverso (ex: Traduzido como)"
+                                                className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[9px] text-white min-w-0"
+                                            />
+                                        </div>
                                         <button
                                             onClick={() => {
                                                 if (selectedRelatedId) {
@@ -596,9 +604,9 @@ export default function SectionsPanel({
                                                 }
                                             }}
                                             disabled={!selectedRelatedId}
-                                            className="px-2 bg-blue-600 text-white rounded text-[10px] hover:bg-blue-500 disabled:opacity-50"
+                                            className="w-full py-1 bg-blue-600 text-white rounded text-[10px] hover:bg-blue-500 disabled:opacity-50 font-bold"
                                         >
-                                            Adicionar
+                                            Adicionar Vínculo
                                         </button>
                                     </div>
                                 </div>
