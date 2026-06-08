@@ -73,6 +73,11 @@ export default function PersonCard({ person }: PersonCardProps) {
                             [{person.disambiguation}]
                         </span>
                     )}
+                    {person.is_group && (
+                        <span className="text-[9px] bg-purple-500/20 border border-purple-500/30 text-purple-300 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider w-fit my-1 block">
+                            Grupo / Coletivo
+                        </span>
+                    )}
                     {person.gender_display && (
                         <span className="text-[10px] text-blue-300 font-bold uppercase opacity-80 mt-1 block tracking-wider">
                             {person.gender_display}

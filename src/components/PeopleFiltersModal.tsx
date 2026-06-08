@@ -36,6 +36,12 @@ const FIELDS = [
         { id: 'exact', label: 'Igual a' },
         { id: 'exclude', label: 'Diferente de' }
     ] },
+    { id: 'is_group', label: 'Tipo de Perfil', type: 'select', options: [
+        { id: 'true', label: 'Grupo / Coletivo' },
+        { id: 'false', label: 'Individual' },
+    ], operations: [
+        { id: 'exact', label: 'Igual a' }
+    ] },
     { id: 'country', label: 'País', type: 'text', operations: [
         { id: 'exact', label: 'Igual a' },
         { id: 'exclude', label: 'Diferente de' }

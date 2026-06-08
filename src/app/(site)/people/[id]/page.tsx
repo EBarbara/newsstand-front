@@ -208,6 +208,8 @@ function PersonPageContent({ id }: { id: string }) {
     const [editDeathDate, setEditDeathDate] = useState("");
     const [editRelationships, setEditRelationships] = useState<PersonRelationship[]>([]);
     const [editTags, setEditTags] = useState<Tag[]>([]);
+    const [editIsGroup, setEditIsGroup] = useState(false);
+    const [editMembers, setEditMembers] = useState<string[]>([]);
 
     // Relationship search
     const [relSearch, setRelSearch] = useState("");
@@ -244,6 +246,8 @@ function PersonPageContent({ id }: { id: string }) {
                 setEditDeathDate(data.death_date || "");
                 setEditRelationships(data.relationships || []);
                 setEditTags(data.tags || []);
+                setEditIsGroup(data.is_group || false);
+                setEditMembers(data.members || []);
                 setLoading(false);
             })
             .catch(() => {
@@ -314,6 +318,10 @@ function PersonPageContent({ id }: { id: string }) {
 
             // Append aliases
             formData.append("aliases", JSON.stringify(editAliases.filter(a => a.trim())));
+
+            // Append is_group and members
+            formData.append("is_group", editIsGroup.toString());
+            formData.append("members", JSON.stringify(editMembers.filter(m => m.trim())));
 
             // Append relationships (only those where this person is the source)
             const relationshipsToSave = editRelationships.filter(r => r.is_from !== false);
@@ -628,6 +636,78 @@ function PersonPageContent({ id }: { id: string }) {
                                 </div>
                             )}
                         </div>
+
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Tipo de Perfil</label>
+                            {isEditing ? (
+                                <select
+                                    value={editIsGroup ? "true" : "false"}
+                                    onChange={(e) => setEditIsGroup(e.target.value === "true")}
+                                    className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 mt-1 text-sm text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                                >
+                                    <option value="false">Pessoa / Individual</option>
+                                    <option value="true">Grupo / Coletivo</option>
+                                </select>
+                            ) : (
+                                <p className="text-gray-200">{person.is_group ? "Grupo / Coletivo" : "Individual"}</p>
+                            )}
+                        </div>
+
+                        {((isEditing ? editIsGroup : person.is_group)) && (
+                            <div>
+                                <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Membros / Integrantes</label>
+                                {isEditing ? (
+                                    <div className="flex flex-col gap-2 mt-1">
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {editMembers.map((member, idx) => (
+                                                <span key={idx} className="flex items-center gap-1.5 px-2 py-0.5 bg-purple-500/20 border border-purple-500/30 rounded-md text-xs text-purple-300">
+                                                    {member}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setEditMembers(editMembers.filter((_, i) => i !== idx))}
+                                                        className="hover:text-red-400 font-bold"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Novo membro (aperte Enter)..."
+                                            className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200 focus:outline-none focus:border-blue-500 transition-colors"
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    e.preventDefault();
+                                                    const val = (e.target as HTMLInputElement).value.trim();
+                                                    if (val && !editMembers.includes(val)) {
+                                                        setEditMembers([...editMembers, val]);
+                                                        (e.target as HTMLInputElement).value = "";
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-wrap gap-1.5 mt-1">
+                                        {person.members && person.members.length > 0 ? (
+                                            person.members.map((member, idx) => (
+                                                <Link
+                                                    key={idx}
+                                                    href={`/people?search=${encodeURIComponent(member)}`}
+                                                    className="px-2.5 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-md text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-500/20 transition-all font-medium"
+                                                >
+                                                    {member}
+                                                </Link>
+                                            ))
+                                        ) : (
+                                            <p className="text-xs text-gray-600 italic">Nenhum membro listado</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-500 tracking-wider">Data de Nascimento</label>
                             {isEditing ? (

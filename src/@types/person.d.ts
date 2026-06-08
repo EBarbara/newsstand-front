@@ -12,6 +12,8 @@ export interface Person {
     photo_focus_x?: number;
     photo_focus_y?: number;
     aliases?: string[];
+    is_group?: boolean;
+    members?: string[];
     disambiguation?: string;
     links?: PersonLink[];
     credits?: PersonCredit[];
