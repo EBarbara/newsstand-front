@@ -334,6 +334,7 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
                         render_ids: c.render_ids || []
                     })),
                 relationships: (section.relationships || [])
+                    .filter(r => r.is_from !== false)
                     .map(r => ({
                         issue_section_id: r.issue_section_id,
                         label: r.label,

@@ -142,7 +142,7 @@ export default function Sidebar({ issue, sections, currentPageId, currentPageNum
                                                     href={`/reader/${rel.issue_id}?page=${rel.start_page || 1}`}
                                                     className={styles.relationshipLink}
                                                 >
-                                                    {rel.issue_section_title || rel.section_name} ({rel.magazine_name} Ed. {rel.issue_edition?.replace("-", "/")})
+                                                    {rel.issue_section_title || rel.section_name} ({rel.magazine_name} {rel.issue_volume ? `Vol. ${rel.issue_volume} ` : ""}Ed. {rel.issue_edition?.replace("-", "/")})
                                                 </a>
                                             </li>
                                         ))}

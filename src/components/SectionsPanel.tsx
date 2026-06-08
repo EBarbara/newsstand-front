@@ -512,44 +512,62 @@ export default function SectionsPanel({
                                 <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Vínculos (Traduções / Republicações)</label>
 
                                 <div className="flex flex-col gap-1.5">
-                                    {(s.relationships || []).map((rel, idx) => (
-                                        <div key={idx} className="flex gap-2 items-center bg-[#1a1d23] p-1.5 rounded border border-gray-800">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-[10px] font-bold text-gray-300 truncate">
-                                                    {rel.issue_section_title || rel.section_name || "Sem título"}
-                                                </div>
-                                                <div className="text-[9px] text-gray-500 truncate">
-                                                    {rel.magazine_name} {rel.issue_volume ? `Vol. ${rel.issue_volume} ` : ""}{rel.issue_edition ? `Ed. ${rel.issue_edition}` : ""}
-                                                </div>
-                                                <div className="flex flex-col gap-1 mt-1">
-                                                    <div className="flex items-center gap-1">
-                                                        <span className="text-[8px] text-gray-500 w-10 shrink-0 font-bold uppercase">Ida:</span>
-                                                        <input
-                                                            value={rel.label || ""}
-                                                            onChange={(e) => updateRelationshipLabel(s.id, idx, e.target.value)}
-                                                            placeholder="Rótulo (ex: Tradução de)"
-                                                            className="flex-1 bg-transparent text-[10px] text-blue-300 focus:outline-none border-b border-transparent focus:border-blue-500 min-w-0"
-                                                        />
+                                    {(s.relationships || []).map((rel, idx) => {
+                                        const isIncoming = rel.is_from === false;
+                                        return (
+                                            <div key={idx} className="flex gap-2 items-center bg-[#1a1d23] p-1.5 rounded border border-gray-800">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex justify-between items-center gap-1">
+                                                        <div className="text-[10px] font-bold text-gray-300 truncate">
+                                                            {rel.issue_section_title || rel.section_name || "Sem título"}
+                                                        </div>
+                                                        {isIncoming && (
+                                                            <span className="text-[8px] px-1 bg-gray-800 text-gray-500 rounded font-bold uppercase shrink-0" title="Vínculo de entrada (criado na outra seção)">
+                                                                Entrada 🔒
+                                                            </span>
+                                                        )}
                                                     </div>
-                                                    <div className="flex items-center gap-1">
-                                                        <span className="text-[8px] text-gray-500 w-10 shrink-0 font-bold uppercase">Volta:</span>
-                                                        <input
-                                                            value={rel.inverse_label || ""}
-                                                            onChange={(e) => updateRelationshipInverseLabel(s.id, idx, e.target.value)}
-                                                            placeholder="Inverso (ex: Traduzido como)"
-                                                            className="flex-1 bg-transparent text-[10px] text-gray-400 focus:outline-none border-b border-transparent focus:border-gray-500 min-w-0"
-                                                        />
+                                                    <div className="text-[9px] text-gray-500 truncate">
+                                                        {rel.magazine_name} {rel.issue_volume ? `Vol. ${rel.issue_volume} ` : ""}{rel.issue_edition ? `Ed. ${rel.issue_edition}` : ""}
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 mt-1">
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-[8px] text-gray-500 w-10 shrink-0 font-bold uppercase">Ida:</span>
+                                                            <input
+                                                                value={rel.label || ""}
+                                                                onChange={(e) => updateRelationshipLabel(s.id, idx, e.target.value)}
+                                                                disabled={isIncoming}
+                                                                placeholder="Rótulo (ex: Tradução de)"
+                                                                className={`flex-1 bg-transparent text-[10px] focus:outline-none border-b border-transparent focus:border-blue-500 min-w-0 ${
+                                                                    isIncoming ? "text-gray-500 cursor-not-allowed" : "text-blue-300"
+                                                                }`}
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-[8px] text-gray-500 w-10 shrink-0 font-bold uppercase">Volta:</span>
+                                                            <input
+                                                                value={rel.inverse_label || ""}
+                                                                onChange={(e) => updateRelationshipInverseLabel(s.id, idx, e.target.value)}
+                                                                disabled={isIncoming}
+                                                                placeholder="Inverso (ex: Traduzido como)"
+                                                                className={`flex-1 bg-transparent text-[10px] focus:outline-none border-b border-transparent focus:border-gray-500 min-w-0 ${
+                                                                    isIncoming ? "text-gray-600 cursor-not-allowed" : "text-gray-400"
+                                                                }`}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                {!isIncoming && (
+                                                    <button
+                                                        onClick={() => removeRelationshipFromSection(s.id, idx)}
+                                                        className="text-gray-500 hover:text-red-400 p-0.5"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                )}
                                             </div>
-                                            <button
-                                                onClick={() => removeRelationshipFromSection(s.id, idx)}
-                                                className="text-gray-500 hover:text-red-400 p-0.5"
-                                            >
-                                                ✕
-                                            </button>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
 
                                 {/* ADD RELATIONSHIP */}
@@ -573,7 +591,7 @@ export default function SectionsPanel({
                                             )}
                                             {relatedSections.map(item => (
                                                 <option key={item.id} value={item.id}>
-                                                    {item.magazine_name} (Ed. {item.issue_edition?.replace("-", "/")}) - {item.title || item.section_name}
+                                                    {item.magazine_name} ({item.issue_volume ? `Vol. ${item.issue_volume} ` : ""}Ed. {item.issue_edition?.replace("-", "/")}) - {item.title || item.section_name}
                                                 </option>
                                             ))}
                                         </select>
