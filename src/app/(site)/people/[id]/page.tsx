@@ -23,8 +23,18 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+    const [isWide, setIsWide] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
     const imgRef = useRef<HTMLImageElement>(null);
+
+    const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        const container = containerRef.current;
+        if (!container) return;
+        const containerRatio = container.clientWidth / container.clientHeight;
+        const imgRatio = img.naturalWidth / img.naturalHeight;
+        setIsWide(imgRatio > containerRatio);
+    };
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -127,8 +137,11 @@ function ImageCropper({ image, onCrop, onCancel }: CropperProps) {
                         alt="Crop preview"
                         draggable={false}
                         crossOrigin="anonymous"
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-none transition-transform duration-75 ease-out"
+                        onLoad={handleImageLoad}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 ease-out"
                         style={{
+                            width: isWide ? "100%" : "auto",
+                            height: isWide ? "auto" : "100%",
                             transform: `translate(calc(-50% + ${offset.x}px), calc(-50% + ${offset.y}px)) scale(${scale})`,
                         }}
                     />
