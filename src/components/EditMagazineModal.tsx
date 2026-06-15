@@ -195,7 +195,7 @@ export default function EditMagazineModal({ isOpen, onClose, magazine, onSave }:
                                     />
                                 </label>
                                 <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
-                                    PNG, JPG ou SVG recomendados. Proporção retangular ou quadrada.
+                                    PNG, JPG ou WebP recomendados. Proporção retangular ou quadrada.
                                 </p>
                             </div>
                         </div>
