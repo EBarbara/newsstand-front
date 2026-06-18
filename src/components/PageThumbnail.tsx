@@ -29,6 +29,19 @@ export default function PageThumbnail({
     const insertInputRef = useRef<HTMLInputElement>(null);
     const [isAdjustingFocus, setIsAdjustingFocus] = useState(false);
 
+    const getFileName = (url: string) => {
+        if (!url) return "";
+        try {
+            const parts = url.split('/');
+            const fileNameWithParams = parts[parts.length - 1];
+            const fileName = fileNameWithParams.split('?')[0];
+            const decoded = decodeURIComponent(fileName);
+            return decoded.replace(/^\d{4}_/, "");
+        } catch (e) {
+            return "";
+        }
+    };
+
     return (
         <div
             onClick={(e) => {
@@ -163,6 +176,16 @@ export default function PageThumbnail({
                         DELETE
                     </button>
                 </div>
+            </div>
+
+            {/* FILENAME DISPLAY */}
+            <div className="p-1.5 px-2 bg-black/40 border-t border-gray-800/60 text-center flex items-center justify-center">
+                <span 
+                    className="text-[10px] text-gray-400 font-mono block truncate w-full" 
+                    title={getFileName(image)}
+                >
+                    {getFileName(image)}
+                </span>
             </div>
 
             {/* CONTROLS FOOTER (ONLY IF COVER) */}
