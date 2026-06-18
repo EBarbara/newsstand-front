@@ -19,7 +19,7 @@ if (!IS_SERVER && !_api) {
     _api = `${window.location.protocol}//${window.location.hostname}:8080/api/${API_VERSION}`;
 }
 if (!IS_SERVER && !_media) {
-    _media = `${window.location.protocol}//${window.location.hostname}:8080/api/${API_VERSION}`;
+    _media = `${window.location.protocol}//${window.location.hostname}:8080`;
 }
 
 // Ensure protocols
