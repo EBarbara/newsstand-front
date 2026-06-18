@@ -52,6 +52,7 @@ export interface PersonCredit {
     issue_cover_focus_x?: number;
     issue_cover_focus_y?: number;
     section_title: string | null;
+    section_translated_title?: string | null;
     section_type: string;
     importance?: number;
     start_page?: number | null;

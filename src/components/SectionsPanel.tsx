@@ -16,6 +16,7 @@ type Props = Pick<
     | "createSection"
     | "deleteSection"
     | "updateSectionTitle"
+    | "updateSectionTranslatedTitle"
     | "updateSectionText"
     | "updateSectionType"
     | "createNewSectionType"
@@ -46,6 +47,7 @@ export default function SectionsPanel({
     createSection,
     deleteSection,
     updateSectionTitle,
+    updateSectionTranslatedTitle,
     updateSectionText,
     updateSectionType,
     createNewSectionType,
@@ -298,7 +300,16 @@ export default function SectionsPanel({
                                 />
                             ) : (
                                 <span className="text-sm font-semibold truncate block">
-                                    {s.title || (s.section && s.section.name) || "Sem título"}
+                                    {s.translated_title ? (
+                                        <span>
+                                            {s.title || "Sem título"}{" "}
+                                            <span className={`${selectedSectionId === s.id ? "text-blue-200" : "text-gray-400"} text-xs font-normal`}>
+                                                ({s.translated_title})
+                                            </span>
+                                        </span>
+                                    ) : (
+                                        s.title || (s.section && s.section.name) || "Sem título"
+                                    )}
                                 </span>
                             )}
                         </div>
@@ -315,6 +326,16 @@ export default function SectionsPanel({
 
                     {selectedSectionId === s.id && (
                         <div className="mt-3 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Título Traduzido</label>
+                                <input
+                                    value={s.translated_title || ""}
+                                    onChange={(e) => updateSectionTranslatedTitle(s.id, e.target.value)}
+                                    placeholder="Título traduzido (opcional)"
+                                    className="w-full p-1 bg-[#252a33] border border-blue-400/30 rounded text-xs text-white focus:outline-none"
+                                />
+                            </div>
+
                             <div className="flex flex-col gap-1">
                                 <label className="text-[10px] uppercase font-bold text-blue-200 opacity-70">Tipo</label>
                                 <select
@@ -519,7 +540,16 @@ export default function SectionsPanel({
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex justify-between items-center gap-1">
                                                         <div className="text-[10px] font-bold text-gray-300 truncate">
-                                                            {rel.issue_section_title || rel.section_name || "Sem título"}
+                                                            {rel.issue_section_translated_title ? (
+                                                                <span>
+                                                                    {rel.issue_section_title}{" "}
+                                                                    <span className="text-gray-500 font-normal text-[10px]">
+                                                                        ({rel.issue_section_translated_title})
+                                                                    </span>
+                                                                </span>
+                                                            ) : (
+                                                                rel.issue_section_title || rel.section_name || "Sem título"
+                                                            )}
                                                         </div>
                                                         {isIncoming && (
                                                             <span className="text-[8px] px-1 bg-gray-800 text-gray-500 rounded font-bold uppercase shrink-0" title="Vínculo de entrada (criado na outra seção)">
@@ -591,7 +621,7 @@ export default function SectionsPanel({
                                             )}
                                             {relatedSections.map(item => (
                                                 <option key={item.id} value={item.id}>
-                                                    {item.magazine_name} ({item.issue_volume ? `Vol. ${item.issue_volume} ` : ""}Ed. {item.issue_edition?.replace("-", "/")}) - {item.title || item.section_name}
+                                                    {item.magazine_name} ({item.issue_volume ? `Vol. ${item.issue_volume} ` : ""}Ed. {item.issue_edition?.replace("-", "/")}) - {item.translated_title ? `${item.title} (${item.translated_title})` : item.title || item.section_name}
                                                 </option>
                                             ))}
                                         </select>

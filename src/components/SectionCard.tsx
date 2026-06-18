@@ -25,10 +25,30 @@ export default function SectionCard({ section, slug, edition, issueId, renders }
                 <div className="font-medium text-lg">
                     {firstIndex !== undefined ? (
                         <Link href={`/reader/${issueId}?page=${firstIndex}`} className="hover:underline hover:text-blue-400 transition-colors">
-                            {section.title || section.section.name}
+                            {section.translated_title ? (
+                                <span>
+                                    {section.title || "Sem título"}{" "}
+                                    <span className="text-gray-400 font-normal text-sm">
+                                        ({section.translated_title})
+                                    </span>
+                                </span>
+                            ) : (
+                                section.title || section.section.name
+                            )}
                         </Link>
                     ) : (
-                        <span>{section.title || section.section.name}</span>
+                        <span>
+                            {section.translated_title ? (
+                                <span>
+                                    {section.title || "Sem título"}{" "}
+                                    <span className="text-gray-400 font-normal text-sm">
+                                        ({section.translated_title})
+                                    </span>
+                                </span>
+                            ) : (
+                                section.title || section.section.name
+                            )}
+                        </span>
                     )}
                 </div>
                 {sortedCredits.length > 0 && (

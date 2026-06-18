@@ -16,6 +16,7 @@ export interface IssueSectionRelationship {
     id?: number;
     issue_section_id: number;
     issue_section_title: string | null;
+    issue_section_translated_title?: string | null;
     section_name: string;
     magazine_name: string;
     magazine_slug: string;
@@ -33,6 +34,7 @@ export type IssueSection = {
     id: number;
     section: Section;
     title: string | null;
+    translated_title: string | null;
     segments: Segment[];
     text_content?: string;
     credits: Credit[];
@@ -43,6 +45,7 @@ export type IssueSection = {
 export type GlobalIssueSection = {
     id: number;
     title: string | null;
+    translated_title: string | null;
     section_name: string;
     section_id: number;
     magazine_name: string;

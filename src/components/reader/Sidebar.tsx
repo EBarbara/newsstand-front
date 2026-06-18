@@ -60,9 +60,21 @@ export default function Sidebar({ issue, sections, currentPageId, currentPageNum
                         <div>
                             <strong>Section</strong>
                             <div>
-                                {!section.title || section.title === section.section.name 
-                                    ? section.section.name 
-                                    : `${section.title} (${section.section.name})`}
+                                {section.translated_title ? (
+                                    <span>
+                                        {section.title || "Sem título"}{" "}
+                                        <span className="text-gray-400 font-normal text-xs">
+                                            ({section.translated_title})
+                                        </span>{" "}
+                                        <span className="text-gray-500 font-normal text-xs">
+                                            ({section.section.name})
+                                        </span>
+                                    </span>
+                                ) : (
+                                    !section.title || section.title === section.section.name 
+                                        ? section.section.name 
+                                        : `${section.title} (${section.section.name})`
+                                )}
                             </div>
                             
                             {(prevPage !== null || nextPage !== null) && (
@@ -142,7 +154,16 @@ export default function Sidebar({ issue, sections, currentPageId, currentPageNum
                                                     href={`/reader/${rel.issue_id}?page=${rel.start_page || 1}`}
                                                     className={styles.relationshipLink}
                                                 >
-                                                    {rel.issue_section_title || rel.section_name} ({rel.magazine_name} {rel.issue_volume ? `Vol. ${rel.issue_volume} ` : ""}Ed. {rel.issue_edition?.replace("-", "/")})
+                                                    {rel.issue_section_translated_title ? (
+                                                        <span>
+                                                            {rel.issue_section_title}{" "}
+                                                            <span className="text-gray-400 font-normal text-xs">
+                                                                ({rel.issue_section_translated_title})
+                                                            </span>
+                                                        </span>
+                                                    ) : (
+                                                        rel.issue_section_title || rel.section_name
+                                                    )} ({rel.magazine_name} {rel.issue_volume ? `Vol. ${rel.issue_volume} ` : ""}Ed. {rel.issue_edition?.replace("-", "/")})
                                                 </a>
                                             </li>
                                         ))}

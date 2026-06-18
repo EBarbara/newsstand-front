@@ -40,6 +40,7 @@ export type IssueEditorState = {
     createSection: () => void
     deleteSection: (sectionId: number) => void
     updateSectionTitle: (sectionId: number, title: string) => void
+    updateSectionTranslatedTitle: (sectionId: number, translatedTitle: string) => void
     updateSectionText: (sectionId: number, text: string) => void
     updateSectionType: (sectionId: number, typeId: number) => void
     createNewSectionType: (name: string) => Promise<void>
@@ -198,6 +199,14 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
         )
     }
 
+    function updateSectionTranslatedTitle(sectionId: number, translatedTitle: string) {
+        setSections(prev =>
+            prev.map(s =>
+                s.id === sectionId ? { ...s, translated_title: translatedTitle } : s
+            )
+        )
+    }
+
     function updateSectionText(sectionId: number, text: string) {
         setSections(prev =>
             prev.map(s =>
@@ -323,6 +332,7 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
             const updatedSection = await updateIssueSection(issue.id, sectionId, {
                 segments,
                 title: section.title ?? "",
+                translated_title: section.translated_title ?? "",
                 text_content: section.text_content ?? "",
                 section_id: section.section.id,
                 credits: (section.credits || [])
@@ -562,6 +572,7 @@ export function useIssueEditor(slug: string, edition: string, volume?: string) {
         createSection,
         deleteSection,
         updateSectionTitle,
+        updateSectionTranslatedTitle,
         updateSectionText,
         updateSectionType,
         createNewSectionType,

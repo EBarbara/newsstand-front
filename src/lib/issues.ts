@@ -113,6 +113,7 @@ export function updateIssueSection(
     data: {
         segments: { start_page: number; end_page: number }[],
         title: string,
+        translated_title?: string,
         text_content?: string,
         section_id?: number,
         credits?: { person_id: number; role: string | null }[],
@@ -138,6 +139,7 @@ export function createIssueSection(
     data: {
         section_id: number
         title: string
+        translated_title?: string
         order: number
         text_content?: string
         segments: { start_page: number; end_page: number }[]

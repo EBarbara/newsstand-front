@@ -1108,7 +1108,16 @@ function PersonPageContent({ id }: { id: string }) {
                                                                             className="flex flex-wrap items-center gap-x-3 gap-y-1 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all group/item"
                                                                         >
                                                                             <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
-                                                                                {item.section_title || item.section_type}
+                                                                                {item.section_translated_title ? (
+                                                                                    <span>
+                                                                                        {item.section_title || "Sem título"}{" "}
+                                                                                        <span className="text-gray-400 font-normal text-sm">
+                                                                                            ({item.section_translated_title})
+                                                                                        </span>
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    item.section_title || item.section_type
+                                                                                )}
                                                                                 {item.age_at_issue && <span className="ml-2 text-xs font-normal text-gray-500">{item.age_at_issue}</span>}
                                                                             </h3>
                                                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.importance === 1
@@ -1186,7 +1195,18 @@ function PersonPageContent({ id }: { id: string }) {
                                                                         className="flex items-center justify-between text-sm text-gray-400 px-2 py-1 rounded-lg hover:bg-white/5 hover:text-blue-300 transition-all group/minor"
                                                                     >
                                                                         <div className="flex items-center gap-2">
-                                                                            <span>{item.section_title || item.section_type}</span>
+                                                                            <span>
+                                                                                {item.section_translated_title ? (
+                                                                                    <span>
+                                                                                        {item.section_title || "Sem título"}{" "}
+                                                                                        <span className="text-gray-400 font-normal text-xs">
+                                                                                            ({item.section_translated_title})
+                                                                                        </span>
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    item.section_title || item.section_type
+                                                                                )}
+                                                                            </span>
                                                                             {item.age_at_issue && <span className="text-[10px] text-gray-600">{item.age_at_issue}</span>}
                                                                             <span className="text-[9px] text-gray-600 uppercase tracking-tighter">({item.role || "Citação"})</span>
                                                                         </div>

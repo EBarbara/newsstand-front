@@ -41,7 +41,16 @@ export default function GlobalSectionCard({ section }: Props) {
             {/* INFO AREA */}
             <div className="p-3 flex flex-col gap-1.5 min-w-0">
                 <div className="font-bold text-gray-100 text-sm line-clamp-2 min-h-[2.5rem] leading-tight group-hover:text-blue-300 transition-colors">
-                    {section.title || section.section_name}
+                    {section.translated_title ? (
+                        <span>
+                            {section.title || "Sem título"}{" "}
+                            <span className="text-gray-400 font-normal text-xs">
+                                ({section.translated_title})
+                            </span>
+                        </span>
+                    ) : (
+                        section.title || section.section_name
+                    )}
                 </div>
                 
                 <div className="flex flex-col gap-0.5">
