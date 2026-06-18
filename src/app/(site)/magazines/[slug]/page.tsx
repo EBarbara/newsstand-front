@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname, useParams } from 'next/navigation';
 
-import { getIssuesByMagazine } from "@/lib/issues";
+import { getIssuesByMagazine, getMediaUrl } from "@/lib/issues";
 import IssueCard from "@/components/issueCard/IssueCard";
 import ImportCbzButton from "@/components/ImportCbzButton";
 import CreateEmptyIssueButton from "@/components/CreateEmptyIssueButton";
@@ -239,7 +239,7 @@ function MagazineIssuesContent() {
                                 {magazine.logo ? (
                                     <div className="relative h-28 w-28 md:h-32 md:w-32 flex-shrink-0 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 p-2 shadow-md flex items-center justify-center">
                                         <img
-                                            src={magazine.logo}
+                                            src={getMediaUrl(magazine.logo)}
                                             alt={magazine.name}
                                             className="h-full w-full object-contain"
                                         />

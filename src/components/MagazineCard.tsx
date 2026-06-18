@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Magazine } from "@/@types/magazine";
+import { getMediaUrl } from "@/lib/issues";
 
 export default function MagazineCard({ mag }: { mag: Magazine }) {
     // Dynamic background gradient based on the slug to make cards look vibrant if there's no logo
@@ -40,7 +41,7 @@ export default function MagazineCard({ mag }: { mag: Magazine }) {
                     {mag.logo ? (
                         <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center p-1.5 shadow-inner">
                             <img
-                                src={mag.logo}
+                                src={getMediaUrl(mag.logo)}
                                 alt={mag.name}
                                 className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
                             />

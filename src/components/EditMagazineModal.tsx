@@ -5,6 +5,7 @@ import { Magazine } from "@/@types/magazine";
 import { Tag } from "@/@types/tag";
 import { updateMagazine } from "@/lib/magazines";
 import TagEditor from "./TagEditor";
+import { getMediaUrl } from "@/lib/issues";
 
 interface EditMagazineModalProps {
     isOpen: boolean;
@@ -40,7 +41,7 @@ export default function EditMagazineModal({ isOpen, onClose, magazine, onSave }:
             setCountry(magazine.country || "");
             setDescription(magazine.description || "");
             setSelectedTags(magazine.tags || []);
-            setLogoPreview(magazine.logo || null);
+            setLogoPreview(magazine.logo ? getMediaUrl(magazine.logo) : null);
             setLogoFile(null);
             setKeepExistingLogo(true);
             setError(null);
