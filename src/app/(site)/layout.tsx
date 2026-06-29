@@ -21,6 +21,7 @@ export default function RootLayout({
 
             <nav className={styles.nav}>
               <Link href="/magazines" className={styles.navLink}>Revistas</Link>
+              <Link href="/publishers" className={styles.navLink}>Editoras</Link>
               <Link href="/people" className={styles.navLink}>Pessoas</Link>
               <Link href="/sections" className={styles.navLink}>Seções</Link>
               <Link href="/tags" className={styles.navLink}>Tags</Link>

@@ -56,12 +56,12 @@ export default function MagazineCard({ mag }: { mag: Magazine }) {
                         <h2 className="font-bold text-lg text-zinc-900 dark:text-white group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors truncate">
                             {mag.name}
                         </h2>
-                        {mag.publisher ? (
+                        {mag.publishers && mag.publishers.length > 0 ? (
                             <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold truncate">
-                                🏢 {mag.publisher}
+                                🏢 {mag.publishers.map(p => p.publisher.name).join(', ')}
                             </span>
                         ) : (
-                            <span className="text-xs text-zinc-400 dark:text-zinc-500 truncate">
+                            <span className="text-xs text-zinc-400 dark:text-zinc-550 truncate">
                                 Sem editora registrada
                             </span>
                         )}

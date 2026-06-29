@@ -1,10 +1,11 @@
 import { Tag } from "./tag";
+import { MagazinePublisher } from "./publisher";
 
 export type Magazine = {
     id?: number;
     name: string;
     slug: string;
-    publisher?: string;
+    publishers?: MagazinePublisher[];
     language?: string;
     country?: string;
     country_code?: string;

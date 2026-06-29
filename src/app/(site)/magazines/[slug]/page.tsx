@@ -261,9 +261,23 @@ function MagazineIssuesContent() {
                                                 </span>
                                             )}
                                         </h1>
-                                        {magazine.publisher && (
+                                        {magazine.publishers && magazine.publishers.length > 0 && (
                                             <span className="text-sm font-bold text-zinc-500 dark:text-zinc-400">
-                                                🏢 Editora: <span className="text-zinc-850 dark:text-zinc-300 font-semibold">{magazine.publisher}</span>
+                                                🏢 Editoras:{" "}
+                                                {magazine.publishers.map((mp, index) => {
+                                                    const dateRange = (mp.start_date || mp.end_date)
+                                                        ? ` (${mp.start_date ? new Date(mp.start_date).getFullYear() : '?'}-${mp.end_date ? new Date(mp.end_date).getFullYear() : 'Atualmente'})`
+                                                        : '';
+                                                    return (
+                                                        <span key={mp.publisher.id} className="text-zinc-800 dark:text-zinc-300 font-semibold">
+                                                            {index > 0 && ", "}
+                                                            <Link href={`/publishers/${mp.publisher.slug}`} className="hover:text-blue-500 dark:hover:text-blue-400 underline decoration-dotted transition-colors">
+                                                                {mp.publisher.name}
+                                                            </Link>
+                                                            <span className="text-xs font-normal text-zinc-400 dark:text-zinc-500">{dateRange}</span>
+                                                        </span>
+                                                    );
+                                                })}
                                             </span>
                                         )}
                                     </div>
