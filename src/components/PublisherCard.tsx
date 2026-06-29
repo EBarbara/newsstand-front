@@ -68,6 +68,17 @@ export default function PublisherCard({ publisher }: PublisherCardProps) {
                     </div>
                 </div>
 
+                {/* Description snippet if present */}
+                {publisher.description ? (
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 min-h-[2rem] leading-relaxed">
+                        {publisher.description}
+                    </p>
+                ) : (
+                    <p className="text-xs text-zinc-400 dark:text-zinc-550 italic line-clamp-2 min-h-[2rem]">
+                        Sem descrição disponível.
+                    </p>
+                )}
+
                 {/* Country/Website and Aliases */}
                 <div className="flex flex-wrap gap-1.5 mt-1">
                     {(flagUrl || publisher.country) && (

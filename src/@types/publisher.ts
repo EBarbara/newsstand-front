@@ -7,6 +7,7 @@ export interface Publisher {
     website?: string | null;
     logo?: string | null;
     aliases?: string[];
+    description?: string | null;
     slug: string;
 }
 

@@ -19,6 +19,7 @@ export default function PublisherModal({ isOpen, onClose, publisher, onSave }: P
     const [website, setWebsite] = useState("");
     const [aliases, setAliases] = useState<string[]>([]);
     const [aliasInput, setAliasInput] = useState("");
+    const [description, setDescription] = useState("");
 
     // Logo image state
     const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -36,6 +37,7 @@ export default function PublisherModal({ isOpen, onClose, publisher, onSave }: P
                 setCountry(publisher.country || "");
                 setWebsite(publisher.website || "");
                 setAliases(publisher.aliases || []);
+                setDescription(publisher.description || "");
                 setLogoPreview(publisher.logo ? getMediaUrl(publisher.logo) : null);
                 setKeepExistingLogo(true);
             } else {
@@ -44,6 +46,7 @@ export default function PublisherModal({ isOpen, onClose, publisher, onSave }: P
                 setCountry("");
                 setWebsite("");
                 setAliases([]);
+                setDescription("");
                 setLogoPreview(null);
                 setKeepExistingLogo(false);
             }
@@ -101,6 +104,7 @@ export default function PublisherModal({ isOpen, onClose, publisher, onSave }: P
             formData.append("country", country.trim());
             formData.append("website", website.trim());
             formData.append("aliases", JSON.stringify(aliases));
+            formData.append("description", description.trim());
 
             // Handle logo update
             if (logoFile) {
@@ -245,6 +249,20 @@ export default function PublisherModal({ isOpen, onClose, publisher, onSave }: P
                                 className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                             />
                         </div>
+                    </div>
+
+                    {/* Descrição */}
+                    <div>
+                        <label className="block text-xs uppercase font-extrabold tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">
+                            Descrição
+                        </label>
+                        <textarea
+                            placeholder="Descreva a história, relevância ou curiosidades sobre esta editora..."
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            rows={3}
+                            className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                        />
                     </div>
 
                     {/* Aliases (Tags inside Input) */}

@@ -152,6 +152,16 @@ function PublisherDetailContent({ slug }: { slug: string }) {
                             )}
                         </div>
 
+                        {publisher.description ? (
+                            <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-3xl leading-relaxed">
+                                {publisher.description}
+                            </p>
+                        ) : (
+                            <p className="text-sm text-zinc-450 dark:text-zinc-500 italic">
+                                Nenhuma descrição disponível. Clique em &quot;Editar Editora&quot; para adicionar informações sobre esta editora.
+                            </p>
+                        )}
+
                         {/* Aliases */}
                         {publisher.aliases && publisher.aliases.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 items-center mt-1">
