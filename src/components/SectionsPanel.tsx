@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { IssueEditorState } from "@/hooks/useIssueEditor";
-import { getPeople } from "@/lib/people";
+import { getPeople, createPerson } from "@/lib/people";
 import { Person } from "@/@types/person";
 import { getIssueUrl, getGlobalIssueSections } from "@/lib/issues";
 import TagEditor from "./TagEditor";
@@ -511,18 +511,46 @@ export default function SectionsPanel({
                                             className="flex-1 p-1 bg-[#252a33] border border-gray-700 rounded text-[10px] text-white"
                                         />
                                         <button
-                                            onClick={() => {
+                                            onClick={async () => {
+                                                const nameToUse = peopleSearch.trim();
                                                 if (selectedPersonId) {
                                                     addCreditToSection(s.id, selectedPersonId, newCreditRole, newCreditImportance);
                                                     setSelectedPersonId(null);
                                                     setNewCreditRole("");
                                                     setNewCreditImportance(2);
+                                                    setPeopleSearch("");
+                                                } else if (nameToUse) {
+                                                    const existingPerson = people.find(p => p.name.toLowerCase() === nameToUse.toLowerCase());
+                                                    if (existingPerson) {
+                                                        addCreditToSection(s.id, existingPerson.id, newCreditRole, newCreditImportance);
+                                                        setSelectedPersonId(null);
+                                                        setNewCreditRole("");
+                                                        setNewCreditImportance(2);
+                                                        setPeopleSearch("");
+                                                    } else {
+                                                        try {
+                                                            const created = await createPerson(nameToUse);
+                                                            setPeople(prev => [...prev, created]);
+                                                            addCreditToSection(s.id, created.id, newCreditRole, newCreditImportance);
+                                                            window.open(`/people/${created.id}`, '_blank');
+                                                            setSelectedPersonId(null);
+                                                            setNewCreditRole("");
+                                                            setNewCreditImportance(2);
+                                                            setPeopleSearch("");
+                                                        } catch (err) {
+                                                            console.error("Failed to create person:", err);
+                                                            alert("Erro ao criar pessoa no banco de dados.");
+                                                        }
+                                                    }
                                                 }
                                             }}
-                                            disabled={!selectedPersonId}
+                                            disabled={!selectedPersonId && !peopleSearch.trim()}
                                             className="px-2 bg-blue-600 text-white rounded text-[10px] hover:bg-blue-500 disabled:opacity-50"
                                         >
-                                            Adicionar
+                                            {!selectedPersonId && peopleSearch.trim() && !people.some(p => p.name.toLowerCase() === peopleSearch.trim().toLowerCase())
+                                                ? "Criar e Adicionar"
+                                                : "Adicionar"
+                                            }
                                         </button>
                                     </div>
                                 </div>
