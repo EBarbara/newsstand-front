@@ -1100,40 +1100,58 @@ function PersonPageContent({ id }: { id: string }) {
                                                                     </span>
                                                                 </Link>
 
-                                                                <div className="space-y-2">
+                                                                <div className="space-y-3">
                                                                     {group.items.sort((a: any, b: any) => (a.importance || 2) - (b.importance || 2)).map((item: any) => (
-                                                                        <Link
-                                                                            key={item.id}
-                                                                            href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
-                                                                            className="flex flex-wrap items-center gap-x-3 gap-y-1 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all group/item"
-                                                                        >
-                                                                            <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
-                                                                                {item.section_translated_title ? (
-                                                                                    <span>
-                                                                                        {item.section_title || "Sem título"}{" "}
-                                                                                        <span className="text-gray-400 font-normal text-sm">
-                                                                                            ({item.section_translated_title})
-                                                                                        </span>
+                                                                        <div key={item.id} className="flex flex-col gap-1.5 p-2 -mx-2 rounded-xl hover:bg-white/5 transition-all">
+                                                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 group/item">
+                                                                                <Link
+                                                                                    href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
+                                                                                    className="flex-1 flex flex-wrap items-center gap-x-3 gap-y-1"
+                                                                                >
+                                                                                    <h3 className={`font-semibold transition-colors ${item.importance === 1 ? "text-amber-400 group-hover/item:text-amber-300" : item.importance === 3 ? "text-gray-500 text-sm" : "text-gray-100 group-hover/item:text-blue-300"}`}>
+                                                                                        {item.section_translated_title ? (
+                                                                                            <span>
+                                                                                                {item.section_title || "Sem título"}{" "}
+                                                                                                <span className="text-gray-400 font-normal text-sm">
+                                                                                                    ({item.section_translated_title})
+                                                                                                </span>
+                                                                                            </span>
+                                                                                        ) : (
+                                                                                            item.section_title || item.section_type
+                                                                                        )}
+                                                                                        {item.age_at_issue && <span className="ml-2 text-xs font-normal text-gray-500">{item.age_at_issue}</span>}
+                                                                                    </h3>
+                                                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.importance === 1
+                                                                                            ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                                                                            : item.importance === 3
+                                                                                                ? "bg-gray-500/5 text-gray-500 border-gray-500/10"
+                                                                                                : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                                                                                        }`}>
+                                                                                        {item.role || (item.importance === 1 ? "Estrela" : item.importance === 3 ? "Citação" : "Colaborador")}
                                                                                     </span>
-                                                                                ) : (
-                                                                                    item.section_title || item.section_type
-                                                                                )}
-                                                                                {item.age_at_issue && <span className="ml-2 text-xs font-normal text-gray-500">{item.age_at_issue}</span>}
-                                                                            </h3>
-                                                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.importance === 1
-                                                                                    ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                                                                    : item.importance === 3
-                                                                                        ? "bg-gray-500/5 text-gray-500 border-gray-500/10"
-                                                                                        : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                                                                                }`}>
-                                                                                {item.role || (item.importance === 1 ? "Estrela" : item.importance === 3 ? "Citação" : "Colaborador")}
-                                                                            </span>
-                                                                            {item.start_page && (
-                                                                                <span className="ml-auto opacity-0 group-hover/item:opacity-100 text-[10px] font-bold text-blue-500 uppercase tracking-tighter transition-all translate-x-2 group-hover/item:translate-x-0">
-                                                                                    Ler Seção →
-                                                                                </span>
+                                                                                    {item.start_page && (
+                                                                                        <span className="ml-auto opacity-0 group-hover/item:opacity-100 text-[10px] font-bold text-blue-500 uppercase tracking-tighter transition-all translate-x-2 group-hover/item:translate-x-0">
+                                                                                            Ler Seção →
+                                                                                        </span>
+                                                                                    )}
+                                                                                </Link>
+                                                                            </div>
+                                                                            {item.republications && item.republications.length > 0 && (
+                                                                                <div className="flex flex-wrap items-center gap-2 mt-1.5 pl-4 text-xs text-gray-400">
+                                                                                    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Republicações/Traduções:</span>
+                                                                                    {item.republications.map((rep: any) => (
+                                                                                        <Link
+                                                                                            key={rep.id}
+                                                                                            href={rep.start_page ? `/reader/${rep.issue_id}?page=${rep.start_page}` : (rep.issue_volume ? `/magazines/${rep.magazine_slug}/${rep.issue_volume}/${rep.issue_edition}` : `/magazines/${rep.magazine_slug}/${rep.issue_edition}`)}
+                                                                                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-[11px] text-blue-400 hover:text-blue-300"
+                                                                                        >
+                                                                                            <span>{rep.magazine_name} {rep.issue_volume ? `Vol. ${rep.issue_volume} ` : ""}Ed. {rep.issue_edition?.replace("-", "/")}</span>
+                                                                                            {rep.role && <span className="text-[9px] text-gray-500">({rep.role})</span>}
+                                                                                        </Link>
+                                                                                    ))}
+                                                                                </div>
                                                                             )}
-                                                                        </Link>
+                                                                        </div>
                                                                     ))}
                                                                 </div>
                                                             </div>
@@ -1187,35 +1205,52 @@ function PersonPageContent({ id }: { id: string }) {
                                                                     Ver Edição →
                                                                 </Link>
                                                             </div>
-                                                            <div className="p-2 space-y-1">
+                                                            <div className="p-2 space-y-1.5">
                                                                 {group.items.map((item: any) => (
-                                                                    <Link
-                                                                        key={item.id}
-                                                                        href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
-                                                                        className="flex items-center justify-between text-sm text-gray-400 px-2 py-1 rounded-lg hover:bg-white/5 hover:text-blue-300 transition-all group/minor"
-                                                                    >
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span>
-                                                                                {item.section_translated_title ? (
+                                                                    <div key={item.id} className="flex flex-col gap-1 px-2 py-1 rounded-lg hover:bg-white/5 transition-all">
+                                                                        <div className="flex items-center justify-between text-sm text-gray-400 group/minor">
+                                                                            <Link
+                                                                                href={item.start_page ? `/reader/${item.issue_id}?page=${item.start_page}` : (item.issue_volume ? `/magazines/${item.magazine_slug}/${item.issue_volume}/${item.issue_edition}` : `/magazines/${item.magazine_slug}/${item.issue_edition}`)}
+                                                                                className="flex-1 flex items-center justify-between hover:text-blue-300 transition-colors"
+                                                                            >
+                                                                                <div className="flex items-center gap-2">
                                                                                     <span>
-                                                                                        {item.section_title || "Sem título"}{" "}
-                                                                                        <span className="text-gray-400 font-normal text-xs">
-                                                                                            ({item.section_translated_title})
-                                                                                        </span>
+                                                                                        {item.section_translated_title ? (
+                                                                                            <span>
+                                                                                                {item.section_title || "Sem título"}{" "}
+                                                                                                <span className="text-gray-400 font-normal text-xs">
+                                                                                                    ({item.section_translated_title})
+                                                                                                </span>
+                                                                                            </span>
+                                                                                        ) : (
+                                                                                            item.section_title || item.section_type
+                                                                                        )}
                                                                                     </span>
-                                                                                ) : (
-                                                                                    item.section_title || item.section_type
+                                                                                    {item.age_at_issue && <span className="text-[10px] text-gray-600">{item.age_at_issue}</span>}
+                                                                                    <span className="text-[9px] text-gray-600 uppercase tracking-tighter">({item.role || "Citação"})</span>
+                                                                                </div>
+                                                                                {item.start_page && (
+                                                                                    <span className="text-[9px] font-bold text-blue-500/50 group-hover/minor:text-blue-400 opacity-0 group-hover/minor:opacity-100 transition-opacity">
+                                                                                        P.{item.start_page} ↗
+                                                                                    </span>
                                                                                 )}
-                                                                            </span>
-                                                                            {item.age_at_issue && <span className="text-[10px] text-gray-600">{item.age_at_issue}</span>}
-                                                                            <span className="text-[9px] text-gray-600 uppercase tracking-tighter">({item.role || "Citação"})</span>
+                                                                            </Link>
                                                                         </div>
-                                                                        {item.start_page && (
-                                                                            <span className="text-[9px] font-bold text-blue-500/50 group-hover/minor:text-blue-400 opacity-0 group-hover/minor:opacity-100 transition-opacity">
-                                                                                P.{item.start_page} ↗
-                                                                            </span>
+                                                                        {item.republications && item.republications.length > 0 && (
+                                                                            <div className="flex flex-wrap items-center gap-1.5 mt-1 pl-2 text-[11px] text-gray-500">
+                                                                                <span className="text-[9px] font-medium text-gray-600 uppercase tracking-wider">Refs:</span>
+                                                                                {item.republications.map((rep: any) => (
+                                                                                    <Link
+                                                                                        key={rep.id}
+                                                                                        href={rep.start_page ? `/reader/${rep.issue_id}?page=${rep.start_page}` : (rep.issue_volume ? `/magazines/${rep.magazine_slug}/${rep.issue_volume}/${rep.issue_edition}` : `/magazines/${rep.magazine_slug}/${rep.issue_edition}`)}
+                                                                                        className="hover:text-blue-400 transition-colors bg-white/5 border border-white/5 px-1.5 py-0.5 rounded text-[10px]"
+                                                                                    >
+                                                                                        {rep.magazine_name} Ed. {rep.issue_edition?.replace("-", "/")}
+                                                                                    </Link>
+                                                                                ))}
+                                                                            </div>
                                                                         )}
-                                                                    </Link>
+                                                                    </div>
                                                                 ))}
                                                             </div>
                                                         </div>

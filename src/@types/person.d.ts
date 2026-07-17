@@ -58,6 +58,8 @@ export interface PersonCredit {
     start_page?: number | null;
     render_ids?: number[];
     age_at_issue?: string | null;
+    issue_section_id: number;
+    republications?: any[];
 }
 
 export { type PaginatedResponse };
