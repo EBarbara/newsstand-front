@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, use, useRef, useMemo } from "react";
-import { getPersonDetail, updatePerson, getPersonCredits } from "@/lib/people";
+import { getPersonDetail, updatePerson, getPersonCredits, deletePerson } from "@/lib/people";
 import { notFound, useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getMediaUrl } from "@/lib/issues";
@@ -365,6 +365,22 @@ function PersonPageContent({ id }: { id: string }) {
         }
     };
 
+    const handleDelete = async () => {
+        if (!person) return;
+        if (!confirm(`Deseja realmente excluir permanentemente a pessoa ${person.name}? Esta ação não pode ser desfeita e removerá seus créditos em edições.`)) {
+            return;
+        }
+
+        try {
+            await deletePerson(person.id);
+            router.push("/people");
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to delete person:", error);
+            alert("Erro ao excluir pessoa.");
+        }
+    };
+
     const addLink = () => {
         setEditLinks([...editLinks, { url: "", label: "" }]);
     };
@@ -493,12 +509,20 @@ function PersonPageContent({ id }: { id: string }) {
 
             <div className="flex justify-end mb-6">
                 {!isEditing ? (
-                    <button
-                        onClick={() => setIsEditing(true)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-colors"
-                    >
-                        Editar Perfil
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition-colors"
+                        >
+                            Editar Perfil
+                        </button>
+                        <button
+                            onClick={handleDelete}
+                            className="flex items-center gap-2 bg-red-600/15 hover:bg-red-650 text-red-500 hover:text-white border border-red-500/30 hover:border-transparent px-4 py-2 rounded-lg transition-all font-bold text-sm"
+                        >
+                            <span>🗑️</span> Excluir Pessoa
+                        </button>
+                    </div>
                 ) : (
                     <div className="flex gap-2">
                         <button
